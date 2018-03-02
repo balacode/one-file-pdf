@@ -112,8 +112,10 @@ package pdf
 //
 // # Private Functions
 //   (*PDF) colorEqual(a, b PDFColor) bool
+//   (*PDF) err(a ...interface{})
 //   (*PDF) escape(s string) []byte
 //   (*PDF) getPointsPerUnit(unitName string) float64
+//   (*PDF) isWhiteSpace(s string) bool
 
 import "bytes"         // standard
 import "compress/zlib" // standard
@@ -1925,23 +1927,6 @@ func (*PDF) escape(s string) []byte {
 	return []byte(s)
 } //                                                                      escape
 
-// isWhiteSpace returns true if all the
-// characters in a string are white-spaces.
-func (*PDF) isWhiteSpace(s string) bool {
-	if s == "" {
-		return false
-	}
-	for _, ch := range s {
-		if ch != ' ' && ch != '\a' &&
-			ch != '\b' && ch != '\f' &&
-			ch != '\n' && ch != '\r' &&
-			ch != '\t' && ch != '\v' {
-			return false
-		}
-	}
-	return true
-} //                                                                isWhiteSpace
-
 // getPointsPerUnit returns the number of points
 // per a named unit of measurement.
 // called by: SetUnits(), ToPoints()
@@ -1960,5 +1945,22 @@ func (*PDF) getPointsPerUnit(unitName string) float64 {
 	}
 	return 0
 } //                                                            getPointsPerUnit
+
+// isWhiteSpace returns true if all the
+// characters in a string are white-spaces.
+func (*PDF) isWhiteSpace(s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, ch := range s {
+		if ch != ' ' && ch != '\a' &&
+			ch != '\b' && ch != '\f' &&
+			ch != '\n' && ch != '\r' &&
+			ch != '\t' && ch != '\v' {
+			return false
+		}
+	}
+	return true
+} //                                                                isWhiteSpace
 
 //end
