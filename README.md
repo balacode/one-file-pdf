@@ -11,13 +11,13 @@ The result is a single .go file with less than 1999 lines of code.
 - You can just drop the one_file_pdf.go file in your Go project. No need to manage dependencies. (But remember to change the package to 'main' or whatever package you are adding it to.)
 - The current version of the file is indicated in the header (the timestamp).
 
-**Supported Features (i.e. the fundamentals):**
+**Supported Features (the fundamentals):**
 - You can use all built-in PDF fonts: Courier, Helvetica, Symbol, Times, ZapfDingbats, and their variants
 - Draw lines with different thickness
 - Draw filled or outline rectangles
 - Draw grayscale PNG images
 
-**Not Supported (i.e. everything else):**
+**Not Supported (everything else):**
 - Unicode (requires font embedding)
 - Font embedding
 - PDF encryption
