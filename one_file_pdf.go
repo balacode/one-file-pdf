@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-02 16:29:05 91A3AC                              [one_file_pdf.go]
+// :v: 2018-03-02 16:44:08 4021D0                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -111,9 +111,9 @@ package pdf
 //   (pdf *PDF) warnIfNoPage() bool
 //
 // # Private Functions
-//   (_ *PDF) colorEqual(a, b PDFColor) bool
-//   (_ *PDF) escape(s string) []byte
-//   (_ *PDF) getPointsPerUnit(unitName string) float64
+//   (*PDF) colorEqual(a, b PDFColor) bool
+//   (*PDF) escape(s string) []byte
+//   (*PDF) getPointsPerUnit(unitName string) float64
 
 import "bytes"         // standard
 import "compress/zlib" // standard
@@ -1556,7 +1556,7 @@ func (pdf *PDF) WrapTextLines(width float64, text string) []string {
 // ToPoints converts a string composed of a number and unit
 // to points. For example '1 cm' or '1cm' becomes 28.346 points.
 //
-// Recongised units are:
+// Recognised units are:
 // mm cm " in inch inches tw twip twips pt point points
 func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
 	numberAndUnit = strings.ToUpper(
@@ -1685,7 +1685,6 @@ func (pdf *PDF) drawTextLine(text string) *PDF {
 			font.isBuiltIn = true
 			font.isBold = false
 			font.isItalic = false
-			isValid = true
 		}
 		// has the font been added to the global list? If not, add it:
 		for _, iter := range pdf.fonts {
@@ -1897,24 +1896,23 @@ func (pdf *PDF) streamData(content []byte) {
 // colorEqual compares two PDFColor values
 // and returns true if they are equal.
 //
-// called by: applyNonStrokeColor(),
-//            applyStrokeColor()
-func (_ *PDF) colorEqual(a, b PDFColor) bool {
+// called by: applyNonStrokeColor(), applyStrokeColor()
+func (*PDF) colorEqual(a, b PDFColor) bool {
 	return a.Red == b.Red && a.Green == b.Green && a.Blue == b.Blue
 } //                                                                  colorEqual
 
 // err reports an error
-func (_ *PDF) err(a ...interface{}) {
+func (*PDF) err(a ...interface{}) {
 	fmt.Println(a)
 } //                                                                         err
 
 // escape escapes special characters '(', '(' and '\' in strings
 // in order to avoid them interfering with PDF commands.
 // called by: Bytes(), drawTextLine()
-func (_ *PDF) escape(s string) []byte {
-	if strings.Contains(s, "(") ||
-		strings.Contains(s, ")") ||
+func (*PDF) escape(s string) []byte {
+	if strings.Contains(s, "(") || strings.Contains(s, ")") ||
 		strings.Contains(s, "\\") {
+		//
 		var writer = bytes.NewBuffer(make([]byte, 0, len(s)))
 		for _, r := range s {
 			if r == '(' || r == ')' || r == '\\' {
@@ -1929,7 +1927,7 @@ func (_ *PDF) escape(s string) []byte {
 
 // isWhiteSpace returns true if all the
 // characters in a string are white-spaces.
-func (_ *PDF) isWhiteSpace(s string) bool {
+func (*PDF) isWhiteSpace(s string) bool {
 	if s == "" {
 		return false
 	}
@@ -1947,7 +1945,7 @@ func (_ *PDF) isWhiteSpace(s string) bool {
 // getPointsPerUnit returns the number of points
 // per a named unit of measurement.
 // called by: SetUnits(), ToPoints()
-func (_ *PDF) getPointsPerUnit(unitName string) float64 {
+func (*PDF) getPointsPerUnit(unitName string) float64 {
 	switch strings.Trim(strings.ToUpper(unitName), " \a\b\f\n\r\t\v") {
 	case "MM":
 		return 2.83464566929134 // 1 inch / 25.4mm per inch * 72 points per in.
