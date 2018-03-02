@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-03 00:41:38 545B1B                              [one_file_pdf.go]
+// :v: 2018-03-03 00:43:06 5B397D                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -25,9 +25,6 @@ package pdf
 //
 // # Constructor
 //   NewPDF(pageSize string) PDF
-//
-// # Destructor
-//   (pdf *PDF) Reset() *PDF
 //
 // # Read-Only Properties
 //   (pdf *PDF) CurrentPage() int
@@ -88,6 +85,7 @@ package pdf
 //   (pdf *PDF) DrawUnitGrid() *PDF
 //   (pdf *PDF) FillBox(x, y, width, height float64) *PDF
 //   (pdf *PDF) NextLine() *PDF
+//   (pdf *PDF) Reset() *PDF
 //   (pdf *PDF) SaveFile(filename string) *PDF
 //   (pdf *PDF) SetColumnWidths(widths ...float64) *PDF
 //   (pdf *PDF) TextWidth(text string) float64
@@ -715,26 +713,6 @@ func NewPDF(pageSize string) PDF {
 	pdf.SetUnits("point")
 	return pdf
 } //                                                                      NewPDF
-
-// -----------------------------------------------------------------------------
-// # Destructor
-
-// Reset releases all resources and resets all variables.
-func (pdf *PDF) Reset() *PDF {
-	for _, page := range pdf.pages {
-		page.fontIDs = []int{}
-		page.imageNos = []int{}
-		page.pageContent.Reset()
-	}
-	pdf.docAuthor, pdf.docCreator, pdf.docKeywords = "", "", ""
-	pdf.docSubject, pdf.docTitle, pdf.unitName = "", "", ""
-	pdf.pages = []PDFPage{}
-	pdf.fonts = []PDFFont{}
-	pdf.images = []PDFImage{}
-	pdf.columnWidths = []float64{}
-	pdf.content.Reset()
-	return pdf
-} //                                                                       Reset
 
 // -----------------------------------------------------------------------------
 // # Read-Only Properties
@@ -1442,6 +1420,23 @@ func (pdf *PDF) NextLine() *PDF {
 	pdf.SetXY(x, y)
 	return pdf
 } //                                                                    NextLine
+
+// Reset releases all resources and resets all variables.
+func (pdf *PDF) Reset() *PDF {
+	for _, page := range pdf.pages {
+		page.fontIDs = []int{}
+		page.imageNos = []int{}
+		page.pageContent.Reset()
+	}
+	pdf.docAuthor, pdf.docCreator, pdf.docKeywords = "", "", ""
+	pdf.docSubject, pdf.docTitle, pdf.unitName = "", "", ""
+	pdf.pages = []PDFPage{}
+	pdf.fonts = []PDFFont{}
+	pdf.images = []PDFImage{}
+	pdf.columnWidths = []float64{}
+	pdf.content.Reset()
+	return pdf
+} //                                                                       Reset
 
 // SaveFile generates and saves the PDF document to a file.
 func (pdf *PDF) SaveFile(filename string) *PDF {
