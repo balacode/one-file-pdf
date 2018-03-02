@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-02 14:48:15 7158BE                              [one_file_pdf.go]
+// :v: 2018-03-02 16:29:05 91A3AC                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1081,7 +1081,7 @@ func (pdf *PDF) Bytes() []byte {
 		pdf.streamData(content)
 	}
 	var endobj = func() {
-		pdf.printf(">>" + "\n" + "endobj" + "\n")
+		pdf.printf(">>\nendobj\n")
 	}
 	// free any existing generated content and write beginning of document
 	var pageObjectsIndex = 3
@@ -1090,7 +1090,7 @@ func (pdf *PDF) Bytes() []byte {
 	var infoObjectIndex = imageObjectsIndex + len(pdf.images)
 	pdf.setCurrentPage(PDFNoPage)
 	pdf.content.Reset()
-	pdf.printf("%" + "%" + "P" + "D" + "F" + "-" + "1" + "." + "4" + "\n")
+	pdf.printf("%%PDF-1.4\n")
 	obj("/Catalog")
 	pdf.printf("/Pages 2 0 R")
 	endobj()
@@ -1118,7 +1118,7 @@ func (pdf *PDF) Bytes() []byte {
 	// write each page
 	for _, pg := range pdf.pages {
 		if pg.pageContent.Len() == 0 {
-			fmt.Printf("WARNING: Empty Page" + "\n")
+			fmt.Printf("WARNING: Empty Page\n")
 			continue
 		}
 		obj("/Page")
@@ -1165,7 +1165,7 @@ func (pdf *PDF) Bytes() []byte {
 			iter.width, iter.height,
 		)
 		pdf.streamData(iter.data)
-		pdf.printf("\n" + "endobj" + "\n")
+		pdf.printf("\nendobj\n")
 	}
 	// write info object
 	if pdf.docTitle != "" || pdf.docSubject != "" ||
@@ -1190,18 +1190,17 @@ func (pdf *PDF) Bytes() []byte {
 	// write cross-reference table at end of document
 	var startXref = pdf.content.Len()
 	pdf.setCurrentPage(PDFNoPage).
-		printf("xref"+"\n"+"0 %d"+"\n"+"0000000000 65535 f "+"\n",
+		printf("xref\n0 %d\n0000000000 65535 f \n",
 			len(objectOffsets))
 	for _, offset := range objectOffsets[1:] {
-		pdf.printf("%010d 00000 n "+"\n", offset)
+		pdf.printf("%010d 00000 n \n", offset)
 	}
 	// write the trailer
-	pdf.printf("trailer"+"\n"+"<</Size %d/Root 1 0 R", len(objectOffsets))
+	pdf.printf("trailer\n<</Size %d/Root 1 0 R", len(objectOffsets))
 	if infoObjectIndex > 0 {
 		pdf.printf("/Info %d 0 R", infoObjectIndex)
 	}
-	pdf.printf(">>"+"\n"+"startxref"+"\n"+"%d"+"\n", startXref).
-		printf("%" + "%" + "%" + "%" + "E" + "O" + "F" + "\n")
+	pdf.printf(">>\nstartxref\n%d\n", startXref).printf("%%%%EOF\n")
 	return pdf.content.Bytes()
 } //                                                                       Bytes
 
@@ -1215,7 +1214,7 @@ func (pdf *PDF) DrawBox(x, y, width, height float64) *PDF {
 	y = pdf.pageHeightPt - y - height
 	pdf.applyLineWidth().applyStrokeColor()
 	// re = construct a rectangular path, S = stroke path
-	pdf.printf("%.3f %.3f %.3f %.3f re S"+"\n", x, y, width, height)
+	pdf.printf("%.3f %.3f %.3f %.3f re S\n", x, y, width, height)
 	return pdf
 } //                                                                     DrawBox
 
@@ -1258,7 +1257,7 @@ func (pdf *PDF) DrawImage(
 	if imgNo == -1 {
 		var decoded, _, err = image.Decode(imageBuf)
 		if err != nil {
-			fmt.Printf("image not decoded: %v"+"\n", err)
+			fmt.Printf("image not decoded: %v\n", err)
 			return pdf
 		}
 		var bounds = decoded.Bounds()
@@ -1299,11 +1298,11 @@ func (pdf *PDF) DrawImage(
 	var width = float64(img.width) / float64(img.height) * height
 	//
 	// write command to draw the image
-	pdf.printf("q"+"\n"+ // save graphics state
+	pdf.printf("q\n"+ // save graphics state
 		// w      h  x  y
-		" %f 0 0 %f %f %f cm"+"\n"+
-		"/Im%d Do"+"\n"+
-		"Q"+"\n", // restore graphics state
+		" %f 0 0 %f %f %f cm\n"+
+		"/Im%d Do\n"+
+		"Q\n", // restore graphics state
 		width, height, x, y, imgNo)
 	return pdf
 } //                                                                   DrawImage
@@ -1319,7 +1318,7 @@ func (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF {
 	pdf.applyLineWidth().applyStrokeColor()
 	//
 	// send command to draw the line
-	pdf.printf("%.3f %.3f m %.3f %.3f l S"+"\n", x1, y1, x2, y2)
+	pdf.printf("%.3f %.3f m %.3f %.3f l S\n", x1, y1, x2, y2)
 	return pdf
 } //                                                                    DrawLine
 
@@ -1427,7 +1426,7 @@ func (pdf *PDF) FillBox(x, y, width, height float64) *PDF {
 		width*pdf.pointsPerUnit, height*pdf.pointsPerUnit
 	y = pdf.pageHeightPt - y - height
 	pdf.applyLineWidth().applyNonStrokeColor().
-		printf("%.3f %.3f %.3f %.3f re f"+"\n", x, y, width, height)
+		printf("%.3f %.3f %.3f %.3f re f\n", x, y, width, height)
 	// 're' = construct a rectangular path, f = fill
 	return pdf
 } //                                                                     FillBox
@@ -1599,7 +1598,7 @@ func (pdf *PDF) applyLineWidth() *PDF {
 	var val = &pdf.pagePtr.lineWidth
 	if int(*val*10000) != int(pdf.lineWidth*10000) {
 		*val = pdf.lineWidth
-		pdf.printf("%.3f w"+"\n", float64(*val))
+		pdf.printf("%.3f w\n", float64(*val))
 	}
 	return pdf
 } //                                                              applyLineWidth
@@ -1612,7 +1611,7 @@ func (pdf *PDF) applyNonStrokeColor() *PDF {
 	if !pdf.colorEqual(*val, pdf.color) {
 		*val = pdf.color
 		pdf.printf(
-			"%.3f %.3f %.3f rg"+"\n", // non-stroking (text) color
+			"%.3f %.3f %.3f rg\n", // non-stroking (text) color
 			float64((*val).Red)/255,
 			float64((*val).Green)/255,
 			float64((*val).Blue)/255,
@@ -1630,7 +1629,7 @@ func (pdf *PDF) applyStrokeColor() *PDF {
 	if !pdf.colorEqual(*val, pdf.color) {
 		*val = pdf.color
 		pdf.printf(
-			"%.3f %.3f %.3f RG"+"\n", // RG - stroke (line) color
+			"%.3f %.3f %.3f RG\n", // RG - stroke (line) color
 			float64((*val).Red)/255,
 			float64((*val).Green)/255,
 			float64((*val).Blue)/255,
@@ -1718,13 +1717,13 @@ func (pdf *PDF) drawTextLine(text string) *PDF {
 		}
 		pg.fontID = font.fontID
 		pg.fontSizePt = pdf.fontSizePt
-		pdf.printf("BT /F%d %d Tf ET"+"\n", pg.fontID, int(pg.fontSizePt))
+		pdf.printf("BT /F%d %d Tf ET\n", pg.fontID, int(pg.fontSizePt))
 	}
 	// applyHorizontalScaling sets the horizontal text scaling
 	var applyHorizontalScaling = func() {
 		if pdf.pagePtr.horizontalScaling != pdf.horizontalScaling {
 			pdf.pagePtr.horizontalScaling = pdf.horizontalScaling
-			pdf.printf("BT %d Tz ET"+"\n", pdf.pagePtr.horizontalScaling)
+			pdf.printf("BT %d Tz ET\n", pdf.pagePtr.horizontalScaling)
 		}
 	}
 	// draw the text:
@@ -1735,7 +1734,7 @@ func (pdf *PDF) drawTextLine(text string) *PDF {
 	if pg.x < 0 || pg.y < 0 {
 		pdf.SetXY(0, 0)
 	}
-	pdf.printf("BT %d %d Td (%s) Tj ET"+"\n",
+	pdf.printf("BT %d %d Td (%s) Tj ET\n",
 		int(pg.x), int(pg.y), pdf.escape(text))
 	pg.x += pdf.textWidthPt1000(text)
 	return pdf
@@ -1888,7 +1887,7 @@ func (pdf *PDF) streamData(content []byte) {
 		writer.Close()
 		content = buf.Bytes()
 	}
-	pdf.printf("%s/Length %d>>stream"+"\n"+"%s"+"\n"+"endstream"+"\n",
+	pdf.printf("%s/Length %d>>stream\n%s\nendstream\n",
 		filter, len(content), content)
 } //                                                                  streamData
 
