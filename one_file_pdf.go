@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-02 14:10:22 75156B                           [zr/one_file_pdf.go]
+// :v: 2018-03-02 14:41:14 48FB5A                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -75,16 +75,16 @@ package pdf
 //   (pdf *PDF) DrawBox(x, y, width, height float64) *PDF
 //   (pdf *PDF) DrawImage(
 //                 x, y, height float64, fileNameOrBytes interface{},
-//             ) *PDF
+//              ) *PDF
 //   (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF
 //   (pdf *PDF) DrawText(text string) *PDF
 //   (pdf *PDF) DrawTextAlignedToBox(
 //                 x, y, width, height float64, align, text string,
-//             ) *PDF
+//              ) *PDF
 //   (pdf *PDF) DrawTextAt(x, y float64, text string) *PDF
 //   (pdf *PDF) DrawTextInBox(
 //                 x, y, width, height float64, align, text string,
-//             ) *PDF
+//              ) *PDF
 //   (pdf *PDF) DrawUnitGrid() *PDF
 //   (pdf *PDF) FillBox(x, y, width, height float64) *PDF
 //   (pdf *PDF) NextLine() *PDF
@@ -111,7 +111,7 @@ package pdf
 //   (pdf *PDF) warnIfNoPage() bool
 //
 // # Private Functions
-//   colorEqual(colorA, colorB PDFColor) bool
+//   (_ *PDF) colorEqual(a, b PDFColor) bool
 //   (_ *PDF) escape(s string) []byte
 //   (_ *PDF) getPointsPerUnit(unitName string) float64
 
@@ -140,22 +140,22 @@ type PDF struct {
 	pageSize          PDFPageSize
 	pageNo            int
 	pagePtr           *PDFPage
+	columnNo          int
 	color             PDFColor
 	fontName          string
 	fontSizePt        float64
 	lineWidth         float64
 	horizontalScaling uint16
-	compressStreams   bool
+	compressStreams   bool // enable stream compression?
 	content           bytes.Buffer
 	contentPtr        *bytes.Buffer
 	//
 	// extra features
-	pointsPerUnit float64
-	unitName      string
-	pageWidthPt   float64
-	pageHeightPt  float64
+	unitName      string  // name of measurement unit
+	pointsPerUnit float64 // number of points per measurement unit
+	pageWidthPt   float64 // page width in points
+	pageHeightPt  float64 // page height in points
 	columnWidths  []float64
-	column        int
 } //                                                                         PDF
 
 // PDFColor represents a color value.
