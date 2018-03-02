@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-03 00:36:32 6C51A7                              [one_file_pdf.go]
+// :v: 2018-03-03 00:41:38 545B1B                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -722,31 +722,17 @@ func NewPDF(pageSize string) PDF {
 // Reset releases all resources and resets all variables.
 func (pdf *PDF) Reset() *PDF {
 	for _, page := range pdf.pages {
-		if len(page.fontIDs) > 0 {
-			page.fontIDs = []int{}
-		}
-		if len(page.imageNos) > 0 {
-			page.imageNos = []int{}
-		}
-		if page.pageContent.Len() > 0 {
-			page.pageContent.Reset()
-		}
+		page.fontIDs = []int{}
+		page.imageNos = []int{}
+		page.pageContent.Reset()
 	}
-	if len(pdf.pages) > 0 {
-		pdf.pages = []PDFPage{}
-	}
-	if len(pdf.fonts) > 0 {
-		pdf.fonts = []PDFFont{}
-	}
-	if len(pdf.images) > 0 {
-		pdf.images = []PDFImage{}
-	}
+	pdf.docAuthor, pdf.docCreator, pdf.docKeywords = "", "", ""
+	pdf.docSubject, pdf.docTitle, pdf.unitName = "", "", ""
+	pdf.pages = []PDFPage{}
+	pdf.fonts = []PDFFont{}
+	pdf.images = []PDFImage{}
+	pdf.columnWidths = []float64{}
 	pdf.content.Reset()
-	pdf.docAuthor, pdf.docCreator, pdf.docKeywords, pdf.docSubject,
-		pdf.docTitle, pdf.unitName = "", "", "", "", "", ""
-	if len(pdf.columnWidths) > 0 {
-		pdf.columnWidths = []float64{}
-	}
 	return pdf
 } //                                                                       Reset
 
