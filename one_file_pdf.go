@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-02 17:11:33 350D9A                              [one_file_pdf.go]
+// :v: 2018-03-03 00:36:32 6C51A7                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -97,6 +97,7 @@ package pdf
 //   (pdf *PDF) ToPoints(numberAndUnit string) float64
 //
 // # Private Methods
+//   (pdf *PDF) applyFont()
 //   (pdf *PDF) applyLineWidth() *PDF
 //   (pdf *PDF) applyNonStrokeColor() *PDF
 //   (pdf *PDF) applyStrokeColor() *PDF
@@ -1226,7 +1227,6 @@ func (pdf *PDF) DrawImage(
 	x, y, height float64,
 	fileNameOrBytes interface{},
 ) *PDF {
-	//
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
@@ -1584,6 +1584,82 @@ func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
 // -----------------------------------------------------------------------------
 // # Private Methods
 
+// applyFont writes a font change command, provided the font has
+// been changed since the last operation that uses fonts.
+//
+// This should be called just before a font needs to be used.
+// This way, if a font is picked with SetFontName() property, but
+// never used to draw text, no font selection command is output.
+//
+// Before calling this method, the font name must be already
+// set by SetFontName(), which is stored in pdf.font.fontName
+//
+// What this method does:
+// - Validates the current font name and determines if it is a
+//   standard (built-in) font like Helvetica or a TrueType font.
+// - Fills the document-wide list of fonts (pdf.fonts).
+// - Adds items to the list of font ID's used on the current page.
+//
+// called by drawTextLine()
+func (pdf *PDF) applyFont() {
+	var isValid = pdf.fontName != ""
+	var font PDFFont
+	if isValid {
+		isValid = false
+		for i, name := range PDFBuiltInFontNames {
+			name = strings.ToUpper(name)
+			if strings.ToUpper(pdf.fontName) != name {
+				continue
+			}
+			font.fontName = PDFBuiltInFontNames[i]
+			font.isBuiltIn = true
+			font.isBold = strings.Contains(name, "BOLD")
+			font.isItalic = strings.Contains(name, "OBLIQUE") ||
+				strings.Contains(name, "ITALIC")
+			isValid = true
+			break
+		}
+	}
+	// if there is no selected font or it's invalid, use Helvetica
+	if !isValid {
+		font.fontName = "Helvetica"
+		font.isBuiltIn = true
+		font.isBold = false
+		font.isItalic = false
+	}
+	// has the font been added to the global list? If not, add it:
+	for _, iter := range pdf.fonts {
+		if font.fontName == iter.fontName {
+			font.fontID = iter.fontID
+			break
+		}
+	}
+	if font.fontID == 0 {
+		font.fontID = 1 + len(pdf.fonts)
+		pdf.fonts = append(pdf.fonts, font)
+	}
+	var pg = pdf.pagePtr
+	if pg.fontID == font.fontID &&
+		(int(pg.fontSizePt*1000) == int(pdf.fontSizePt)*1000) {
+		return
+	}
+	// add the font ID to the current page, if not already referenced
+	var alreadyUsedOnPage bool
+	for _, id := range pg.fontIDs {
+		if id == font.fontID {
+			alreadyUsedOnPage = true
+			break
+		}
+	}
+	if !alreadyUsedOnPage {
+		pg.fontIDs = append(pg.fontIDs, 0)
+		pg.fontIDs[len(pg.fontIDs)-1] = font.fontID
+	}
+	pg.fontID = font.fontID
+	pg.fontSizePt = pdf.fontSizePt
+	pdf.printf("BT /F%d %d Tf ET\n", pg.fontID, int(pg.fontSizePt))
+} //                                                                   applyFont
+
 // applyLineWidth writes a line-width PDF command ('w') to the current
 // page's content stream, if the value changed since last call.
 // called by: DrawBox(), DrawLine(), FillBox()
@@ -1638,79 +1714,6 @@ func (pdf *PDF) drawTextLine(text string) *PDF {
 	if text == "" {
 		return pdf
 	}
-	// applyFont writes a font change command, provided the font has
-	// been changed since the last operation that uses fonts.
-	//
-	// This should be called just before a font needs to be used.
-	// This way, if a font is picked with SetFontName() property, but
-	// never used to draw text, no font selection command is output.
-	//
-	// Before calling this method, the font name must be already
-	// set by SetFontName(), which is stored in pdf.font.fontName
-	//
-	// What this function does:
-	// - Validates the current font name and determines if it is a
-	//   standard (built-in) font like Helvetica or a TrueType font.
-	// - Fills the document-wide list of fonts (pdf.fonts).
-	// - Adds items to the list of font ID's used on the current page.
-	var applyFont = func() {
-		var isValid = pdf.fontName != ""
-		var font PDFFont
-		if isValid {
-			isValid = false
-			for i, name := range PDFBuiltInFontNames {
-				name = strings.ToUpper(name)
-				if strings.ToUpper(pdf.fontName) != name {
-					continue
-				}
-				font.fontName = PDFBuiltInFontNames[i]
-				font.isBuiltIn = true
-				font.isBold = strings.Contains(name, "BOLD")
-				font.isItalic = strings.Contains(name, "OBLIQUE") ||
-					strings.Contains(name, "ITALIC")
-				isValid = true
-				break
-			}
-		}
-		// if there is no selected font or it's invalid, use Helvetica
-		if !isValid {
-			font.fontName = "Helvetica"
-			font.isBuiltIn = true
-			font.isBold = false
-			font.isItalic = false
-		}
-		// has the font been added to the global list? If not, add it:
-		for _, iter := range pdf.fonts {
-			if font.fontName == iter.fontName {
-				font.fontID = iter.fontID
-				break
-			}
-		}
-		if font.fontID == 0 {
-			font.fontID = 1 + len(pdf.fonts)
-			pdf.fonts = append(pdf.fonts, font)
-		}
-		var pg = pdf.pagePtr
-		if pg.fontID == font.fontID &&
-			(int(pg.fontSizePt*1000) == int(pdf.fontSizePt)*1000) {
-			return
-		}
-		// add the font ID to the current page, if not already referenced
-		var alreadyUsedOnPage bool
-		for _, id := range pg.fontIDs {
-			if id == font.fontID {
-				alreadyUsedOnPage = true
-				break
-			}
-		}
-		if !alreadyUsedOnPage {
-			pg.fontIDs = append(pg.fontIDs, 0)
-			pg.fontIDs[len(pg.fontIDs)-1] = font.fontID
-		}
-		pg.fontID = font.fontID
-		pg.fontSizePt = pdf.fontSizePt
-		pdf.printf("BT /F%d %d Tf ET\n", pg.fontID, int(pg.fontSizePt))
-	}
 	// applyHorizontalScaling sets the horizontal text scaling
 	var applyHorizontalScaling = func() {
 		if pdf.pagePtr.horizontalScaling != pdf.horizontalScaling {
@@ -1719,7 +1722,7 @@ func (pdf *PDF) drawTextLine(text string) *PDF {
 		}
 	}
 	// draw the text:
-	applyFont()
+	pdf.applyFont()
 	applyHorizontalScaling()
 	pdf.applyNonStrokeColor()
 	var pg = pdf.pagePtr
