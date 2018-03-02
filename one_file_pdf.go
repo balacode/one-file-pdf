@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-02 14:41:14 48FB5A                              [one_file_pdf.go]
+// :v: 2018-03-02 14:48:15 7158BE                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -104,7 +104,7 @@ package pdf
 //   (pdf *PDF) drawTextBox(
 //                 x, y, width, height float64,
 //                 wrapText bool, align, text string,
-//             ) *PDF
+//              ) *PDF
 //   (pdf *PDF) printf(format string, args ...interface{}) *PDF
 //   (pdf *PDF) setCurrentPage(pageNo int) *PDF
 //   (pdf *PDF) textWidthPt1000(text string) float64
@@ -1333,15 +1333,15 @@ func (pdf *PDF) DrawText(text string) *PDF {
 		return pdf
 	}
 	var x = 0.0
-	for i := 0; i < pdf.column; i++ {
+	for i := 0; i < pdf.columnNo; i++ {
 		x += pdf.columnWidths[i]
 	}
 	pdf.SetX(x)
 	pdf.drawTextLine(text)
-	if pdf.column == (len(pdf.columnWidths) - 1) {
+	if pdf.columnNo == (len(pdf.columnWidths) - 1) {
 		pdf.NextLine()
 	} else {
-		pdf.column++
+		pdf.columnNo++
 	}
 	return pdf
 } //                                                                    DrawText
@@ -1445,7 +1445,7 @@ func (pdf *PDF) NextLine() *PDF {
 		pdf.AddPage()
 		y = 0
 	}
-	pdf.column = 0
+	pdf.columnNo = 0
 	if len(pdf.columnWidths) == 0 {
 		x = 0
 	} else {
