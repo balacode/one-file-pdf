@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-02 16:44:08 4021D0                              [one_file_pdf.go]
+// :v: 2018-03-02 17:11:33 350D9A                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -116,6 +116,7 @@ package pdf
 //   (*PDF) escape(s string) []byte
 //   (*PDF) getPointsPerUnit(unitName string) float64
 //   (*PDF) isWhiteSpace(s string) bool
+//   (*PDF) splitLines(s string) []string
 
 import "bytes"         // standard
 import "compress/zlib" // standard
@@ -1493,22 +1494,12 @@ func (pdf *PDF) TextWidth(text string) float64 {
 // You can find out the number of lines needed to wrap some
 // text by checking the length of the returned array.
 func (pdf *PDF) WrapTextLines(width float64, text string) []string {
-	var ar = []string{text} //                      first handle the newlines...
-	{
-		var split = func(ar []string, sep string) []string {
-			var ret []string
-			for _, iter := range ar {
-				if strings.Contains(iter, sep) {
-					ret = append(ret, strings.Split(iter, sep)...)
-				} else {
-					ret = append(ret, iter)
-				}
-			}
-			return ret
-		}
-		ar = split(split(split(ar, "\r\n"), "\r"), "\n")
-	}
-	var ret []string //                  ...then break lines based on text width
+	//
+	// first handle the newlines...
+	var ar = pdf.splitLines(text)
+	//
+	// ...then break lines based on text width
+	var ret []string
 	for _, iter := range ar {
 		for pdf.TextWidth(iter) > width {
 			var max = len(iter)
@@ -1962,5 +1953,21 @@ func (*PDF) isWhiteSpace(s string) bool {
 	}
 	return true
 } //                                                                isWhiteSpace
+
+// splitLines __
+func (*PDF) splitLines(s string) []string {
+	var split = func(ar []string, sep string) []string {
+		var ret []string
+		for _, iter := range ar {
+			if strings.Contains(iter, sep) {
+				ret = append(ret, strings.Split(iter, sep)...)
+			} else {
+				ret = append(ret, iter)
+			}
+		}
+		return ret
+	}
+	return split(split(split([]string{s}, "\r\n"), "\r"), "\n")
+} //                                                                  splitLines
 
 //end
