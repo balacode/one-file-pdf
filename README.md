@@ -1,5 +1,6 @@
 ## one-file-pdf - A minimalist PDF generator in &lt;2K lines and 1 file
-[![Go Report Card](https://goreportcard.com/badge/github.com/balacode/one-file-pdf)](https://goreportcard.com/report/github.com/balacode/one-file-pdf)  
+[![Go Report Card](https://goreportcard.com/badge/github.com/balacode/one-file-pdf)](https://goreportcard.com/report/github.com/balacode/one-file-pdf)
+[![Build Status](https://travis-ci.org/balacode/one-file-pdf.svg?branch=master)](https://travis-ci.org/balacode/one-file-pdf)  
 
 The main idea behind this project was:  
 "How small can I make a PDF generator for it to still be useful for 80% of common PDF generation needs?"
