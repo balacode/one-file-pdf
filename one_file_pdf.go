@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-03 00:43:06 5B397D                              [one_file_pdf.go]
+// :v: 2018-03-03 01:11:41 1297D4                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -18,10 +18,10 @@ package pdf
 //
 // # Constants
 //   const PDFNoPage = -1
-//   var PDFBuiltInFontNames = []string
-//   var PDFColorNames = []PDFColorName
-//   var PDFStandardPageSizes = []PDFPageSize
-//   var pdfFontWidths = [][]int
+//   PDFBuiltInFontNames = []string
+//   PDFColorNames = []PDFColorName
+//   PDFStandardPageSizes = []PDFPageSize
+//   pdfFontWidths = [][]int
 //
 // # Constructor
 //   NewPDF(pageSize string) PDF
@@ -109,6 +109,14 @@ package pdf
 //   (pdf *PDF) textWidthPt1000(text string) float64
 //   (pdf *PDF) warnIfNoPage() bool
 //
+// # Private Generation Methods
+//   (pdf *PDF) nextObject() int
+//   (pdf *PDF) writeEndobj()
+//   (pdf *PDF) writeObj(objectType string)
+//   (pdf *PDF) writePages(fontsIndex, imagesIndex int)
+//   (pdf *PDF) writeStream(content []byte)
+//   (pdf *PDF) writeStreamData(content []byte)
+//
 // # Private Functions
 //   (*PDF) colorEqual(a, b PDFColor) bool
 //   (*PDF) err(a ...interface{})
@@ -148,11 +156,13 @@ type PDF struct {
 	fontSizePt        float64
 	lineWidth         float64
 	horizontalScaling uint16
-	compressStreams   bool // enable stream compression?
-	content           bytes.Buffer
-	contentPtr        *bytes.Buffer
+	compressStreams   bool          // enable stream compression?
+	content           bytes.Buffer  // content buffer where PDF is written
+	contentPtr        *bytes.Buffer // pointer to PDF/current page's buffer
+	objOffsets        []int         // used by Bytes() and write..()
+	objNo             int           // used by Bytes() and write..()
 	//
-	// extra features
+	// extra features:
 	unitName      string  // name of measurement unit
 	pointsPerUnit float64 // number of points per measurement unit
 	pageWidthPt   float64 // page width in points
@@ -687,6 +697,9 @@ var pdfFontWidths = [][]int{
 	{500, 556, 556, 500, 000, 500, 444, 444, 500, 000},         // 255
 } //                                                               pdfFontWidths
 
+// pdfPagesIndex __
+const pdfPagesIndex = 3
+
 // -----------------------------------------------------------------------------
 // # Constructor
 
@@ -1020,119 +1033,47 @@ func (pdf *PDF) AddPage() *PDF {
 // you'll find the core structure of a PDF document.
 func (pdf *PDF) Bytes() []byte {
 	// called by: SaveFile()
-	var objectOffsets []int
-	var objectNo int
+	pdf.objOffsets = []int{}
+	pdf.objNo = 0
 	//
-	// increases the object serial number and stores its offset in the array
-	var nextObject = func() int {
-		objectNo++
-		for len(objectOffsets) <= objectNo {
-			objectOffsets = append(objectOffsets, pdf.content.Len())
-		}
-		return objectNo
-	}
-	// outputs an object header
-	var obj = func(objectType string) {
-		pdf.setCurrentPage(PDFNoPage)
-		var objectNo = nextObject()
-		if objectType == "" {
-			pdf.printf("%d 0 obj<<", objectNo)
-		} else if objectType[0] == '/' {
-			pdf.printf("%d 0 obj<</Type%s", objectNo, objectType)
-		} else {
-			pdf.err("objectType should begin with '/' or be a blank string.")
-		}
-	}
-	// (outputs a stream object to the document's main buffer)
-	var streamObject = func(content []byte) {
-		pdf.setCurrentPage(PDFNoPage).printf("%d 0 obj <<", nextObject())
-		pdf.streamData(content)
-	}
-	var endobj = func() {
-		pdf.printf(">>\nendobj\n")
-	}
 	// free any existing generated content and write beginning of document
-	var pageObjectsIndex = 3
-	var fontObjectsIndex = pageObjectsIndex + len(pdf.pages)*2
-	var imageObjectsIndex = fontObjectsIndex + len(pdf.fonts)
-	var infoObjectIndex = imageObjectsIndex + len(pdf.images)
+	var fontsIndex = pdfPagesIndex + len(pdf.pages)*2
+	var imagesIndex = fontsIndex + len(pdf.fonts)
+	var infoIndex = imagesIndex + len(pdf.images)
 	pdf.setCurrentPage(PDFNoPage)
 	pdf.content.Reset()
 	pdf.printf("%%PDF-1.4\n")
-	obj("/Catalog")
+	pdf.writeObj("/Catalog")
 	pdf.printf("/Pages 2 0 R")
-	endobj()
+	pdf.writeEndobj()
 	//
 	//  write /Pages object, page count and page size
-	obj("/Pages") // 2 0 obj
+	pdf.writeObj("/Pages") // 2 0 obj
 	pdf.printf("/Count %d/MediaBox[0 0 %d %d]", len(pdf.pages),
 		int(pdf.pageSize.WidthPt), int(pdf.pageSize.HeightPt))
 	//
-	// page numbers
-	if len(pdf.pages) > 0 {
-		var pageObjectNo = pageObjectsIndex
-		pdf.printf("/Kids[")
-		for i := range pdf.pages {
-			if i > 0 {
-				pdf.printf(" ")
-			}
-			pdf.printf("%d 0 R", pageObjectNo)
-			pageObjectNo += 2 // 1 for page, 1 for stream
-		}
-		pdf.printf("]")
-	}
-	endobj()
+	// write page numbers and pages
+	pdf.writePages(fontsIndex, imagesIndex)
 	//
-	// write each page
-	for _, pg := range pdf.pages {
-		if pg.pageContent.Len() == 0 {
-			fmt.Printf("WARNING: Empty Page\n")
-			continue
-		}
-		obj("/Page")
-		pdf.printf("/Parent 2 0 R/Contents %d 0 R", objectNo+1)
-		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
-			pdf.printf("/Resources<<")
-		}
-		if len(pg.fontIDs) > 0 {
-			pdf.printf("/Font <<")
-			for fontNo := range pdf.fonts {
-				pdf.printf("/F%d %d 0 R", fontNo+1, fontObjectsIndex+fontNo)
-			}
-			pdf.printf(">>")
-		}
-		if len(pg.imageNos) > 0 {
-			pdf.printf("/XObject<<")
-			for imageNo := range pg.imageNos {
-				pdf.printf("/Im%d %d 0 R", imageNo, imageObjectsIndex+imageNo)
-			}
-			pdf.printf(">>")
-		}
-		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
-			pdf.printf(">>")
-		}
-		endobj()
-		streamObject([]byte(pg.pageContent.String()))
-	}
 	// write fonts
 	for _, iter := range pdf.fonts {
-		obj("/Font")
+		pdf.writeObj("/Font")
 		if iter.isBuiltIn {
 			pdf.printf("/Subtype/Type1/Name/F%d"+
 				"/BaseFont/%s/Encoding/WinAnsiEncoding",
 				iter.fontID, iter.fontName)
 		}
-		endobj()
+		pdf.writeEndobj()
 	}
 	// write images
 	for _, iter := range pdf.images {
-		obj("/XObject")
+		pdf.writeObj("/XObject")
 		pdf.printf(
 			"/Subtype/Image/Width %d/Height %d"+
 				"/ColorSpace/DeviceGray/BitsPerComponent 8",
 			iter.width, iter.height,
 		)
-		pdf.streamData(iter.data)
+		pdf.writeStreamData(iter.data)
 		pdf.printf("\nendobj\n")
 	}
 	// write info object
@@ -1153,20 +1094,19 @@ func (pdf *PDF) Bytes() []byte {
 					printf(string(pdf.escape(iter.field))).printf(")")
 			}
 		}
-		endobj() // info
+		pdf.writeEndobj() // info
 	}
 	// write cross-reference table at end of document
 	var startXref = pdf.content.Len()
 	pdf.setCurrentPage(PDFNoPage).
-		printf("xref\n0 %d\n0000000000 65535 f \n",
-			len(objectOffsets))
-	for _, offset := range objectOffsets[1:] {
+		printf("xref\n0 %d\n0000000000 65535 f \n", len(pdf.objOffsets))
+	for _, offset := range pdf.objOffsets[1:] {
 		pdf.printf("%010d 00000 n \n", offset)
 	}
 	// write the trailer
-	pdf.printf("trailer\n<</Size %d/Root 1 0 R", len(objectOffsets))
-	if infoObjectIndex > 0 {
-		pdf.printf("/Info %d 0 R", infoObjectIndex)
+	pdf.printf("trailer\n<</Size %d/Root 1 0 R", len(pdf.objOffsets))
+	if infoIndex > 0 {
+		pdf.printf("/Info %d 0 R", infoIndex)
 	}
 	pdf.printf(">>\nstartxref\n%d\n", startXref).printf("%%%%EOF\n")
 	return pdf.content.Bytes()
@@ -1847,8 +1787,94 @@ func (pdf *PDF) warnIfNoPage() bool {
 // -----------------------------------------------------------------------------
 // # Private Generation Methods
 
-// streamData __
-func (pdf *PDF) streamData(content []byte) {
+// nextObject increases the object serial number
+// and stores its offset in the array
+func (pdf *PDF) nextObject() int {
+	pdf.objNo++
+	for len(pdf.objOffsets) <= pdf.objNo {
+		pdf.objOffsets = append(pdf.objOffsets, pdf.content.Len())
+	}
+	return pdf.objNo
+} //                                                                  nextObject
+
+// writeEndobj __
+func (pdf *PDF) writeEndobj() {
+	pdf.printf(">>\nendobj\n")
+} //                                                                 writeEndobj
+
+// writeObj outputs an object header
+func (pdf *PDF) writeObj(objectType string) {
+	pdf.setCurrentPage(PDFNoPage)
+	var objNo = pdf.nextObject()
+	if objectType == "" {
+		pdf.printf("%d 0 obj<<", objNo)
+	} else if objectType[0] == '/' {
+		pdf.printf("%d 0 obj<</Type%s", objNo, objectType)
+	} else {
+		pdf.err("objectType should begin with '/' or be a blank string.")
+	}
+} //                                                                    writeObj
+
+// writePages __
+func (pdf *PDF) writePages(fontsIndex, imagesIndex int) {
+	//
+	// write page numbers
+	if len(pdf.pages) > 0 {
+		var pageObjectNo = pdfPagesIndex
+		pdf.printf("/Kids[")
+		for i := range pdf.pages {
+			if i > 0 {
+				pdf.printf(" ")
+			}
+			pdf.printf("%d 0 R", pageObjectNo)
+			pageObjectNo += 2 // 1 for page, 1 for stream
+		}
+		pdf.printf("]")
+	}
+	pdf.writeEndobj()
+	//
+	// write each page
+	for _, pg := range pdf.pages {
+		if pg.pageContent.Len() == 0 {
+			fmt.Printf("WARNING: Empty Page\n")
+			continue
+		}
+		pdf.writeObj("/Page")
+		pdf.printf("/Parent 2 0 R/Contents %d 0 R", pdf.objNo+1)
+		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
+			pdf.printf("/Resources<<")
+		}
+		if len(pg.fontIDs) > 0 {
+			pdf.printf("/Font <<")
+			for fontNo := range pdf.fonts {
+				pdf.printf("/F%d %d 0 R", fontNo+1, fontsIndex+fontNo)
+			}
+			pdf.printf(">>")
+		}
+		if len(pg.imageNos) > 0 {
+			pdf.printf("/XObject<<")
+			for imageNo := range pg.imageNos {
+				pdf.printf("/Im%d %d 0 R", imageNo, imagesIndex+imageNo)
+			}
+			pdf.printf(">>")
+		}
+		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
+			pdf.printf(">>")
+		}
+		pdf.writeEndobj()
+		pdf.writeStream([]byte(pg.pageContent.String()))
+	}
+} //                                                                  writePages
+
+// writeStream outputs a stream object to the document's main buffer)
+func (pdf *PDF) writeStream(content []byte) {
+	pdf.setCurrentPage(PDFNoPage)
+	pdf.printf("%d 0 obj <<", pdf.nextObject())
+	pdf.writeStreamData(content)
+} //                                                                 writeStream
+
+// writeStreamData __
+func (pdf *PDF) writeStreamData(content []byte) {
 	pdf.setCurrentPage(PDFNoPage)
 	var filter string
 	if pdf.compressStreams {
@@ -1865,7 +1891,7 @@ func (pdf *PDF) streamData(content []byte) {
 	}
 	pdf.printf("%s/Length %d>>stream\n%s\nendstream\n",
 		filter, len(content), content)
-} //                                                                  streamData
+} //                                                             writeStreamData
 
 // -----------------------------------------------------------------------------
 // # Private Functions
