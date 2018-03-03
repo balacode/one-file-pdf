@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-03 01:11:41 1297D4                              [one_file_pdf.go]
+// :v: 2018-03-03 01:15:49 C03133                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -104,13 +104,13 @@ package pdf
 //                 x, y, width, height float64,
 //                 wrapText bool, align, text string,
 //              ) *PDF
-//   (pdf *PDF) printf(format string, args ...interface{}) *PDF
 //   (pdf *PDF) setCurrentPage(pageNo int) *PDF
 //   (pdf *PDF) textWidthPt1000(text string) float64
 //   (pdf *PDF) warnIfNoPage() bool
 //
 // # Private Generation Methods
 //   (pdf *PDF) nextObject() int
+//   (pdf *PDF) write(format string, args ...interface{}) *PDF
 //   (pdf *PDF) writeEndobj()
 //   (pdf *PDF) writeObj(objectType string)
 //   (pdf *PDF) writePages(fontsIndex, imagesIndex int)
@@ -1042,14 +1042,14 @@ func (pdf *PDF) Bytes() []byte {
 	var infoIndex = imagesIndex + len(pdf.images)
 	pdf.setCurrentPage(PDFNoPage)
 	pdf.content.Reset()
-	pdf.printf("%%PDF-1.4\n")
+	pdf.write("%%PDF-1.4\n")
 	pdf.writeObj("/Catalog")
-	pdf.printf("/Pages 2 0 R")
+	pdf.write("/Pages 2 0 R")
 	pdf.writeEndobj()
 	//
 	//  write /Pages object, page count and page size
 	pdf.writeObj("/Pages") // 2 0 obj
-	pdf.printf("/Count %d/MediaBox[0 0 %d %d]", len(pdf.pages),
+	pdf.write("/Count %d/MediaBox[0 0 %d %d]", len(pdf.pages),
 		int(pdf.pageSize.WidthPt), int(pdf.pageSize.HeightPt))
 	//
 	// write page numbers and pages
@@ -1059,7 +1059,7 @@ func (pdf *PDF) Bytes() []byte {
 	for _, iter := range pdf.fonts {
 		pdf.writeObj("/Font")
 		if iter.isBuiltIn {
-			pdf.printf("/Subtype/Type1/Name/F%d"+
+			pdf.write("/Subtype/Type1/Name/F%d"+
 				"/BaseFont/%s/Encoding/WinAnsiEncoding",
 				iter.fontID, iter.fontName)
 		}
@@ -1068,13 +1068,13 @@ func (pdf *PDF) Bytes() []byte {
 	// write images
 	for _, iter := range pdf.images {
 		pdf.writeObj("/XObject")
-		pdf.printf(
+		pdf.write(
 			"/Subtype/Image/Width %d/Height %d"+
 				"/ColorSpace/DeviceGray/BitsPerComponent 8",
 			iter.width, iter.height,
 		)
 		pdf.writeStreamData(iter.data)
-		pdf.printf("\nendobj\n")
+		pdf.write("\nendobj\n")
 	}
 	// write info object
 	if pdf.docTitle != "" || pdf.docSubject != "" ||
@@ -1090,8 +1090,10 @@ func (pdf *PDF) Bytes() []byte {
 			{"/Creator ", pdf.docCreator},
 		} {
 			if iter.field != "" {
-				pdf.printf(iter.label).printf("(").
-					printf(string(pdf.escape(iter.field))).printf(")")
+				pdf.write(iter.label).
+					write("(").
+					write(string(pdf.escape(iter.field))).
+					write(")")
 			}
 		}
 		pdf.writeEndobj() // info
@@ -1099,16 +1101,17 @@ func (pdf *PDF) Bytes() []byte {
 	// write cross-reference table at end of document
 	var startXref = pdf.content.Len()
 	pdf.setCurrentPage(PDFNoPage).
-		printf("xref\n0 %d\n0000000000 65535 f \n", len(pdf.objOffsets))
+		write("xref\n0 %d\n0000000000 65535 f \n", len(pdf.objOffsets))
 	for _, offset := range pdf.objOffsets[1:] {
-		pdf.printf("%010d 00000 n \n", offset)
+		pdf.write("%010d 00000 n \n", offset)
 	}
 	// write the trailer
-	pdf.printf("trailer\n<</Size %d/Root 1 0 R", len(pdf.objOffsets))
+	pdf.write("trailer\n<</Size %d/Root 1 0 R", len(pdf.objOffsets))
 	if infoIndex > 0 {
-		pdf.printf("/Info %d 0 R", infoIndex)
+		pdf.write("/Info %d 0 R", infoIndex)
 	}
-	pdf.printf(">>\nstartxref\n%d\n", startXref).printf("%%%%EOF\n")
+	pdf.write(">>\nstartxref\n%d\n", startXref).
+		write("%%%%EOF\n")
 	return pdf.content.Bytes()
 } //                                                                       Bytes
 
@@ -1122,7 +1125,7 @@ func (pdf *PDF) DrawBox(x, y, width, height float64) *PDF {
 	y = pdf.pageHeightPt - y - height
 	pdf.applyLineWidth().applyStrokeColor()
 	// re = construct a rectangular path, S = stroke path
-	pdf.printf("%.3f %.3f %.3f %.3f re S\n", x, y, width, height)
+	pdf.write("%.3f %.3f %.3f %.3f re S\n", x, y, width, height)
 	return pdf
 } //                                                                     DrawBox
 
@@ -1205,7 +1208,7 @@ func (pdf *PDF) DrawImage(
 	var width = float64(img.width) / float64(img.height) * height
 	//
 	// write command to draw the image
-	pdf.printf("q\n"+ // save graphics state
+	pdf.write("q\n"+ // save graphics state
 		// w      h  x  y
 		" %f 0 0 %f %f %f cm\n"+
 		"/Im%d Do\n"+
@@ -1225,7 +1228,7 @@ func (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF {
 	pdf.applyLineWidth().applyStrokeColor()
 	//
 	// send command to draw the line
-	pdf.printf("%.3f %.3f m %.3f %.3f l S\n", x1, y1, x2, y2)
+	pdf.write("%.3f %.3f m %.3f %.3f l S\n", x1, y1, x2, y2)
 	return pdf
 } //                                                                    DrawLine
 
@@ -1333,7 +1336,7 @@ func (pdf *PDF) FillBox(x, y, width, height float64) *PDF {
 		width*pdf.pointsPerUnit, height*pdf.pointsPerUnit
 	y = pdf.pageHeightPt - y - height
 	pdf.applyLineWidth().applyNonStrokeColor().
-		printf("%.3f %.3f %.3f %.3f re f\n", x, y, width, height)
+		write("%.3f %.3f %.3f %.3f re f\n", x, y, width, height)
 	// 're' = construct a rectangular path, f = fill
 	return pdf
 } //                                                                     FillBox
@@ -1578,7 +1581,7 @@ func (pdf *PDF) applyFont() {
 	}
 	pg.fontID = font.fontID
 	pg.fontSizePt = pdf.fontSizePt
-	pdf.printf("BT /F%d %d Tf ET\n", pg.fontID, int(pg.fontSizePt))
+	pdf.write("BT /F%d %d Tf ET\n", pg.fontID, int(pg.fontSizePt))
 } //                                                                   applyFont
 
 // applyLineWidth writes a line-width PDF command ('w') to the current
@@ -1588,7 +1591,7 @@ func (pdf *PDF) applyLineWidth() *PDF {
 	var val = &pdf.pagePtr.lineWidth
 	if int(*val*10000) != int(pdf.lineWidth*10000) {
 		*val = pdf.lineWidth
-		pdf.printf("%.3f w\n", float64(*val))
+		pdf.write("%.3f w\n", float64(*val))
 	}
 	return pdf
 } //                                                              applyLineWidth
@@ -1600,7 +1603,7 @@ func (pdf *PDF) applyNonStrokeColor() *PDF {
 	var val = &pdf.pagePtr.nonStrokeColor
 	if !pdf.colorEqual(*val, pdf.color) {
 		*val = pdf.color
-		pdf.printf(
+		pdf.write(
 			"%.3f %.3f %.3f rg\n", // non-stroking (text) color
 			float64((*val).Red)/255,
 			float64((*val).Green)/255,
@@ -1618,7 +1621,7 @@ func (pdf *PDF) applyStrokeColor() *PDF {
 	var val = &pdf.pagePtr.strokeColor
 	if !pdf.colorEqual(*val, pdf.color) {
 		*val = pdf.color
-		pdf.printf(
+		pdf.write(
 			"%.3f %.3f %.3f RG\n", // RG - stroke (line) color
 			float64((*val).Red)/255,
 			float64((*val).Green)/255,
@@ -1639,7 +1642,7 @@ func (pdf *PDF) drawTextLine(text string) *PDF {
 	var applyHorizontalScaling = func() {
 		if pdf.pagePtr.horizontalScaling != pdf.horizontalScaling {
 			pdf.pagePtr.horizontalScaling = pdf.horizontalScaling
-			pdf.printf("BT %d Tz ET\n", pdf.pagePtr.horizontalScaling)
+			pdf.write("BT %d Tz ET\n", pdf.pagePtr.horizontalScaling)
 		}
 	}
 	// draw the text:
@@ -1650,7 +1653,7 @@ func (pdf *PDF) drawTextLine(text string) *PDF {
 	if pg.x < 0 || pg.y < 0 {
 		pdf.SetXY(0, 0)
 	}
-	pdf.printf("BT %d %d Td (%s) Tj ET\n",
+	pdf.write("BT %d %d Td (%s) Tj ET\n",
 		int(pg.x), int(pg.y), pdf.escape(text))
 	pg.x += pdf.textWidthPt1000(text)
 	return pdf
@@ -1709,24 +1712,6 @@ func (pdf *PDF) drawTextBox(
 	}
 	return pdf
 } //                                                                 drawTextBox
-
-// printf writes formatted strings (like fmt.Sprintf) to the current page's
-// content stream or to the final generated PDF, if there is no active page.
-// called by: Bytes(), DrawBox(), DrawLine(), drawTextLine(), FillBox()
-//            applyLineWidth(), applyNonStrokeColor(), applyStrokeColor()
-func (pdf *PDF) printf(format string, args ...interface{}) *PDF {
-	var buf *bytes.Buffer
-	if pdf.pageNo == PDFNoPage {
-		buf = pdf.contentPtr
-	} else if pdf.pageNo > (len(pdf.pages) - 1) {
-		pdf.err("Invalid page number.")
-		return pdf
-	} else {
-		buf = &pdf.pagePtr.pageContent
-	}
-	buf.Write([]byte(fmt.Sprintf(format, args...)))
-	return pdf
-} //                                                                      printf
 
 // setCurrentPage selects the currently-active page.
 // called by: AddPage(), Bytes()
@@ -1797,9 +1782,27 @@ func (pdf *PDF) nextObject() int {
 	return pdf.objNo
 } //                                                                  nextObject
 
+// write writes formatted strings (like fmt.Sprintf) to the current page's
+// content stream or to the final generated PDF, if there is no active page.
+// called by: Bytes(), DrawBox(), DrawLine(), drawTextLine(), FillBox()
+//            applyLineWidth(), applyNonStrokeColor(), applyStrokeColor()
+func (pdf *PDF) write(format string, args ...interface{}) *PDF {
+	var buf *bytes.Buffer
+	if pdf.pageNo == PDFNoPage {
+		buf = pdf.contentPtr
+	} else if pdf.pageNo > (len(pdf.pages) - 1) {
+		pdf.err("Invalid page number.")
+		return pdf
+	} else {
+		buf = &pdf.pagePtr.pageContent
+	}
+	buf.Write([]byte(fmt.Sprintf(format, args...)))
+	return pdf
+} //                                                                       write
+
 // writeEndobj __
 func (pdf *PDF) writeEndobj() {
-	pdf.printf(">>\nendobj\n")
+	pdf.write(">>\nendobj\n")
 } //                                                                 writeEndobj
 
 // writeObj outputs an object header
@@ -1807,9 +1810,9 @@ func (pdf *PDF) writeObj(objectType string) {
 	pdf.setCurrentPage(PDFNoPage)
 	var objNo = pdf.nextObject()
 	if objectType == "" {
-		pdf.printf("%d 0 obj<<", objNo)
+		pdf.write("%d 0 obj<<", objNo)
 	} else if objectType[0] == '/' {
-		pdf.printf("%d 0 obj<</Type%s", objNo, objectType)
+		pdf.write("%d 0 obj<</Type%s", objNo, objectType)
 	} else {
 		pdf.err("objectType should begin with '/' or be a blank string.")
 	}
@@ -1821,15 +1824,15 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) {
 	// write page numbers
 	if len(pdf.pages) > 0 {
 		var pageObjectNo = pdfPagesIndex
-		pdf.printf("/Kids[")
+		pdf.write("/Kids[")
 		for i := range pdf.pages {
 			if i > 0 {
-				pdf.printf(" ")
+				pdf.write(" ")
 			}
-			pdf.printf("%d 0 R", pageObjectNo)
+			pdf.write("%d 0 R", pageObjectNo)
 			pageObjectNo += 2 // 1 for page, 1 for stream
 		}
-		pdf.printf("]")
+		pdf.write("]")
 	}
 	pdf.writeEndobj()
 	//
@@ -1840,26 +1843,26 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) {
 			continue
 		}
 		pdf.writeObj("/Page")
-		pdf.printf("/Parent 2 0 R/Contents %d 0 R", pdf.objNo+1)
+		pdf.write("/Parent 2 0 R/Contents %d 0 R", pdf.objNo+1)
 		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
-			pdf.printf("/Resources<<")
+			pdf.write("/Resources<<")
 		}
 		if len(pg.fontIDs) > 0 {
-			pdf.printf("/Font <<")
+			pdf.write("/Font <<")
 			for fontNo := range pdf.fonts {
-				pdf.printf("/F%d %d 0 R", fontNo+1, fontsIndex+fontNo)
+				pdf.write("/F%d %d 0 R", fontNo+1, fontsIndex+fontNo)
 			}
-			pdf.printf(">>")
+			pdf.write(">>")
 		}
 		if len(pg.imageNos) > 0 {
-			pdf.printf("/XObject<<")
+			pdf.write("/XObject<<")
 			for imageNo := range pg.imageNos {
-				pdf.printf("/Im%d %d 0 R", imageNo, imagesIndex+imageNo)
+				pdf.write("/Im%d %d 0 R", imageNo, imagesIndex+imageNo)
 			}
-			pdf.printf(">>")
+			pdf.write(">>")
 		}
 		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
-			pdf.printf(">>")
+			pdf.write(">>")
 		}
 		pdf.writeEndobj()
 		pdf.writeStream([]byte(pg.pageContent.String()))
@@ -1869,7 +1872,7 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) {
 // writeStream outputs a stream object to the document's main buffer)
 func (pdf *PDF) writeStream(content []byte) {
 	pdf.setCurrentPage(PDFNoPage)
-	pdf.printf("%d 0 obj <<", pdf.nextObject())
+	pdf.write("%d 0 obj <<", pdf.nextObject())
 	pdf.writeStreamData(content)
 } //                                                                 writeStream
 
@@ -1889,7 +1892,7 @@ func (pdf *PDF) writeStreamData(content []byte) {
 		writer.Close()
 		content = buf.Bytes()
 	}
-	pdf.printf("%s/Length %d>>stream\n%s\nendstream\n",
+	pdf.write("%s/Length %d>>stream\n%s\nendstream\n",
 		filter, len(content), content)
 } //                                                             writeStreamData
 
