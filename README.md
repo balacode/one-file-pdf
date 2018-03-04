@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/balacode/one-file-pdf.svg?branch=master)](https://travis-ci.org/balacode/one-file-pdf)  
 
 The main idea behind this project was:  
-"How small can I make a PDF generator for it to still be useful for 80% of common PDF generation needs?"
+*"How small can I make a PDF generator for it to still be useful for 80% of common PDF generation needs?"*
 
 The result is a single .go file with less than 1999 lines of code.
 
