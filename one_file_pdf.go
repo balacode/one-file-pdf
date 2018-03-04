@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-04 01:04:25 2E9F06                              [one_file_pdf.go]
+// :v: 2018-03-04 01:44:32 9D9C34                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1742,15 +1742,13 @@ func (pdf *PDF) textWidthPt1000(text string) float64 {
 		return 0
 	}
 	var w = 0.0
-	var charWidths = pdfFontWidths[0]
-	// TODO:                       ^ this is not considering the font name!
-	//
 	for i, r := range text {
 		if r < 0 || r > 255 {
 			pdf.err("char out of range at %d: %d", i, r)
 			break
 		}
-		w += float64(charWidths[r])
+		w += float64(pdfFontWidths[r][0])
+		// TODO: [0] is not considering the current font!
 	}
 	return w * pdf.fontSizePt / 1000 * float64(pdf.horizontalScaling) / 100
 } //                                                             textWidthPt1000
