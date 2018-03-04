@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-04 01:44:32 9D9C34                              [one_file_pdf.go]
+// :v: 2018-03-04 02:54:01 A474D7                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -847,42 +847,49 @@ func (pdf *PDF) Y() float64 {
 // for subsequent text and line drawing and fills.
 // If the name is unknown or valid, sets the current color to black.
 func (pdf *PDF) SetColor(nameOrHTMLValue string) *PDF {
+	//
+	// if name starts with '#' treat it as HTML color (#RRGGBB)
 	nameOrHTMLValue = strings.ToUpper(nameOrHTMLValue)
-	var color = (func() PDFColor {
-		//
-		// if name starts with '#' treat it as HTML color (#RRGGBB)
-		if nameOrHTMLValue[0] == '#' {
-			var hex [6]uint8
-			for i, r := range nameOrHTMLValue[1:] {
-				if i > 6 {
-					break
-				}
-				if (r >= '0' && r <= '9') || (r >= 'a' && r <= 'f') {
-					if r >= '0' && r <= '9' {
-						hex[i] = uint8(r - '0')
-					} else if r >= 'A' && r <= 'F' {
-						hex[i] = uint8(r - 'A' + 10)
-					} else {
-						hex[i] = 255
-					}
-				} else {
-					return PDFColor{} // black - conversion failed
-				}
+	if nameOrHTMLValue[0] == '#' {
+		var hex [6]uint8
+		for i, r := range nameOrHTMLValue[1:] {
+			if i > 6 {
+				break
 			}
-			return PDFColor{
-				Red:   hex[0]*16 + hex[1],
-				Green: hex[2]*16 + hex[3],
-				Blue:  hex[4]*16 + hex[5],
+			if r >= '0' && r <= '9' {
+				hex[i] = uint8(r - '0')
+				continue
 			}
+			if r >= 'A' && r <= 'F' {
+				hex[i] = uint8(r - 'A' + 10)
+				continue
+			}
+			pdf.err("Invalid color code '" + nameOrHTMLValue + "'." +
+				"Setting to black.")
+			pdf.SetColorRGB(0, 0, 0)
+			return pdf
 		}
-		for _, color := range PDFColorNames { // otherwise search for color name
-			if nameOrHTMLValue == color.name {
-				return color.val
-			}
+		pdf.SetColorRGB(
+			int(hex[0]*16+hex[1]),
+			int(hex[2]*16+hex[3]),
+			int(hex[4]*16+hex[5]),
+		)
+		return pdf
+	}
+	// otherwise search for color name
+	for _, color := range PDFColorNames {
+		if nameOrHTMLValue == color.name {
+			pdf.SetColorRGB(
+				int(color.val.Red),
+				int(color.val.Green),
+				int(color.val.Blue),
+			)
+			return pdf
 		}
-		return PDFColor{} // black - color name not found
-	})() //                                                                 IIFE
-	pdf.SetColorRGB(int(color.Red), int(color.Green), int(color.Blue))
+	}
+	pdf.err("Color name '" + nameOrHTMLValue + "' not known." +
+		"Setting to black.")
+	pdf.SetColorRGB(0, 0, 0)
 	return pdf
 } //                                                                    SetColor
 
