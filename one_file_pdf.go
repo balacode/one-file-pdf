@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-03 01:15:49 C03133                              [one_file_pdf.go]
+// :v: 2018-03-04 01:04:25 2E9F06                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -119,7 +119,7 @@ package pdf
 //
 // # Private Functions
 //   (*PDF) colorEqual(a, b PDFColor) bool
-//   (*PDF) err(a ...interface{})
+//   (PDF) err(a ...interface{})
 //   (*PDF) escape(s string) []byte
 //   (*PDF) getPointsPerUnit(unitName string) float64
 //   (*PDF) isWhiteSpace(s string) bool
@@ -705,24 +705,23 @@ const pdfPagesIndex = 3
 
 // NewPDF creates and initializes a new PDF object.
 func NewPDF(pageSize string) PDF {
-	var pdf PDF //                                        create a new PDF object
-	pdf.compressStreams = true
-	pdf.horizontalScaling = 100
-	pdf.pageNo = PDFNoPage
 	//
 	// get and store dimensions of specified page size (in points)
 	var size = PDFPageSizeOf(pageSize)
 	if size.Name == "" {
-		pdf.err("Unknown page_size ^", pageSize, ". Defaulting to 'A4'.")
+		PDF{}.err("Unknown page_size ", pageSize, ". Defaulting to 'A4'.\n")
 		size = PDFPageSizeOf("A4")
 	}
-	pdf.pageSize = size
-	//
-	// store page dimensions
-	pdf.pageWidthPt = pdf.pageSize.WidthPt
-	pdf.pageHeightPt = pdf.pageSize.HeightPt
-	//
-	// set default units, otherwise pointsPerUnit and all x and y will be 0
+	// create a new PDF object
+	var pdf = PDF{
+		pageNo:            PDFNoPage,
+		pageSize:          size,
+		pageWidthPt:       size.WidthPt,
+		pageHeightPt:      size.HeightPt,
+		horizontalScaling: 100,
+		compressStreams:   true,
+	}
+	// set default units, otherwise pointsPerUnit and x and y will be 0
 	pdf.SetUnits("point")
 	return pdf
 } //                                                                      NewPDF
@@ -1908,7 +1907,7 @@ func (*PDF) colorEqual(a, b PDFColor) bool {
 } //                                                                  colorEqual
 
 // err reports an error
-func (*PDF) err(a ...interface{}) {
+func (PDF) err(a ...interface{}) {
 	fmt.Println(a)
 } //                                                                         err
 
