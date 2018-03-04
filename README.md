@@ -1,4 +1,5 @@
 ## one-file-pdf - A minimalist PDF generator in &lt;2K lines and 1 file
+[![godoc](https://godoc.org/github.com/balacode/one-file-pdf?status.svg)](https://godoc.org/github.com/balacode/one-file-pdf)
 [![Go Report Card](https://goreportcard.com/badge/github.com/balacode/one-file-pdf)](https://goreportcard.com/report/github.com/balacode/one-file-pdf)
 [![Build Status](https://travis-ci.org/balacode/one-file-pdf.svg?branch=master)](https://travis-ci.org/balacode/one-file-pdf)  
 
@@ -9,7 +10,7 @@ The result is a single .go file with less than 1999 lines of code.
 
 - All the basics for generating PDF documents, enough for generating mundane business reports.
 - It's easier to learn about the internals of the PDF format with a smaller library.
-- You can just drop the one_file_pdf.go file in your Go project. No need to manage dependencies. (But remember to change the package to 'main' or whatever package you are adding it to.)
+- You can just drop *one_file_pdf.go* into your Go project. No need to manage dependencies. (But remember to change the package to 'main' or whatever package you are adding it to.)
 - The current version of the file is indicated in the header (the timestamp).
 
 **Supported Features (the fundamentals):**
