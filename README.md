@@ -32,11 +32,11 @@ The result is a single .go file with less than 1999 lines of code.
 
 **Hello World**
 
+```go
 import "fmt" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-```go
 func main() {
 	fmt.Println(`Generating a "Hello World" PDF...`)
 	//
