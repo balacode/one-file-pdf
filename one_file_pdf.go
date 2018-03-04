@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-04 02:54:01 A474D7                              [one_file_pdf.go]
+// :v: 2018-03-04 12:13:25 0E6677                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -12,7 +12,6 @@ package pdf
 //   PDFFont struct
 //   PDFImage struct
 //   PDFPage struct
-//
 //   PDFPageSize struct
 //   PDFPageSizeOf(pageSize string) PDFPageSize
 //
@@ -217,8 +216,7 @@ type PDFPage struct {
 	horizontalScaling uint16
 } //                                                                     PDFPage
 
-// PDFPageSize represents a page size name
-// and its width and height in points.
+// PDFPageSize represents a page size name and its dimensions in points.
 type PDFPageSize struct {
 	Name     string
 	WidthPt  float64
@@ -980,7 +978,8 @@ func (pdf *PDF) SetLineWidth(points float64) *PDF {
 } //                                                                SetLineWidth
 
 // SetUnits changes the current measurement units.
-// Can be upper/lowercase: MM CM " IN INCH INCHES TW TWIP TWIPS PT POINT POINTS.
+// Can be upper/lowercase:
+// MM CM " IN INCH INCHES TW TWIP TWIPS PT POINT POINTS.
 func (pdf *PDF) SetUnits(unitName string) *PDF {
 	pdf.unitName = strings.ToUpper(strings.Trim(unitName, " \a\b\f\n\r\t\v"))
 	pdf.pointsPerUnit = pdf.getPointsPerUnit(pdf.unitName)
@@ -1116,8 +1115,7 @@ func (pdf *PDF) Bytes() []byte {
 	if infoIndex > 0 {
 		pdf.write("/Info %d 0 R", infoIndex)
 	}
-	pdf.write(">>\nstartxref\n%d\n", startXref).
-		write("%%%%EOF\n")
+	pdf.write(">>\nstartxref\n%d\n", startXref).write("%%%%EOF\n")
 	return pdf.content.Bytes()
 } //                                                                       Bytes
 
@@ -1126,8 +1124,8 @@ func (pdf *PDF) DrawBox(x, y, width, height float64) *PDF {
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
-	x, y, width, height = x*pdf.pointsPerUnit, y*pdf.pointsPerUnit,
-		width*pdf.pointsPerUnit, height*pdf.pointsPerUnit
+	x, y = x*pdf.pointsPerUnit, y*pdf.pointsPerUnit
+	width, height = width*pdf.pointsPerUnit, height*pdf.pointsPerUnit
 	y = pdf.pageHeightPt - y - height
 	pdf.applyLineWidth().applyStrokeColor()
 	// re = construct a rectangular path, S = stroke path
@@ -1135,7 +1133,13 @@ func (pdf *PDF) DrawBox(x, y, width, height float64) *PDF {
 	return pdf
 } //                                                                     DrawBox
 
-// DrawImage draws an image
+// DrawImage draws an image.
+// For now, only grayscale PNG images are supported.
+// 'x' and 'y' specify the position of the image.
+// 'height' specifies its height.
+// (width is scaled to match the image's aspect ratio).
+// fileNameOrBytes is either a string specifying a
+// file name, or a byte slice with PNG image data.
 func (pdf *PDF) DrawImage(
 	x, y, height float64,
 	fileNameOrBytes interface{},
@@ -1143,8 +1147,8 @@ func (pdf *PDF) DrawImage(
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
-	var imageName string
-	var imageBuf *bytes.Buffer
+	var imgName string
+	var imgBuf *bytes.Buffer
 	switch val := fileNameOrBytes.(type) {
 	case string:
 		var data, err = ioutil.ReadFile(val)
@@ -1152,26 +1156,26 @@ func (pdf *PDF) DrawImage(
 			pdf.err("File", val, ":", err)
 			return pdf
 		}
-		imageName = val
-		imageBuf = bytes.NewBuffer(data)
+		imgName = val
+		imgBuf = bytes.NewBuffer(data)
 	case []byte:
 		var l = len(val)
 		if l > 32 {
 			l = 32
 		}
-		imageName = fmt.Sprintf("%x", val[:l])
-		imageBuf = bytes.NewBuffer(val)
+		imgName = fmt.Sprintf("%x", val[:l])
+		imgBuf = bytes.NewBuffer(val)
 	}
 	var pg = pdf.pagePtr
 	var imgNo = -1
 	var img PDFImage
 	for i, iter := range pdf.images {
-		if iter.name == imageName {
+		if iter.name == imgName {
 			imgNo, img = i, iter
 		}
 	}
 	if imgNo == -1 {
-		var decoded, _, err = image.Decode(imageBuf)
+		var decoded, _, err = image.Decode(imgBuf)
 		if err != nil {
 			fmt.Printf("image not decoded: %v\n", err)
 			return pdf
@@ -1188,11 +1192,11 @@ func (pdf *PDF) DrawImage(
 			}
 		}
 		img = PDFImage{
-			name:      imageName,
+			name:      imgName,
 			width:     w,
 			height:    h,
 			data:      data,
-			grayscale: true, //` determine grayscale
+			grayscale: true, //TODO: determine actual grayscale mode
 		}
 		imgNo = len(pdf.images)
 		pdf.images = append(pdf.images, img)
@@ -1208,9 +1212,9 @@ func (pdf *PDF) DrawImage(
 	if !found {
 		pg.imageNos = append(pg.imageNos, imgNo)
 	}
-	x, y, height = x*pdf.pointsPerUnit, y*pdf.pointsPerUnit,
-		height*pdf.pointsPerUnit
-	y = pdf.pageHeightPt - y - height
+	x *= pdf.pointsPerUnit
+	y = pdf.pageHeightPt - y*pdf.pointsPerUnit - height
+	height *= pdf.pointsPerUnit
 	var width = float64(img.width) / float64(img.height) * height
 	//
 	// write command to draw the image
@@ -1313,6 +1317,7 @@ func (pdf *PDF) DrawUnitGrid() *PDF {
 	var xv = 0.3
 	var yv = 0.3
 	var i = 0
+	//
 	// draw vertical lines
 	for x = 0; x < pageWidth; x++ {
 		pdf.SetColorRGB(200, 200, 200).DrawLine(x, 0, x, pageHeight)
@@ -1478,7 +1483,6 @@ func (pdf *PDF) WrapTextLines(width float64, text string) []string {
 
 // ToPoints converts a string composed of a number and unit
 // to points. For example '1 cm' or '1cm' becomes 28.346 points.
-//
 // Recognised units are:
 // mm cm " in inch inches tw twip twips pt point points
 func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
@@ -1606,14 +1610,14 @@ func (pdf *PDF) applyLineWidth() *PDF {
 // the current page's content stream, if the value changed since last call.
 // called by: drawTextLine(), FillBox()
 func (pdf *PDF) applyNonStrokeColor() *PDF {
-	var val = &pdf.pagePtr.nonStrokeColor
-	if !pdf.colorEqual(*val, pdf.color) {
-		*val = pdf.color
+	var val = pdf.pagePtr.nonStrokeColor
+	if !pdf.colorEqual(val, pdf.color) {
+		val = pdf.color
 		pdf.write(
 			"%.3f %.3f %.3f rg\n", // non-stroking (text) color
-			float64((*val).Red)/255,
-			float64((*val).Green)/255,
-			float64((*val).Blue)/255,
+			float64(val.Red)/255,
+			float64(val.Green)/255,
+			float64(val.Blue)/255,
 		)
 	}
 	return pdf
@@ -1624,14 +1628,14 @@ func (pdf *PDF) applyNonStrokeColor() *PDF {
 // stream, if the value changed since last call.
 // called by: DrawBox(), DrawLine()
 func (pdf *PDF) applyStrokeColor() *PDF {
-	var val = &pdf.pagePtr.strokeColor
-	if !pdf.colorEqual(*val, pdf.color) {
-		*val = pdf.color
+	var val = pdf.pagePtr.strokeColor
+	if !pdf.colorEqual(val, pdf.color) {
+		val = pdf.color
 		pdf.write(
 			"%.3f %.3f %.3f RG\n", // RG - stroke (line) color
-			float64((*val).Red)/255,
-			float64((*val).Green)/255,
-			float64((*val).Blue)/255,
+			float64(val.Red)/255,
+			float64(val.Green)/255,
+			float64(val.Blue)/255,
 		)
 	}
 	return pdf
@@ -1776,8 +1780,7 @@ func (pdf *PDF) warnIfNoPage() bool {
 // -----------------------------------------------------------------------------
 // # Private Generation Methods
 
-// nextObject increases the object serial number
-// and stores its offset in the array
+// nextObject increases the object serial no. and stores its offset in array
 func (pdf *PDF) nextObject() int {
 	pdf.objNo++
 	for len(pdf.objOffsets) <= pdf.objNo {
@@ -1824,9 +1827,7 @@ func (pdf *PDF) writeObj(objectType string) {
 
 // writePages __
 func (pdf *PDF) writePages(fontsIndex, imagesIndex int) {
-	//
-	// write page numbers
-	if len(pdf.pages) > 0 {
+	if len(pdf.pages) > 0 { //                                write page numbers
 		var pageObjectNo = pdfPagesIndex
 		pdf.write("/Kids[")
 		for i := range pdf.pages {
@@ -1839,9 +1840,7 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) {
 		pdf.write("]")
 	}
 	pdf.writeEndobj()
-	//
-	// write each page
-	for _, pg := range pdf.pages {
+	for _, pg := range pdf.pages { //                            write each page
 		if pg.pageContent.Len() == 0 {
 			fmt.Printf("WARNING: Empty Page\n")
 			continue
@@ -1873,14 +1872,14 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) {
 	}
 } //                                                                  writePages
 
-// writeStream outputs a stream object to the document's main buffer)
+// writeStream outputs a stream object to the document's main buffer.
 func (pdf *PDF) writeStream(content []byte) {
 	pdf.setCurrentPage(PDFNoPage)
 	pdf.write("%d 0 obj <<", pdf.nextObject())
 	pdf.writeStreamData(content)
 } //                                                                 writeStream
 
-// writeStreamData __
+// writeStreamData writes a stream or image stream.
 func (pdf *PDF) writeStreamData(content []byte) {
 	pdf.setCurrentPage(PDFNoPage)
 	var filter string
@@ -1903,15 +1902,13 @@ func (pdf *PDF) writeStreamData(content []byte) {
 // -----------------------------------------------------------------------------
 // # Private Functions
 
-// colorEqual compares two PDFColor values
-// and returns true if they are equal.
-//
+// colorEqual compares two PDFColor values.
 // called by: applyNonStrokeColor(), applyStrokeColor()
 func (*PDF) colorEqual(a, b PDFColor) bool {
 	return a.Red == b.Red && a.Green == b.Green && a.Blue == b.Blue
 } //                                                                  colorEqual
 
-// err reports an error
+// err reports an error.
 func (PDF) err(a ...interface{}) {
 	fmt.Println(a)
 } //                                                                         err
@@ -1954,8 +1951,7 @@ func (*PDF) getPointsPerUnit(unitName string) float64 {
 	return 0
 } //                                                            getPointsPerUnit
 
-// isWhiteSpace returns true if all the
-// characters in a string are white-spaces.
+// isWhiteSpace returns true if all the chars. in 's' are white-spaces.
 func (*PDF) isWhiteSpace(s string) bool {
 	if s == "" {
 		return false
