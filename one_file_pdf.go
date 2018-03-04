@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-04 12:13:25 0E6677                              [one_file_pdf.go]
+// :v: 2018-03-04 12:24:53 1BB7F5                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -118,11 +118,11 @@ package pdf
 //
 // # Private Functions
 //   (*PDF) colorEqual(a, b PDFColor) bool
-//   (PDF) err(a ...interface{})
 //   (*PDF) escape(s string) []byte
 //   (*PDF) getPointsPerUnit(unitName string) float64
 //   (*PDF) isWhiteSpace(s string) bool
 //   (*PDF) splitLines(s string) []string
+//   (PDF) logError(a ...interface{})
 
 import "bytes"         // standard
 import "compress/zlib" // standard
@@ -132,6 +132,10 @@ import "io/ioutil"     // standard
 import "strconv"       // standard
 import "strings"       // standard
 import _ "image/png"   // standard
+
+// PDFErrorHandler is the function that handles errors.
+// You can redefine it as needed or set to nil to mute error messages.
+var PDFErrorHandler = fmt.Println
 
 // -----------------------------------------------------------------------------
 // # Structures
@@ -707,7 +711,7 @@ func NewPDF(pageSize string) PDF {
 	// get and store dimensions of specified page size (in points)
 	var size = PDFPageSizeOf(pageSize)
 	if size.Name == "" {
-		PDF{}.err("Unknown page_size ", pageSize, ". Defaulting to 'A4'.\n")
+		PDF{}.logError("Unknown page size ", pageSize, ". Setting to 'A4'.\n")
 		size = PDFPageSizeOf("A4")
 	}
 	// create a new PDF object
@@ -862,7 +866,7 @@ func (pdf *PDF) SetColor(nameOrHTMLValue string) *PDF {
 				hex[i] = uint8(r - 'A' + 10)
 				continue
 			}
-			pdf.err("Invalid color code '" + nameOrHTMLValue + "'." +
+			pdf.logError("Invalid color code '" + nameOrHTMLValue + "'." +
 				"Setting to black.")
 			pdf.SetColorRGB(0, 0, 0)
 			return pdf
@@ -885,7 +889,7 @@ func (pdf *PDF) SetColor(nameOrHTMLValue string) *PDF {
 			return pdf
 		}
 	}
-	pdf.err("Color name '" + nameOrHTMLValue + "' not known." +
+	pdf.logError("Color name '" + nameOrHTMLValue + "' not known." +
 		"Setting to black.")
 	pdf.SetColorRGB(0, 0, 0)
 	return pdf
@@ -1153,7 +1157,7 @@ func (pdf *PDF) DrawImage(
 	case string:
 		var data, err = ioutil.ReadFile(val)
 		if err != nil {
-			pdf.err("File", val, ":", err)
+			pdf.logError("File", val, ":", err)
 			return pdf
 		}
 		imgName = val
@@ -1274,7 +1278,7 @@ func (pdf *PDF) DrawTextAlignedToBox(
 	x, y, width, height float64, align, text string,
 ) *PDF {
 	if pdf.pageNo < 0 {
-		pdf.err("No current page.")
+		pdf.logError("No current page.")
 		return pdf
 	}
 	pdf.drawTextBox(x, y, width, height, false, align, text)
@@ -1295,7 +1299,7 @@ func (pdf *PDF) DrawTextInBox(
 	x, y, width, height float64, align, text string,
 ) *PDF {
 	if pdf.pageNo < 0 {
-		pdf.err("No current page.")
+		pdf.logError("No current page.")
 		return pdf
 	}
 	pdf.drawTextBox(x, y, width, height, true, align, text)
@@ -1308,7 +1312,7 @@ func (pdf *PDF) DrawTextInBox(
 func (pdf *PDF) DrawUnitGrid() *PDF {
 	var x, y, pageWidth, pageHeight = 0.0, 0.0, pdf.PageWidth(), pdf.PageHeight()
 	if pdf.pageNo < 0 { // ensure there is a current page
-		pdf.err("No current page.")
+		pdf.logError("No current page.")
 		return pdf
 	}
 	pdf.SetLineWidth(0.1).SetFont("Helvetica", 8)
@@ -1396,7 +1400,7 @@ func (pdf *PDF) Reset() *PDF {
 func (pdf *PDF) SaveFile(filename string) *PDF {
 	var err = ioutil.WriteFile(filename, pdf.Bytes(), 0)
 	if err != nil {
-		pdf.err("Failed writing to file", filename, ":", err)
+		pdf.logError("Failed writing to file", filename, ":", err)
 	}
 	return pdf
 } //                                                                    SaveFile
@@ -1404,11 +1408,11 @@ func (pdf *PDF) SaveFile(filename string) *PDF {
 // SetColumnWidths creates columns along the X-axis.
 func (pdf *PDF) SetColumnWidths(widths ...float64) *PDF {
 	if len(widths) < 1 {
-		pdf.err("len(widths) < 1")
+		pdf.logError("len(widths) < 1")
 		return pdf
 	}
 	if len(widths) > 100 {
-		pdf.err("len(widths) > 100")
+		pdf.logError("len(widths) > 100")
 		return pdf
 	}
 	pdf.columnWidths = widths
@@ -1508,7 +1512,7 @@ func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
 	if unit != "" { //                       determine number of points per unit
 		var ppu = pdf.getPointsPerUnit(unit)
 		if int(ppu*1000000) == 0 {
-			pdf.err("Unknown unit name.")
+			pdf.logError("Unknown unit name.")
 		}
 		ret *= ppu
 	}
@@ -1678,7 +1682,7 @@ func (pdf *PDF) drawTextBox(
 		return pdf
 	}
 	if pdf.pageNo < 0 {
-		pdf.err("No current page.")
+		pdf.logError("No current page.")
 		return pdf
 	}
 	var lines = (func() []string {
@@ -1727,7 +1731,7 @@ func (pdf *PDF) drawTextBox(
 // called by: AddPage(), Bytes()
 func (pdf *PDF) setCurrentPage(pageNo int) *PDF {
 	if pageNo != PDFNoPage && pageNo > (len(pdf.pages)-1) {
-		pdf.err("Page number out of range.")
+		pdf.logError("Page number out of range.")
 	} else if pageNo == PDFNoPage {
 		pdf.pagePtr = nil
 		pdf.contentPtr = &pdf.content
@@ -1746,7 +1750,7 @@ func (pdf *PDF) textWidthPt1000(text string) float64 {
 	// warn and return if there is no current page
 	if pdf.pageNo == PDFNoPage || pdf.pageNo > (len(pdf.pages)-1) ||
 		pdf.pagePtr == nil {
-		pdf.err("No current page.")
+		pdf.logError("No current page.")
 		return 0
 	}
 	if text == "" {
@@ -1755,7 +1759,7 @@ func (pdf *PDF) textWidthPt1000(text string) float64 {
 	var w = 0.0
 	for i, r := range text {
 		if r < 0 || r > 255 {
-			pdf.err("char out of range at %d: %d", i, r)
+			pdf.logError("char out of range at %d: %d", i, r)
 			break
 		}
 		w += float64(pdfFontWidths[r][0])
@@ -1771,7 +1775,7 @@ func (pdf *PDF) textWidthPt1000(text string) float64 {
 func (pdf *PDF) warnIfNoPage() bool {
 	if len(pdf.pages) == 0 || pdf.pageNo > (len(pdf.pages)-1) ||
 		pdf.pagePtr == nil {
-		pdf.err("No current page.")
+		pdf.logError("No current page.")
 		return true
 	}
 	return false
@@ -1798,7 +1802,7 @@ func (pdf *PDF) write(format string, args ...interface{}) *PDF {
 	if pdf.pageNo == PDFNoPage {
 		buf = pdf.contentPtr
 	} else if pdf.pageNo > (len(pdf.pages) - 1) {
-		pdf.err("Invalid page number.")
+		pdf.logError("Invalid page number.")
 		return pdf
 	} else {
 		buf = &pdf.pagePtr.pageContent
@@ -1821,7 +1825,7 @@ func (pdf *PDF) writeObj(objectType string) {
 	} else if objectType[0] == '/' {
 		pdf.write("%d 0 obj<</Type%s", objNo, objectType)
 	} else {
-		pdf.err("objectType should begin with '/' or be a blank string.")
+		pdf.logError("objectType should begin with '/' or be a blank string.")
 	}
 } //                                                                    writeObj
 
@@ -1889,7 +1893,7 @@ func (pdf *PDF) writeStreamData(content []byte) {
 		var writer = zlib.NewWriter(&buf)
 		var _, err = writer.Write([]byte(content))
 		if err != nil {
-			pdf.err("Failed compressing:", err)
+			pdf.logError("Failed compressing:", err)
 			return
 		}
 		writer.Close()
@@ -1907,11 +1911,6 @@ func (pdf *PDF) writeStreamData(content []byte) {
 func (*PDF) colorEqual(a, b PDFColor) bool {
 	return a.Red == b.Red && a.Green == b.Green && a.Blue == b.Blue
 } //                                                                  colorEqual
-
-// err reports an error.
-func (PDF) err(a ...interface{}) {
-	fmt.Println(a)
-} //                                                                         err
 
 // escape escapes special characters '(', '(' and '\' in strings
 // in order to avoid them interfering with PDF commands.
@@ -1982,5 +1981,13 @@ func (*PDF) splitLines(s string) []string {
 	}
 	return split(split(split([]string{s}, "\r\n"), "\r"), "\n")
 } //                                                                  splitLines
+
+// logError reports an error by calling PDFErrorHandler,
+// which is set to fmt.Println by default.
+func (PDF) logError(a ...interface{}) {
+	if PDFErrorHandler != nil {
+		PDFErrorHandler(a...)
+	}
+} //                                                                    logError
 
 //end
