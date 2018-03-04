@@ -1388,7 +1388,7 @@ func (pdf *PDF) Reset() *PDF {
 
 // SaveFile generates and saves the PDF document to a file.
 func (pdf *PDF) SaveFile(filename string) *PDF {
-	var err = ioutil.WriteFile(filename, pdf.Bytes(), 0)
+	var err = ioutil.WriteFile(filename, pdf.Bytes(), 0644)
 	if err != nil {
 		pdf.logError("Failed writing to file", filename, ":", err)
 	}
