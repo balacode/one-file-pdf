@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-04 12:24:53 1BB7F5                              [one_file_pdf.go]
+// :v: 2018-03-04 12:31:33 EDA8FD                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -18,7 +18,7 @@ package pdf
 // # Constants
 //   const PDFNoPage = -1
 //   PDFBuiltInFontNames = []string
-//   PDFColorNames = []PDFColorName
+//   PDFColorNames = map[string]PDFColor
 //   PDFStandardPageSizes = []PDFPageSize
 //   pdfFontWidths = [][]int
 //
@@ -180,12 +180,6 @@ type PDFColor struct {
 	Blue  uint8
 } //                                                                    PDFColor
 
-// PDFColorName represents a color name and associated color value.
-type PDFColorName struct {
-	name string
-	val  PDFColor
-} //                                                                PDFColorName
-
 // PDFFont represents a font name and its appearance.
 type PDFFont struct {
 	fontID    int
@@ -265,153 +259,154 @@ var PDFBuiltInFontNames = []string{
 	"ZapfDingbats",
 } //                                                         PDFBuiltInFontNames
 
-// PDFColorNames is an array of web color names,
-// derived from X11 color names.
-var PDFColorNames = []PDFColorName{
-	{"ALICEBLUE", PDFColor{240, 248, 255}},
-	{"ANTIQUEWHITE", PDFColor{250, 235, 215}},
-	{"AQUA", PDFColor{0, 255, 255}},
-	{"AQUAMARINE", PDFColor{127, 255, 212}},
-	{"AZURE", PDFColor{240, 255, 255}},
-	{"BEIGE", PDFColor{245, 245, 220}},
-	{"BISQUE", PDFColor{255, 228, 196}},
-	{"BLACK", PDFColor{0, 0, 0}},
-	{"BLANCHEDALMOND", PDFColor{255, 235, 205}},
-	{"BLANCHEDALMOND", PDFColor{255, 255, 205}},
-	{"BLUE", PDFColor{0, 0, 255}},
-	{"BLUEVIOLET", PDFColor{138, 43, 226}},
-	{"BROWN", PDFColor{165, 42, 42}},
-	{"BURLYWOOD", PDFColor{222, 184, 135}},
-	{"CADETBLUE", PDFColor{95, 158, 160}},
-	{"CHARTREUSE", PDFColor{127, 255, 0}},
-	{"CHOCOLATE", PDFColor{210, 105, 30}},
-	{"CORAL", PDFColor{255, 127, 80}},
-	{"CORNFLOWERBLUE", PDFColor{100, 149, 237}},
-	{"CORNSILK", PDFColor{255, 248, 220}},
-	{"CRIMSON", PDFColor{220, 20, 60}},
-	{"CYAN", PDFColor{0, 255, 255}},
-	{"DARKBLUE", PDFColor{0, 0, 139}},
-	{"DARKCYAN", PDFColor{0, 139, 139}},
-	{"DARKGOLDENROD", PDFColor{184, 134, 11}},
-	{"DARKGRAY", PDFColor{169, 169, 169}},
-	{"DARKGREEN", PDFColor{0, 100, 0}},
-	{"DARKKHAKI", PDFColor{189, 183, 107}},
-	{"DARKMAGENTA", PDFColor{139, 0, 139}},
-	{"DARKOLIVEGREEN", PDFColor{85, 107, 47}},
-	{"DARKORANGE", PDFColor{255, 140, 0}},
-	{"DARKORCHID", PDFColor{153, 50, 204}},
-	{"DARKRED", PDFColor{139, 0, 0}},
-	{"DARKSALMON", PDFColor{233, 150, 122}},
-	{"DARKSEAGREEN", PDFColor{143, 188, 143}},
-	{"DARKSLATEBLUE", PDFColor{72, 61, 139}},
-	{"DARKSLATEGRAY", PDFColor{47, 79, 79}},
-	{"DARKTURQUOISE", PDFColor{0, 206, 209}},
-	{"DARKVIOLET", PDFColor{148, 0, 211}},
-	{"DEEPPINK", PDFColor{255, 20, 147}},
-	{"DEEPSKYBLUE", PDFColor{0, 191, 255}},
-	{"DIMGRAY", PDFColor{105, 105, 105}},
-	{"DODGERBLUE", PDFColor{30, 144, 255}},
-	{"FIREBRICK", PDFColor{178, 34, 34}},
-	{"FLORALWHITE", PDFColor{255, 250, 240}},
-	{"FORESTGREEN", PDFColor{34, 139, 34}},
-	{"FUCHSIA", PDFColor{255, 0, 255}},
-	{"GAINSBORO", PDFColor{220, 220, 220}},
-	{"GHOSTWHITE", PDFColor{248, 248, 255}},
-	{"GOLD", PDFColor{255, 215, 0}},
-	{"GOLDENROD", PDFColor{218, 165, 32}},
-	{"GRAY", PDFColor{127, 127, 127}},
-	{"GRAY", PDFColor{128, 128, 128}},
-	{"GREEN", PDFColor{0, 128, 0}},
-	{"GREENYELLOW", PDFColor{173, 255, 47}},
-	{"HONEYDEW", PDFColor{240, 255, 240}},
-	{"HOTPINK", PDFColor{255, 105, 180}},
-	{"INDIANRED", PDFColor{205, 92, 92}},
-	{"INDIGO", PDFColor{75, 0, 130}},
-	{"IVORY", PDFColor{255, 255, 240}},
-	{"KHAKI", PDFColor{195, 176, 145}},
-	{"KHAKI", PDFColor{240, 230, 140}},
-	{"LAVENDER", PDFColor{230, 230, 250}},
-	{"LAVENDERBLUSH", PDFColor{255, 240, 245}},
-	{"LAWNGREEN", PDFColor{124, 252, 0}},
-	{"LEMONCHIFFON", PDFColor{255, 250, 205}},
-	{"LIGHTBLUE", PDFColor{173, 216, 230}},
-	{"LIGHTCORAL", PDFColor{240, 128, 128}},
-	{"LIGHTCYAN", PDFColor{224, 255, 255}},
-	{"LIGHTGOLDENRODYELLOW", PDFColor{250, 250, 210}},
-	{"LIGHTGRAY", PDFColor{211, 211, 211}},
-	{"LIGHTGREEN", PDFColor{144, 238, 144}},
-	{"LIGHTPINK", PDFColor{255, 182, 193}},
-	{"LIGHTSALMON", PDFColor{255, 160, 122}},
-	{"LIGHTSEAGREEN", PDFColor{32, 178, 170}},
-	{"LIGHTSKYBLUE", PDFColor{135, 206, 250}},
-	{"LIGHTSLATEGRAY", PDFColor{119, 136, 153}},
-	{"LIGHTSTEELBLUE", PDFColor{176, 196, 222}},
-	{"LIGHTYELLOW", PDFColor{255, 255, 224}},
-	{"LIME", PDFColor{0, 255, 0}},
-	{"LIMEGREEN", PDFColor{50, 205, 50}},
-	{"LINEN", PDFColor{250, 240, 230}},
-	{"MAGENTA", PDFColor{255, 0, 255}},
-	{"MAROON", PDFColor{128, 0, 0}},
-	{"MEDIUMAQUAMARINE", PDFColor{102, 205, 170}},
-	{"MEDIUMBLUE", PDFColor{0, 0, 205}},
-	{"MEDIUMORCHID", PDFColor{186, 85, 211}},
-	{"MEDIUMPURPLE", PDFColor{147, 112, 219}},
-	{"MEDIUMSEAGREEN", PDFColor{60, 179, 113}},
-	{"MEDIUMSLATEBLUE", PDFColor{123, 104, 238}},
-	{"MEDIUMSPRINGGREEN", PDFColor{0, 250, 154}},
-	{"MEDIUMTURQUOISE", PDFColor{72, 209, 204}},
-	{"MEDIUMVIOLETRED", PDFColor{199, 21, 133}},
-	{"MIDNIGHTBLUE", PDFColor{25, 25, 112}},
-	{"MINTCREAM", PDFColor{245, 255, 250}},
-	{"MISTYROSE", PDFColor{255, 228, 225}},
-	{"MOCCASIN", PDFColor{255, 228, 181}},
-	{"NAVAJOWHITE", PDFColor{255, 222, 173}},
-	{"NAVY", PDFColor{0, 0, 128}},
-	{"OLDLACE", PDFColor{253, 245, 230}},
-	{"OLIVE", PDFColor{128, 128, 0}},
-	{"OLIVEDRAB", PDFColor{107, 142, 35}},
-	{"ORANGE", PDFColor{255, 165, 0}},
-	{"ORANGERED", PDFColor{255, 69, 0}},
-	{"ORCHID", PDFColor{218, 112, 214}},
-	{"PALEGOLDENROD", PDFColor{238, 232, 170}},
-	{"PALEGREEN", PDFColor{152, 251, 152}},
-	{"PALETURQUOISE", PDFColor{175, 238, 238}},
-	{"PALEVIOLETRED", PDFColor{219, 112, 147}},
-	{"PAPAYAWHIP", PDFColor{255, 239, 213}},
-	{"PEACHPUFF", PDFColor{255, 218, 185}},
-	{"PERU", PDFColor{205, 133, 63}},
-	{"PINK", PDFColor{255, 192, 203}},
-	{"PLUM", PDFColor{221, 160, 221}},
-	{"POWDERBLUE", PDFColor{176, 224, 230}},
-	{"PURPLE", PDFColor{128, 0, 128}},
-	{"RED", PDFColor{255, 0, 0}},
-	{"ROSYBROWN", PDFColor{188, 143, 143}},
-	{"ROYALBLUE", PDFColor{65, 105, 225}},
-	{"SADDLEBROWN", PDFColor{139, 69, 19}},
-	{"SALMON", PDFColor{250, 128, 114}},
-	{"SANDYBROWN", PDFColor{244, 164, 96}},
-	{"SEAGREEN", PDFColor{46, 139, 87}},
-	{"SEASHELL", PDFColor{255, 245, 238}},
-	{"SIENNA", PDFColor{160, 82, 45}},
-	{"SILVER", PDFColor{192, 192, 192}},
-	{"SKYBLUE", PDFColor{135, 206, 235}},
-	{"SLATEBLUE", PDFColor{106, 90, 205}},
-	{"SLATEGRAY", PDFColor{112, 128, 144}},
-	{"SNOW", PDFColor{255, 250, 250}},
-	{"SPRINGGREEN", PDFColor{0, 255, 127}},
-	{"STEELBLUE", PDFColor{70, 130, 180}},
-	{"TAN", PDFColor{210, 180, 140}},
-	{"TEAL", PDFColor{0, 128, 128}},
-	{"THISTLE", PDFColor{216, 191, 216}},
-	{"TOMATO", PDFColor{255, 99, 71}},
-	{"TURQUOISE", PDFColor{64, 224, 208}},
-	{"VIOLET", PDFColor{238, 130, 238}},
-	{"WHEAT", PDFColor{245, 222, 179}},
-	{"WHITE", PDFColor{255, 255, 255}},
-	{"WHITESMOKE", PDFColor{245, 245, 245}},
-	{"YELLOW", PDFColor{255, 255, 0}},
-	{"YELLOWGREEN", PDFColor{139, 205, 50}},
-	{"YELLOWGREEN", PDFColor{154, 205, 50}},
+// PDFColorNames maps web (X11) color names to values.
+// (from https://en.wikipedia.org/wiki/X11_color_names)
+var PDFColorNames = map[string]PDFColor{
+	"ALICEBLUE":            PDFColor{240, 248, 255}, // #F0F8FF
+	"ANTIQUEWHITE":         PDFColor{250, 235, 215}, // #FAEBD7
+	"AQUA":                 PDFColor{0, 255, 255},   // #00FFFF
+	"AQUAMARINE":           PDFColor{127, 255, 212}, // #7FFFD4
+	"AZURE":                PDFColor{240, 255, 255}, // #F0FFFF
+	"BEIGE":                PDFColor{245, 245, 220}, // #F5F5DC
+	"BISQUE":               PDFColor{255, 228, 196}, // #FFE4C4
+	"BLACK":                PDFColor{0, 0, 0},       // #000000
+	"BLANCHEDALMOND":       PDFColor{255, 235, 205}, // #FFEBCD
+	"BLUE":                 PDFColor{0, 0, 255},     // #0000FF
+	"BLUEVIOLET":           PDFColor{138, 43, 226},  // #8A2BE2
+	"BROWN":                PDFColor{165, 42, 42},   // #A52A2A
+	"BURLYWOOD":            PDFColor{222, 184, 135}, // #DEB887
+	"CADETBLUE":            PDFColor{95, 158, 160},  // #5F9EA0
+	"CHARTREUSE":           PDFColor{127, 255, 0},   // #7FFF00
+	"CHOCOLATE":            PDFColor{210, 105, 30},  // #D2691E
+	"CORAL":                PDFColor{255, 127, 80},  // #FF7F50
+	"CORNFLOWERBLUE":       PDFColor{100, 149, 237}, // #6495ED
+	"CORNSILK":             PDFColor{255, 248, 220}, // #FFF8DC
+	"CRIMSON":              PDFColor{220, 20, 60},   // #DC143C
+	"CYAN":                 PDFColor{0, 255, 255},   // #00FFFF
+	"DARKBLUE":             PDFColor{0, 0, 139},     // #00008B
+	"DARKCYAN":             PDFColor{0, 139, 139},   // #008B8B
+	"DARKGOLDENROD":        PDFColor{184, 134, 11},  // #B8860B
+	"DARKGRAY":             PDFColor{169, 169, 169}, // #A9A9A9
+	"DARKGREEN":            PDFColor{0, 100, 0},     // #006400
+	"DARKKHAKI":            PDFColor{189, 183, 107}, // #BDB76B
+	"DARKMAGENTA":          PDFColor{139, 0, 139},   // #8B008B
+	"DARKOLIVEGREEN":       PDFColor{85, 107, 47},   // #556B2F
+	"DARKORANGE":           PDFColor{255, 140, 0},   // #FF8C00
+	"DARKORCHID":           PDFColor{153, 50, 204},  // #9932CC
+	"DARKRED":              PDFColor{139, 0, 0},     // #8B0000
+	"DARKSALMON":           PDFColor{233, 150, 122}, // #E9967A
+	"DARKSEAGREEN":         PDFColor{143, 188, 143}, // #8FBC8F
+	"DARKSLATEBLUE":        PDFColor{72, 61, 139},   // #483D8B
+	"DARKSLATEGRAY":        PDFColor{47, 79, 79},    // #2F4F4F
+	"DARKTURQUOISE":        PDFColor{0, 206, 209},   // #00CED1
+	"DARKVIOLET":           PDFColor{148, 0, 211},   // #9400D3
+	"DEEPPINK":             PDFColor{255, 20, 147},  // #FF1493
+	"DEEPSKYBLUE":          PDFColor{0, 191, 255},   // #00BFFF
+	"DIMGRAY":              PDFColor{105, 105, 105}, // #696969
+	"DODGERBLUE":           PDFColor{30, 144, 255},  // #1E90FF
+	"FIREBRICK":            PDFColor{178, 34, 34},   // #B22222
+	"FLORALWHITE":          PDFColor{255, 250, 240}, // #FFFAF0
+	"FORESTGREEN":          PDFColor{34, 139, 34},   // #228B22
+	"FUCHSIA":              PDFColor{255, 0, 255},   // #FF00FF
+	"GAINSBORO":            PDFColor{220, 220, 220}, // #DCDCDC
+	"GHOSTWHITE":           PDFColor{248, 248, 255}, // #F8F8FF
+	"GOLD":                 PDFColor{255, 215, 0},   // #FFD700
+	"GOLDENROD":            PDFColor{218, 165, 32},  // #DAA520
+	"GRAY":                 PDFColor{190, 190, 190}, // #BEBEBE X11 Version
+	"GREEN":                PDFColor{0, 255, 0},     // #00FF00 X11 Version
+	"GREENYELLOW":          PDFColor{173, 255, 47},  // #ADFF2F
+	"HONEYDEW":             PDFColor{240, 255, 240}, // #F0FFF0
+	"HOTPINK":              PDFColor{255, 105, 180}, // #FF69B4
+	"INDIANRED":            PDFColor{205, 92, 92},   // #CD5C5C
+	"INDIGO":               PDFColor{75, 0, 130},    // #4B0082
+	"IVORY":                PDFColor{255, 255, 240}, // #FFFFF0
+	"KHAKI":                PDFColor{240, 230, 140}, // #F0E68C
+	"LAVENDER":             PDFColor{230, 230, 250}, // #E6E6FA
+	"LAVENDERBLUSH":        PDFColor{255, 240, 245}, // #FFF0F5
+	"LAWNGREEN":            PDFColor{124, 252, 0},   // #7CFC00
+	"LEMONCHIFFON":         PDFColor{255, 250, 205}, // #FFFACD
+	"LIGHTBLUE":            PDFColor{173, 216, 230}, // #ADD8E6
+	"LIGHTCORAL":           PDFColor{240, 128, 128}, // #F08080
+	"LIGHTCYAN":            PDFColor{224, 255, 255}, // #E0FFFF
+	"LIGHTGOLDENRODYELLOW": PDFColor{250, 250, 210}, // #FAFAD2
+	"LIGHTGRAY":            PDFColor{211, 211, 211}, // #D3D3D3
+	"LIGHTGREEN":           PDFColor{144, 238, 144}, // #90EE90
+	"LIGHTPINK":            PDFColor{255, 182, 193}, // #FFB6C1
+	"LIGHTSALMON":          PDFColor{255, 160, 122}, // #FFA07A
+	"LIGHTSEAGREEN":        PDFColor{32, 178, 170},  // #20B2AA
+	"LIGHTSKYBLUE":         PDFColor{135, 206, 250}, // #87CEFA
+	"LIGHTSLATEGRAY":       PDFColor{119, 136, 153}, // #778899
+	"LIGHTSTEELBLUE":       PDFColor{176, 196, 222}, // #B0C4DE
+	"LIGHTYELLOW":          PDFColor{255, 255, 224}, // #FFFFE0
+	"LIME":                 PDFColor{0, 255, 0},     // #00FF00
+	"LIMEGREEN":            PDFColor{50, 205, 50},   // #32CD32
+	"LINEN":                PDFColor{250, 240, 230}, // #FAF0E6
+	"MAGENTA":              PDFColor{255, 0, 255},   // #FF00FF
+	"MAROON":               PDFColor{176, 48, 96},   // #B03060 X11 Version
+	"MEDIUMAQUAMARINE":     PDFColor{102, 205, 170}, // #66CDAA
+	"MEDIUMBLUE":           PDFColor{0, 0, 205},     // #0000CD
+	"MEDIUMORCHID":         PDFColor{186, 85, 211},  // #BA55D3
+	"MEDIUMPURPLE":         PDFColor{147, 112, 219}, // #9370DB
+	"MEDIUMSEAGREEN":       PDFColor{60, 179, 113},  // #3CB371
+	"MEDIUMSLATEBLUE":      PDFColor{123, 104, 238}, // #7B68EE
+	"MEDIUMSPRINGGREEN":    PDFColor{0, 250, 154},   // #00FA9A
+	"MEDIUMTURQUOISE":      PDFColor{72, 209, 204},  // #48D1CC
+	"MEDIUMVIOLETRED":      PDFColor{199, 21, 133},  // #C71585
+	"MIDNIGHTBLUE":         PDFColor{25, 25, 112},   // #191970
+	"MINTCREAM":            PDFColor{245, 255, 250}, // #F5FFFA
+	"MISTYROSE":            PDFColor{255, 228, 225}, // #FFE4E1
+	"MOCCASIN":             PDFColor{255, 228, 181}, // #FFE4B5
+	"NAVAJOWHITE":          PDFColor{255, 222, 173}, // #FFDEAD
+	"NAVY":                 PDFColor{0, 0, 128},     // #000080
+	"OLDLACE":              PDFColor{253, 245, 230}, // #FDF5E6
+	"OLIVE":                PDFColor{128, 128, 0},   // #808000
+	"OLIVEDRAB":            PDFColor{107, 142, 35},  // #6B8E23
+	"ORANGE":               PDFColor{255, 165, 0},   // #FFA500
+	"ORANGERED":            PDFColor{255, 69, 0},    // #FF4500
+	"ORCHID":               PDFColor{218, 112, 214}, // #DA70D6
+	"PALEGOLDENROD":        PDFColor{238, 232, 170}, // #EEE8AA
+	"PALEGREEN":            PDFColor{152, 251, 152}, // #98FB98
+	"PALETURQUOISE":        PDFColor{175, 238, 238}, // #AFEEEE
+	"PALEVIOLETRED":        PDFColor{219, 112, 147}, // #DB7093
+	"PAPAYAWHIP":           PDFColor{255, 239, 213}, // #FFEFD5
+	"PEACHPUFF":            PDFColor{255, 218, 185}, // #FFDAB9
+	"PERU":                 PDFColor{205, 133, 63},  // #CD853F
+	"PINK":                 PDFColor{255, 192, 203}, // #FFC0CB
+	"PLUM":                 PDFColor{221, 160, 221}, // #DDA0DD
+	"POWDERBLUE":           PDFColor{176, 224, 230}, // #B0E0E6
+	"PURPLE":               PDFColor{160, 32, 240},  // #A020F0 X11 Version
+	"REBECCAPURPLE":        PDFColor{102, 51, 153},  // #663399
+	"RED":                  PDFColor{255, 0, 0},     // #FF0000
+	"ROSYBROWN":            PDFColor{188, 143, 143}, // #BC8F8F
+	"ROYALBLUE":            PDFColor{65, 105, 225},  // #4169E1
+	"SADDLEBROWN":          PDFColor{139, 69, 19},   // #8B4513
+	"SALMON":               PDFColor{250, 128, 114}, // #FA8072
+	"SANDYBROWN":           PDFColor{244, 164, 96},  // #F4A460
+	"SEAGREEN":             PDFColor{46, 139, 87},   // #2E8B57
+	"SEASHELL":             PDFColor{255, 245, 238}, // #FFF5EE
+	"SIENNA":               PDFColor{160, 82, 45},   // #A0522D
+	"SILVER":               PDFColor{192, 192, 192}, // #C0C0C0
+	"SKYBLUE":              PDFColor{135, 206, 235}, // #87CEEB
+	"SLATEBLUE":            PDFColor{106, 90, 205},  // #6A5ACD
+	"SLATEGRAY":            PDFColor{112, 128, 144}, // #708090
+	"SNOW":                 PDFColor{255, 250, 250}, // #FFFAFA
+	"SPRINGGREEN":          PDFColor{0, 255, 127},   // #00FF7F
+	"STEELBLUE":            PDFColor{70, 130, 180},  // #4682B4
+	"TAN":                  PDFColor{210, 180, 140}, // #D2B48C
+	"TEAL":                 PDFColor{0, 128, 128},   // #008080
+	"THISTLE":              PDFColor{216, 191, 216}, // #D8BFD8
+	"TOMATO":               PDFColor{255, 99, 71},   // #FF6347
+	"TURQUOISE":            PDFColor{64, 224, 208},  // #40E0D0
+	"VIOLET":               PDFColor{238, 130, 238}, // #EE82EE
+	"WEBGRAY":              PDFColor{128, 128, 128}, // #808080 Web Version
+	"WEBGREEN":             PDFColor{0, 128, 0},     // #008000 Web Version
+	"WEBMAROON":            PDFColor{127, 0, 0},     // #7F0000 Web Version
+	"WEBPURPLE":            PDFColor{127, 0, 127},   // #7F007F Web Version
+	"WHEAT":                PDFColor{245, 222, 179}, // #F5DEB3
+	"WHITE":                PDFColor{255, 255, 255}, // #FFFFFF
+	"WHITESMOKE":           PDFColor{245, 245, 245}, // #F5F5F5
+	"YELLOW":               PDFColor{255, 255, 0},   // #FFFF00
+	"YELLOWGREEN":          PDFColor{154, 205, 50},  // #9ACD32
 } //                                                               PDFColorNames
 
 // PDFStandardPageSizes is an array of standard page sizes,
@@ -879,15 +874,10 @@ func (pdf *PDF) SetColor(nameOrHTMLValue string) *PDF {
 		return pdf
 	}
 	// otherwise search for color name
-	for _, color := range PDFColorNames {
-		if nameOrHTMLValue == color.name {
-			pdf.SetColorRGB(
-				int(color.val.Red),
-				int(color.val.Green),
-				int(color.val.Blue),
-			)
-			return pdf
-		}
+	var color, exists = PDFColorNames[nameOrHTMLValue]
+	if exists {
+		pdf.SetColorRGB(int(color.Red), int(color.Green), int(color.Blue))
+		return pdf
 	}
 	pdf.logError("Color name '" + nameOrHTMLValue + "' not known." +
 		"Setting to black.")
