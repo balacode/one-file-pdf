@@ -1,8 +1,8 @@
 # Binaries for programs and plugins
-*.exe
 *.dll
-*.so
 *.dylib
+*.exe
+*.so
 
 # Test binary, build with `go test -c`
 *.test
@@ -12,3 +12,13 @@
 
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
+
+# Drafts, Etc.
+*.repl
+*`*
+__*
+
+# Generated files
+
+# ignore the generated file, the reference sample is in demo/sample/hello.pdf
+demo/hello.pdf 
