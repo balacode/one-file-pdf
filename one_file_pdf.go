@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-06 00:37:22 69C87F                              [one_file_pdf.go]
+// :v: 2018-03-06 00:42:44 EB5891                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -837,10 +837,10 @@ func (pdf *PDF) Y() float64 {
 func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 	//
 	// if name starts with '#' treat it as HTML color (#RRGGBB)
-	nameOrHTMLColor = strings.ToUpper(nameOrHTMLColor)
-	if nameOrHTMLColor != "" && nameOrHTMLColor[0] == '#' {
+	var s = strings.ToUpper(nameOrHTMLColor)
+	if s != "" && s[0] == '#' {
 		var hex [6]uint8
-		for i, ch := range nameOrHTMLColor[1:] {
+		for i, ch := range s[1:] {
 			if i > 6 {
 				break
 			}
@@ -852,28 +852,21 @@ func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 				hex[i] = uint8(ch - 'A' + 10)
 				continue
 			}
-			pdf.logError("Invalid color code '" + nameOrHTMLColor + "'." +
-				"Setting to black.")
-			pdf.SetColorRGB(0, 0, 0)
-			return pdf
+			pdf.logError("Invalid color code '" + s + "'. Setting to black.")
+			return pdf.SetColorRGB(0, 0, 0)
 		}
-		pdf.SetColorRGB(
+		return pdf.SetColorRGB(
 			int(hex[0]*16+hex[1]),
 			int(hex[2]*16+hex[3]),
-			int(hex[4]*16+hex[5]),
-		)
-		return pdf
+			int(hex[4]*16+hex[5]))
 	}
 	// otherwise search for color name
-	var color, exists = PDFColorNames[nameOrHTMLColor]
+	var clr, exists = PDFColorNames[s]
 	if exists {
-		pdf.SetColorRGB(int(color.Red), int(color.Green), int(color.Blue))
-		return pdf
+		return pdf.SetColorRGB(int(clr.Red), int(clr.Green), int(clr.Blue))
 	}
-	pdf.logError("Color name '" + nameOrHTMLColor + "' not known." +
-		"Setting to black.")
-	pdf.SetColorRGB(0, 0, 0)
-	return pdf
+	pdf.logError("Color name '" + s + "' not known. Setting to black.")
+	return pdf.SetColorRGB(0, 0, 0)
 } //                                                                    SetColor
 
 // SetColorRGB sets the current color using separate
@@ -1103,9 +1096,8 @@ func (pdf *PDF) DrawBox(x, y, width, height float64) *PDF {
 	x *= pdf.pointsPerUnit
 	y = pdf.pageSize.HeightPt - y*pdf.pointsPerUnit - height
 	pdf.applyLineWidth().applyStrokeColor()
-	//
-	// 're' = construct a rectangular path, 'S' = stroke path
 	return pdf.write("%.3f %.3f %.3f %.3f re S\n", x, y, width, height)
+	// 're' = construct a rectangular path, 'S' = stroke path
 } //                                                                     DrawBox
 
 // DrawImage draws a grayscale PNG image.
@@ -1220,8 +1212,7 @@ func (pdf *PDF) DrawText(text string) *PDF {
 		return pdf
 	}
 	if len(pdf.columnWidths) == 0 {
-		pdf.drawTextLine(text)
-		return pdf
+		return pdf.drawTextLine(text)
 	}
 	var x = 0.0
 	for i := 0; i < pdf.columnNo; i++ {
@@ -1339,10 +1330,11 @@ func (pdf *PDF) NextLine() *PDF {
 
 // Reset releases all resources and resets all variables.
 func (pdf *PDF) Reset() *PDF {
-	for _, page := range pdf.pages {
-		page.fontIDs = []int{}
-		page.imageNos = []int{}
-		page.pageContent.Reset()
+	// TODO: If replaced with one-line *pdf=PDF{} will Go release everything?
+	for _, pg := range pdf.pages {
+		pg.fontIDs = []int{}
+		pg.imageNos = []int{}
+		pg.pageContent.Reset()
 	}
 	pdf.docAuthor, pdf.docCreator, pdf.docKeywords = "", "", ""
 	pdf.docSubject, pdf.docTitle, pdf.unitName = "", "", ""
@@ -1435,7 +1427,7 @@ func (pdf *PDF) WrapTextLines(width float64, text string) []string {
 			iter = iter[ln-1:]
 		}
 		ret = append(ret, iter)
-	}
+	} // for
 	return ret
 } //                                                               WrapTextLines
 
@@ -1447,14 +1439,12 @@ func (pdf *PDF) WrapTextLines(width float64, text string) []string {
 // Recognised units are:
 // mm cm " in inch inches tw twip twips pt point points
 func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
-	numberAndUnit = strings.ToUpper(
-		strings.Trim(numberAndUnit, " \a\b\f\n\r\t\v"),
-	)
-	if numberAndUnit == "" {
+	var s = strings.ToUpper(strings.Trim(numberAndUnit, " \a\b\f\n\r\t\v"))
+	if s == "" {
 		return 0
 	}
 	var num, unit string //            read value and unit into separate strings
-	for _, ch := range numberAndUnit {
+	for _, ch := range s {
 		if (ch >= '0' && ch <= '9') || ch == '.' || ch == '-' {
 			num += string(ch)
 			continue
@@ -1535,7 +1525,7 @@ func (pdf *PDF) applyFont() {
 	}
 	var pg = pdf.pagePtr
 	if pg.fontID == font.fontID &&
-		(int(pg.fontSizePt*1000) == int(pdf.fontSizePt)*1000) {
+		int(pg.fontSizePt*1000) == int(pdf.fontSizePt)*1000 {
 		return
 	}
 	// add the font ID to the current page, if not already referenced
@@ -1573,15 +1563,13 @@ func (pdf *PDF) applyLineWidth() *PDF {
 // the current page's content stream, if the value changed since last call.
 // called by: drawTextLine(), FillBox()
 func (pdf *PDF) applyNonStrokeColor() *PDF {
-	var val = &pdf.pagePtr.nonStrokeColor
-	if *val == pdf.color {
+	var clr = &pdf.pagePtr.nonStrokeColor
+	if *clr == pdf.color {
 		return pdf
 	}
-	*val = pdf.color
+	*clr = pdf.color
 	pdf.write("%.3f %.3f %.3f rg\n", // 'rg' = set non-stroking (text) color
-		float64(val.Red)/255,
-		float64(val.Green)/255,
-		float64(val.Blue)/255)
+		float64(clr.Red)/255, float64(clr.Green)/255, float64(clr.Blue)/255)
 	return pdf
 } //                                                         applyNonStrokeColor
 
@@ -1590,15 +1578,13 @@ func (pdf *PDF) applyNonStrokeColor() *PDF {
 // stream, if the value changed since last call.
 // called by: DrawBox(), DrawLine()
 func (pdf *PDF) applyStrokeColor() *PDF {
-	var val = &pdf.pagePtr.strokeColor
-	if *val == pdf.color {
+	var clr = &pdf.pagePtr.strokeColor
+	if *clr == pdf.color {
 		return pdf
 	}
-	*val = pdf.color
+	*clr = pdf.color
 	pdf.write("%.3f %.3f %.3f RG\n", // 'RG' = stroke (line) color
-		float64(val.Red)/255,
-		float64(val.Green)/255,
-		float64(val.Blue)/255)
+		float64(clr.Red)/255, float64(clr.Green)/255, float64(clr.Blue)/255)
 	return pdf
 } //                                                            applyStrokeColor
 
@@ -1640,12 +1626,12 @@ func (pdf *PDF) drawTextBox(
 		pdf.logError("No current page.")
 		return pdf
 	}
-	var lines = (func() []string {
-		if wrapText {
-			return pdf.WrapTextLines(width, text)
-		}
-		return []string{text}
-	})() // IIFE
+	var lines []string
+	if wrapText {
+		lines = pdf.WrapTextLines(width, text)
+	} else {
+		lines = []string{text}
+	}
 	var lineHeight = pdf.FontSize()
 	var allLinesHeight = lineHeight * float64(len(lines))
 	//
@@ -1870,9 +1856,8 @@ func (pdf *PDF) writeStreamData(content []byte) *PDF {
 // in order to avoid them interfering with PDF commands.
 // called by: Bytes(), drawTextLine()
 func (*PDF) escape(s string) []byte {
-	if strings.Contains(s, "(") || strings.Contains(s, ")") ||
-		strings.Contains(s, "\\") {
-		//
+	var has = strings.Contains
+	if has(s, "(") || has(s, ")") || has(s, "\\") {
 		var writer = bytes.NewBuffer(make([]byte, 0, len(s)))
 		for _, ch := range s {
 			if ch == '(' || ch == ')' || ch == '\\' {
@@ -1920,14 +1905,13 @@ func (*PDF) isWhiteSpace(s string) bool {
 
 // splitLines splits 's' into several lines using line breaks in 's'.
 func (*PDF) splitLines(s string) []string {
-	var split = func(ar []string, sep string) []string {
-		var ret []string
+	var split = func(ar []string, sep string) (ret []string) {
 		for _, iter := range ar {
 			if strings.Contains(iter, sep) {
 				ret = append(ret, strings.Split(iter, sep)...)
-			} else {
-				ret = append(ret, iter)
+				continue
 			}
+			ret = append(ret, iter)
 		}
 		return ret
 	}
