@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-05 01:10:08 29C66C                              [one_file_pdf.go]
+// :v: 2018-03-05 01:21:55 6CF64F                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -168,8 +168,6 @@ type PDF struct {
 	// extra features:
 	unitName      string  // name of measurement unit
 	pointsPerUnit float64 // number of points per measurement unit
-	pageWidthPt   float64 // page width in points
-	pageHeightPt  float64 // page height in points
 	columnWidths  []float64
 } //                                                                         PDF
 
@@ -713,8 +711,6 @@ func NewPDF(pageSize string) PDF {
 	var pdf = PDF{
 		pageNo:            PDFNoPage,
 		pageSize:          size,
-		pageWidthPt:       size.WidthPt,
-		pageHeightPt:      size.HeightPt,
 		horizontalScaling: 100,
 		compressStreams:   true,
 	}
@@ -832,7 +828,7 @@ func (pdf *PDF) Y() float64 {
 	if pdf.warnIfNoPage() {
 		return 0
 	}
-	return (pdf.pageHeightPt - pdf.pagePtr.y) / pdf.pointsPerUnit
+	return (pdf.pageSize.HeightPt - pdf.pagePtr.y) / pdf.pointsPerUnit
 } //                                                                           Y
 
 // -----------------------------------------------------------------------------
@@ -993,7 +989,7 @@ func (pdf *PDF) SetXY(x, y float64) *PDF {
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
-	x, y = x*pdf.pointsPerUnit, pdf.pageHeightPt-y*pdf.pointsPerUnit
+	x, y = x*pdf.pointsPerUnit, pdf.pageSize.HeightPt-y*pdf.pointsPerUnit
 	pdf.pagePtr.x, pdf.pagePtr.y = x, y
 	return pdf
 } //                                                                       SetXY
@@ -1001,7 +997,7 @@ func (pdf *PDF) SetXY(x, y float64) *PDF {
 // SetY changes the Y-coordinate of the current drawing position.
 func (pdf *PDF) SetY(y float64) *PDF {
 	if pdf.warnIfNoPage() {
-		pdf.pagePtr.y = (pdf.pageHeightPt * pdf.pointsPerUnit) -
+		pdf.pagePtr.y = (pdf.pageSize.HeightPt * pdf.pointsPerUnit) -
 			(y * pdf.pointsPerUnit)
 	}
 	return pdf
@@ -1116,7 +1112,7 @@ func (pdf *PDF) DrawBox(x, y, width, height float64) *PDF {
 	}
 	width, height = width*pdf.pointsPerUnit, height*pdf.pointsPerUnit
 	x *= pdf.pointsPerUnit
-	y = pdf.pageHeightPt - y*pdf.pointsPerUnit - height
+	y = pdf.pageSize.HeightPt - y*pdf.pointsPerUnit - height
 	pdf.applyLineWidth().applyStrokeColor()
 	// re = construct a rectangular path, S = stroke path
 	pdf.write("%.3f %.3f %.3f %.3f re S\n", x, y, width, height)
@@ -1203,7 +1199,7 @@ func (pdf *PDF) DrawImage(
 		pg.imageNos = append(pg.imageNos, imgNo)
 	}
 	x *= pdf.pointsPerUnit
-	y = pdf.pageHeightPt - y*pdf.pointsPerUnit - height
+	y = pdf.pageSize.HeightPt - y*pdf.pointsPerUnit - height
 	height *= pdf.pointsPerUnit
 	var width = float64(img.width) / float64(img.height) * height
 	//
@@ -1222,8 +1218,8 @@ func (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF {
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
-	x1, y1 = x1*pdf.pointsPerUnit, pdf.pageHeightPt-y1*pdf.pointsPerUnit
-	x2, y2 = x2*pdf.pointsPerUnit, pdf.pageHeightPt-y2*pdf.pointsPerUnit
+	x1, y1 = x1*pdf.pointsPerUnit, pdf.pageSize.HeightPt-y1*pdf.pointsPerUnit
+	x2, y2 = x2*pdf.pointsPerUnit, pdf.pageSize.HeightPt-y2*pdf.pointsPerUnit
 	pdf.applyLineWidth().applyStrokeColor()
 	//
 	// send command to draw the line
@@ -1334,7 +1330,7 @@ func (pdf *PDF) FillBox(x, y, width, height float64) *PDF {
 	}
 	width, height = width*pdf.pointsPerUnit, height*pdf.pointsPerUnit
 	x *= pdf.pointsPerUnit
-	y = pdf.pageHeightPt - y*pdf.pointsPerUnit - height
+	y = pdf.pageSize.HeightPt - y*pdf.pointsPerUnit - height
 	//
 	// PDF command: 're' = construct a rectangular path, 'f' = fill
 	pdf.applyLineWidth().applyNonStrokeColor().
@@ -1349,7 +1345,7 @@ func (pdf *PDF) NextLine() *PDF {
 	var x = pdf.X()
 	var y = pdf.Y()
 	var lineHeight = pdf.FontSize() * pdf.pointsPerUnit
-	var pageHeight = pdf.pageHeightPt * pdf.pointsPerUnit
+	var pageHeight = pdf.pageSize.HeightPt * pdf.pointsPerUnit
 	y += lineHeight
 	if y > pageHeight {
 		pdf.AddPage()
@@ -1703,7 +1699,7 @@ func (pdf *PDF) drawTextBox(
 		}
 		return height/2 - allLinesHeight/2 - pdf.fontSizePt*0.15 // center
 	})() // IIFE
-	y = pdf.pageHeightPt - y
+	y = pdf.pageSize.HeightPt - y
 	for _, line := range lines {
 		pdf.pagePtr.x, pdf.pagePtr.y = x+alignX(line), y
 		pdf.drawTextLine(line)
