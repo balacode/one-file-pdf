@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-05 18:02:29 2EE194                              [one_file_pdf.go]
+// :v: 2018-03-06 00:28:18 6FA61A                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -110,7 +110,7 @@ package pdf
 //   (pdf *PDF) warnIfNoPage() bool
 //
 // # Private Generation Methods
-//   (pdf *PDF) nextObject() int
+//   (pdf *PDF) nextObj() int
 //   (pdf *PDF) write(format string, args ...interface{}) *PDF
 //   (pdf *PDF) writeEndobj() *PDF
 //   (pdf *PDF) writeObj(objectType string) *PDF
@@ -1740,14 +1740,14 @@ func (pdf *PDF) warnIfNoPage() bool {
 // -----------------------------------------------------------------------------
 // # Private Generation Methods
 
-// nextObject increases the object serial no. and stores its offset in array
-func (pdf *PDF) nextObject() int {
+// nextObj increases the object serial no. and stores its offset in array
+func (pdf *PDF) nextObj() int {
 	pdf.objNo++
 	for len(pdf.objOffsets) <= pdf.objNo {
 		pdf.objOffsets = append(pdf.objOffsets, pdf.content.Len())
 	}
 	return pdf.objNo
-} //                                                                  nextObject
+} //                                                                     nextObj
 
 // write writes formatted strings (like fmt.Sprintf) to the current page's
 // content stream or to the final generated PDF, if there is no active page.
@@ -1775,7 +1775,7 @@ func (pdf *PDF) writeEndobj() *PDF {
 // writeObj outputs an object header
 func (pdf *PDF) writeObj(objectType string) *PDF {
 	pdf.setCurrentPage(PDFNoPage)
-	var objNo = pdf.nextObject()
+	var objNo = pdf.nextObj()
 	if objectType == "" {
 		pdf.write("%d 0 obj<<", objNo)
 	} else if objectType[0] == '/' {
@@ -1836,8 +1836,7 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
 // writeStream outputs a stream object to the document's main buffer.
 func (pdf *PDF) writeStream(content []byte) *PDF {
 	return pdf.setCurrentPage(PDFNoPage).
-		write("%d 0 obj <<", pdf.nextObject()).
-		writeStreamData(content)
+		write("%d 0 obj <<", pdf.nextObj()).writeStreamData(content)
 } //                                                                 writeStream
 
 // writeStreamData writes a stream or image stream.
