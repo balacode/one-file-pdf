@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-05 16:07:32 777A6F                              [one_file_pdf.go]
+// :v: 2018-03-05 16:28:38 B5BE0D                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -12,7 +12,6 @@ package pdf
 //   PDFPageSizeOf(pageSize string) PDFPageSize
 //
 // # Constants
-//   PDFBuiltInFontNames = []string
 //   PDFColorNames = map[string]PDFColor
 //   PDFNoPage = -1
 //   PDFStandardPageSizes = []PDFPageSize
@@ -23,6 +22,7 @@ package pdf
 //   pdfPage struct
 //
 // # Internal Constants
+//   pdfFontNames = []string
 //   pdfFontWidths = [][]int
 //   pdfPagesIndex = 3
 //
@@ -180,8 +180,8 @@ type PDFColor struct {
 // PDFPageSize represents a page size name and its dimensions in points.
 type PDFPageSize struct {
 	Name     string
-	WidthPt  float64
-	HeightPt float64
+	WidthPt  float64 // width in points
+	HeightPt float64 // height in points
 } //                                                                 PDFPageSize
 
 // PDFPageSizeOf returns a PDFPageSize struct based on
@@ -202,25 +202,6 @@ func PDFPageSizeOf(pageSize string) PDFPageSize {
 
 // PDFNoPage specifies there is no current page.
 const PDFNoPage = -1
-
-// PDFBuiltInFontNames lists font names
-// available on all PDF implementations.
-var PDFBuiltInFontNames = []string{
-	"Courier",
-	"Courier-Bold",
-	"Courier-BoldOblique",
-	"Courier-Oblique",
-	"Helvetica",
-	"Helvetica-Bold",
-	"Helvetica-BoldOblique",
-	"Helvetica-Oblique",
-	"Symbol",
-	"Times-Bold",
-	"Times-BoldItalic",
-	"Times-Italic",
-	"Times-Roman",
-	"ZapfDingbats",
-} //                                                         PDFBuiltInFontNames
 
 // PDFColorNames maps web (X11) color names to values.
 // (from https://en.wikipedia.org/wiki/X11_color_names)
@@ -427,17 +408,26 @@ type pdfPage struct {
 // -----------------------------------------------------------------------------
 // # Internal Constants
 
-// Built-in Font Widths:
-// 0 Helvetica
-// 1 HelveticaBold
-// 2 HelveticaBoldOblique
-// 3 HelveticaOblique
-// 4 Symbol
-// 5 TimesBold
-// 6 TimesBoldItalic
-// 7 TimesItalic
-// 8 TimesRoman
-// 9 ZapfDingbats
+// pdfFontNames lists the names of built-in font names
+// these fonts must be available on all PDF implementations
+var pdfFontNames = []string{
+	"Courier",               // fixed-width
+	"Courier-Bold",          // fixed-width
+	"Courier-BoldOblique",   // fixed-width
+	"Courier-Oblique",       // fixed-width
+	"Helvetica",             // 0
+	"Helvetica-Bold",        // 1
+	"Helvetica-BoldOblique", // 2
+	"Helvetica-Oblique",     // 3
+	"Symbol",                // 4
+	"Times-Bold",            // 5
+	"Times-BoldItalic",      // 6
+	"Times-Italic",          // 7
+	"Times-Roman",           // 8
+	"ZapfDingbats",          // 9
+} //                                                                pdfFontNames
+
+// pdfFontWidths specifies the widths of build-in fonts
 var pdfFontWidths = [][]int{
 	{278, 278, 278, 278, 250, 250, 250, 250, 250, 000},         // 000
 	{278, 278, 278, 278, 250, 250, 250, 250, 250, 000},         // 001
@@ -1510,12 +1500,12 @@ func (pdf *PDF) applyFont() {
 	var font pdfFont
 	if isValid {
 		isValid = false
-		for i, name := range PDFBuiltInFontNames {
+		for i, name := range pdfFontNames {
 			name = strings.ToUpper(name)
 			if strings.ToUpper(pdf.fontName) != name {
 				continue
 			}
-			font.fontName = PDFBuiltInFontNames[i]
+			font.fontName = pdfFontNames[i]
 			font.isBuiltIn = true
 			font.isBold = strings.Contains(name, "BOLD")
 			font.isItalic = strings.Contains(name, "OBLIQUE") ||
