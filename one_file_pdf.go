@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-04 12:44:13 1FE6D8                              [one_file_pdf.go]
+// :v: 2018-03-05 01:10:08 29C66C                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -694,7 +694,7 @@ var pdfFontWidths = [][]int{
 	{500, 556, 556, 500, 000, 500, 444, 444, 500, 000},         // 255
 } //                                                               pdfFontWidths
 
-// pdfPagesIndex __
+// pdfPagesIndex is the starting page object index (after Catalog and Pages)
 const pdfPagesIndex = 3
 
 // -----------------------------------------------------------------------------
@@ -849,16 +849,16 @@ func (pdf *PDF) SetColor(nameOrHTMLValue string) *PDF {
 	nameOrHTMLValue = strings.ToUpper(nameOrHTMLValue)
 	if nameOrHTMLValue[0] == '#' {
 		var hex [6]uint8
-		for i, r := range nameOrHTMLValue[1:] {
+		for i, ch := range nameOrHTMLValue[1:] {
 			if i > 6 {
 				break
 			}
-			if r >= '0' && r <= '9' {
-				hex[i] = uint8(r - '0')
+			if ch >= '0' && ch <= '9' {
+				hex[i] = uint8(ch - '0')
 				continue
 			}
-			if r >= 'A' && r <= 'F' {
-				hex[i] = uint8(r - 'A' + 10)
+			if ch >= 'A' && ch <= 'F' {
+				hex[i] = uint8(ch - 'A' + 10)
 				continue
 			}
 			pdf.logError("Invalid color code '" + nameOrHTMLValue + "'." +
@@ -1067,11 +1067,9 @@ func (pdf *PDF) Bytes() []byte {
 	// write images
 	for _, iter := range pdf.images {
 		pdf.writeObj("/XObject")
-		pdf.write(
-			"/Subtype/Image/Width %d/Height %d"+
-				"/ColorSpace/DeviceGray/BitsPerComponent 8",
-			iter.width, iter.height,
-		)
+		pdf.write("/Subtype/Image/Width %d/Height %d"+
+			"/ColorSpace/DeviceGray/BitsPerComponent 8",
+			iter.width, iter.height)
 		pdf.writeStreamData(iter.data)
 		pdf.write("\nendobj\n")
 	}
@@ -1090,9 +1088,7 @@ func (pdf *PDF) Bytes() []byte {
 		} {
 			if iter.field != "" {
 				pdf.write(iter.label).
-					write("(").
-					write(string(pdf.escape(iter.field))).
-					write(")")
+					write("(").write(string(pdf.escape(iter.field))).write(")")
 			}
 		}
 		pdf.writeEndobj() // info
@@ -1118,9 +1114,9 @@ func (pdf *PDF) DrawBox(x, y, width, height float64) *PDF {
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
-	x, y = x*pdf.pointsPerUnit, y*pdf.pointsPerUnit
 	width, height = width*pdf.pointsPerUnit, height*pdf.pointsPerUnit
-	y = pdf.pageHeightPt - y - height
+	x *= pdf.pointsPerUnit
+	y = pdf.pageHeightPt - y*pdf.pointsPerUnit - height
 	pdf.applyLineWidth().applyStrokeColor()
 	// re = construct a rectangular path, S = stroke path
 	pdf.write("%.3f %.3f %.3f %.3f re S\n", x, y, width, height)
@@ -1153,11 +1149,11 @@ func (pdf *PDF) DrawImage(
 		imgName = val
 		imgBuf = bytes.NewBuffer(data)
 	case []byte:
-		var l = len(val)
-		if l > 32 {
-			l = 32
+		var n = len(val)
+		if n > 32 {
+			n = 32
 		}
-		imgName = fmt.Sprintf("%x", val[:l])
+		imgName = fmt.Sprintf("%x", val[:n])
 		imgBuf = bytes.NewBuffer(val)
 	}
 	var pg = pdf.pagePtr
@@ -1179,9 +1175,9 @@ func (pdf *PDF) DrawImage(
 		var data []byte
 		for y := 0; y < h; y++ {
 			for x := 0; x < w; x++ {
-				var r, g, b, _ = decoded.At(x, y).RGBA()
+				var rd, gr, bl, _ = decoded.At(x, y).RGBA()
 				data = append(data, byte(
-					float64(r)*0.2126+float64(g)*0.7152+float64(b)*0.0722,
+					float64(rd)*0.2126+float64(gr)*0.7152+float64(bl)*0.0722,
 				))
 			}
 		}
@@ -1213,7 +1209,7 @@ func (pdf *PDF) DrawImage(
 	//
 	// write command to draw the image
 	pdf.write("q\n"+ // save graphics state
-		// w      h  x  y
+		// w      h x  y
 		" %f 0 0 %f %f %f cm\n"+
 		"/Im%d Do\n"+
 		"Q\n", // restore graphics state
@@ -1226,9 +1222,8 @@ func (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF {
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
-	x1, y1, x2, y2 = x1*pdf.pointsPerUnit, y1*pdf.pointsPerUnit,
-		x2*pdf.pointsPerUnit, y2*pdf.pointsPerUnit
-	y1, y2 = pdf.pageHeightPt-y1, pdf.pageHeightPt-y2
+	x1, y1 = x1*pdf.pointsPerUnit, pdf.pageHeightPt-y1*pdf.pointsPerUnit
+	x2, y2 = x2*pdf.pointsPerUnit, pdf.pageHeightPt-y2*pdf.pointsPerUnit
 	pdf.applyLineWidth().applyStrokeColor()
 	//
 	// send command to draw the line
@@ -1337,12 +1332,13 @@ func (pdf *PDF) FillBox(x, y, width, height float64) *PDF {
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
-	x, y, width, height = x*pdf.pointsPerUnit, y*pdf.pointsPerUnit,
-		width*pdf.pointsPerUnit, height*pdf.pointsPerUnit
-	y = pdf.pageHeightPt - y - height
+	width, height = width*pdf.pointsPerUnit, height*pdf.pointsPerUnit
+	x *= pdf.pointsPerUnit
+	y = pdf.pageHeightPt - y*pdf.pointsPerUnit - height
+	//
+	// PDF command: 're' = construct a rectangular path, 'f' = fill
 	pdf.applyLineWidth().applyNonStrokeColor().
 		write("%.3f %.3f %.3f %.3f re f\n", x, y, width, height)
-	// 're' = construct a rectangular path, f = fill
 	return pdf
 } //                                                                     FillBox
 
@@ -1441,8 +1437,7 @@ func (pdf *PDF) WrapTextLines(width float64, text string) []string {
 			}
 			var inc = ln / 2 //         take half more text until it doesn't fit
 			ln += inc
-			for ln > 0 && ln < max &&
-				pdf.TextWidth(iter[:ln]) <= width {
+			for ln > 0 && ln < max && pdf.TextWidth(iter[:ln]) <= width {
 				if inc > 1 {
 					inc /= 2
 				}
@@ -1687,10 +1682,10 @@ func (pdf *PDF) drawTextBox(
 	// calculate x-axis position of text (left, right, center)
 	x, width = x*pdf.pointsPerUnit, width*pdf.pointsPerUnit
 	var alignX = func(text string) float64 {
-		for _, r := range align {
-			if r == 'l' || r == 'L' {
+		for _, ch := range align {
+			if ch == 'l' || ch == 'L' {
 				return pdf.fontSizePt / 6 // add margin
-			} else if r == 'r' || r == 'R' {
+			} else if ch == 'r' || ch == 'R' {
 				return width - pdf.textWidthPt1000(text) - pdf.fontSizePt/6
 			}
 		}
@@ -1699,10 +1694,10 @@ func (pdf *PDF) drawTextBox(
 	// calculate aligned y-axis position of text (top, bottom, center)
 	y, height = y*pdf.pointsPerUnit, height*pdf.pointsPerUnit
 	y += pdf.fontSizePt + (func() float64 {
-		for _, r := range align {
-			if r == 't' || r == 'T' {
+		for _, ch := range align {
+			if ch == 't' || ch == 'T' {
 				return 0 // top
-			} else if r == 'b' || r == 'B' {
+			} else if ch == 'b' || ch == 'B' {
 				return height - allLinesHeight - 4 // bottom
 			}
 		}
@@ -1747,12 +1742,12 @@ func (pdf *PDF) textWidthPt1000(text string) float64 {
 		return 0
 	}
 	var w = 0.0
-	for i, r := range text {
-		if r < 0 || r > 255 {
-			pdf.logError("char out of range at %d: %d", i, r)
+	for i, ch := range text {
+		if ch < 0 || ch > 255 {
+			pdf.logError("char out of range at %d: %d", i, ch)
 			break
 		}
-		w += float64(pdfFontWidths[r][0])
+		w += float64(pdfFontWidths[ch][0])
 		// TODO: [0] is not considering the current font!
 	}
 	return w * pdf.fontSizePt / 1000 * float64(pdf.horizontalScaling) / 100
@@ -1801,7 +1796,7 @@ func (pdf *PDF) write(format string, args ...interface{}) *PDF {
 	return pdf
 } //                                                                       write
 
-// writeEndobj __
+// writeEndobj writes 'endobj' (PDF object end marker).
 func (pdf *PDF) writeEndobj() {
 	pdf.write(">>\nendobj\n")
 } //                                                                 writeEndobj
@@ -1819,7 +1814,7 @@ func (pdf *PDF) writeObj(objectType string) {
 	}
 } //                                                                    writeObj
 
-// writePages __
+// writePages writes all PDF pages.
 func (pdf *PDF) writePages(fontsIndex, imagesIndex int) {
 	if len(pdf.pages) > 0 { //                                write page numbers
 		var pageObjectNo = pdfPagesIndex
@@ -1910,11 +1905,11 @@ func (*PDF) escape(s string) []byte {
 		strings.Contains(s, "\\") {
 		//
 		var writer = bytes.NewBuffer(make([]byte, 0, len(s)))
-		for _, r := range s {
-			if r == '(' || r == ')' || r == '\\' {
+		for _, ch := range s {
+			if ch == '(' || ch == ')' || ch == '\\' {
 				writer.WriteRune('\\')
 			}
-			writer.WriteRune(r)
+			writer.WriteRune(ch)
 		}
 		return writer.Bytes()
 	}
@@ -1956,7 +1951,7 @@ func (*PDF) isWhiteSpace(s string) bool {
 	return true
 } //                                                                isWhiteSpace
 
-// splitLines __
+// splitLines splits 's' into several lines using line breaks in 's'.
 func (*PDF) splitLines(s string) []string {
 	var split = func(ar []string, sep string) []string {
 		var ret []string
