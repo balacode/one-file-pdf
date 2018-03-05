@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-05 11:59:19 4A2E7D                              [one_file_pdf.go]
+// :v: 2018-03-05 12:16:59 0BD8F7                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -114,7 +114,6 @@ package pdf
 //   (pdf *PDF) writeStreamData(content []byte)
 //
 // # Private Functions
-//   (*PDF) colorEqual(a, b PDFColor) bool
 //   (*PDF) escape(s string) []byte
 //   (*PDF) getPointsPerUnit(unitName string) float64
 //   (*PDF) isWhiteSpace(s string) bool
@@ -1587,16 +1586,15 @@ func (pdf *PDF) applyLineWidth() *PDF {
 // the current page's content stream, if the value changed since last call.
 // called by: drawTextLine(), FillBox()
 func (pdf *PDF) applyNonStrokeColor() *PDF {
-	var val = pdf.pagePtr.nonStrokeColor
-	if !pdf.colorEqual(val, pdf.color) {
-		val = pdf.color
-		pdf.write(
-			"%.3f %.3f %.3f rg\n", // non-stroking (text) color
-			float64(val.Red)/255,
-			float64(val.Green)/255,
-			float64(val.Blue)/255,
-		)
+	var val = &pdf.pagePtr.nonStrokeColor
+	if *val == pdf.color {
+		return pdf
 	}
+	*val = pdf.color
+	pdf.write("%.3f %.3f %.3f rg\n", // non-stroking (text) color
+		float64(val.Red)/255,
+		float64(val.Green)/255,
+		float64(val.Blue)/255)
 	return pdf
 } //                                                         applyNonStrokeColor
 
@@ -1605,16 +1603,15 @@ func (pdf *PDF) applyNonStrokeColor() *PDF {
 // stream, if the value changed since last call.
 // called by: DrawBox(), DrawLine()
 func (pdf *PDF) applyStrokeColor() *PDF {
-	var val = pdf.pagePtr.strokeColor
-	if !pdf.colorEqual(val, pdf.color) {
-		val = pdf.color
-		pdf.write(
-			"%.3f %.3f %.3f RG\n", // RG - stroke (line) color
-			float64(val.Red)/255,
-			float64(val.Green)/255,
-			float64(val.Blue)/255,
-		)
+	var val = &pdf.pagePtr.strokeColor
+	if *val == pdf.color {
+		return pdf
 	}
+	*val = pdf.color
+	pdf.write("%.3f %.3f %.3f RG\n", // RG - stroke (line) color
+		float64(val.Red)/255,
+		float64(val.Green)/255,
+		float64(val.Blue)/255)
 	return pdf
 } //                                                            applyStrokeColor
 
@@ -1879,12 +1876,6 @@ func (pdf *PDF) writeStreamData(content []byte) {
 // -----------------------------------------------------------------------------
 // # Private Functions
 
-// colorEqual compares two PDFColor values.
-// called by: applyNonStrokeColor(), applyStrokeColor()
-func (*PDF) colorEqual(a, b PDFColor) bool {
-	return a.Red == b.Red && a.Green == b.Green && a.Blue == b.Blue
-} //                                                                  colorEqual
-
 // escape escapes special characters '(', '(' and '\' in strings
 // in order to avoid them interfering with PDF commands.
 // called by: Bytes(), drawTextLine()
@@ -1929,10 +1920,8 @@ func (*PDF) isWhiteSpace(s string) bool {
 		return false
 	}
 	for _, ch := range s {
-		if ch != ' ' && ch != '\a' &&
-			ch != '\b' && ch != '\f' &&
-			ch != '\n' && ch != '\r' &&
-			ch != '\t' && ch != '\v' {
+		if ch != ' ' && ch != '\a' && ch != '\b' && ch != '\f' &&
+			ch != '\n' && ch != '\r' && ch != '\t' && ch != '\v' {
 			return false
 		}
 	}
