@@ -35,8 +35,9 @@ The result is a single .go file with less than 1999 lines of code.
 **Hello World**
 
 ```go
-import "fmt" // standard
+package main 
 
+import "fmt" // standard
 import "github.com/balacode/one-file-pdf"
 
 func main() {
