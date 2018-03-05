@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-05 16:53:58 941B81                              [one_file_pdf.go]
+// :v: 2018-03-05 18:02:29 2EE194                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1027,7 +1027,7 @@ func (pdf *PDF) Bytes() []byte {
 	// free any existing generated content and write beginning of document
 	var fontsIndex = pdfPagesIndex + len(pdf.pages)*2
 	var imagesIndex = fontsIndex + len(pdf.fonts)
-	var infoIndex = imagesIndex + len(pdf.images)
+	var infoIndex int // set when metadata found
 	pdf.content.Reset()
 	pdf.setCurrentPage(PDFNoPage).write("%%PDF-1.4\n").
 		writeObj("/Catalog").write("/Pages 2 0 R").writeEndobj()
@@ -1063,6 +1063,7 @@ func (pdf *PDF) Bytes() []byte {
 	if pdf.docTitle != "" || pdf.docSubject != "" ||
 		pdf.docKeywords != "" || pdf.docAuthor != "" || pdf.docCreator != "" {
 		//
+		infoIndex = imagesIndex + len(pdf.images)
 		pdf.writeObj("/Info")
 		for _, iter := range []struct {
 			label string
@@ -1091,7 +1092,7 @@ func (pdf *PDF) Bytes() []byte {
 	// write the trailer
 	pdf.write("trailer\n<</Size %d/Root 1 0 R", len(pdf.objOffsets))
 	if infoIndex > 0 {
-		pdf.write("/Info %d 0 R", infoIndex)
+		pdf.write("/Info %d 0 R", infoIndex) // optional reference to info
 	}
 	pdf.write(">>\nstartxref\n%d\n", startXref).write("%%%%EOF\n")
 	return pdf.content.Bytes()
