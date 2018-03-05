@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-05 16:28:38 B5BE0D                              [one_file_pdf.go]
+// :v: 2018-03-05 16:53:58 941B81                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -804,8 +804,7 @@ func (pdf *PDF) LineWidth() float64 {
 } //                                                                   LineWidth
 
 // Units returns the currently selected measurement units.
-// Can be upper/lowercase:
-// MM CM " in inch inches tw twip twips pt point points.
+// E.g.: MM CM " IN INCH INCHES TW TWIP TWIPS PT POINT POINTS
 func (pdf *PDF) Units() string {
 	return pdf.unitName
 } //                                                                       Units
@@ -1063,6 +1062,8 @@ func (pdf *PDF) Bytes() []byte {
 	// write info object
 	if pdf.docTitle != "" || pdf.docSubject != "" ||
 		pdf.docKeywords != "" || pdf.docAuthor != "" || pdf.docCreator != "" {
+		//
+		pdf.writeObj("/Info")
 		for _, iter := range []struct {
 			label string
 			field string
