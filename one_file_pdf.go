@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-05 11:03:21 2BA10A                              [one_file_pdf.go]
+// :v: 2018-03-05 11:59:19 4A2E7D                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -46,7 +46,7 @@ package pdf
 //   (pdf *PDF) Y() float64
 //
 // # Property Setters
-//   (pdf *PDF) SetColor(nameOrHTMLValue string) *PDF
+//   (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF
 //   (pdf *PDF) SetColorRGB(red, green, blue int) *PDF
 //   (pdf *PDF) SetCompression(compress bool) *PDF
 //   (pdf *PDF) SetDocAuthor(s string) *PDF
@@ -834,13 +834,13 @@ func (pdf *PDF) Y() float64 {
 // for midnight blue (#RRGGBB). The current color is used
 // for subsequent text and line drawing and fills.
 // If the name is unknown or valid, sets the current color to black.
-func (pdf *PDF) SetColor(nameOrHTMLValue string) *PDF {
+func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 	//
 	// if name starts with '#' treat it as HTML color (#RRGGBB)
-	nameOrHTMLValue = strings.ToUpper(nameOrHTMLValue)
-	if nameOrHTMLValue != "" && nameOrHTMLValue[0] == '#' {
+	nameOrHTMLColor = strings.ToUpper(nameOrHTMLColor)
+	if nameOrHTMLColor != "" && nameOrHTMLColor[0] == '#' {
 		var hex [6]uint8
-		for i, ch := range nameOrHTMLValue[1:] {
+		for i, ch := range nameOrHTMLColor[1:] {
 			if i > 6 {
 				break
 			}
@@ -852,7 +852,7 @@ func (pdf *PDF) SetColor(nameOrHTMLValue string) *PDF {
 				hex[i] = uint8(ch - 'A' + 10)
 				continue
 			}
-			pdf.logError("Invalid color code '" + nameOrHTMLValue + "'." +
+			pdf.logError("Invalid color code '" + nameOrHTMLColor + "'." +
 				"Setting to black.")
 			pdf.SetColorRGB(0, 0, 0)
 			return pdf
@@ -865,12 +865,12 @@ func (pdf *PDF) SetColor(nameOrHTMLValue string) *PDF {
 		return pdf
 	}
 	// otherwise search for color name
-	var color, exists = PDFColorNames[nameOrHTMLValue]
+	var color, exists = PDFColorNames[nameOrHTMLColor]
 	if exists {
 		pdf.SetColorRGB(int(color.Red), int(color.Green), int(color.Blue))
 		return pdf
 	}
-	pdf.logError("Color name '" + nameOrHTMLValue + "' not known." +
+	pdf.logError("Color name '" + nameOrHTMLColor + "' not known." +
 		"Setting to black.")
 	pdf.SetColorRGB(0, 0, 0)
 	return pdf
