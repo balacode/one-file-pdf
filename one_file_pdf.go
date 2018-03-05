@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-05 12:46:49 9FE3AA                              [one_file_pdf.go]
+// :v: 2018-03-05 16:07:32 777A6F                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -8,18 +8,23 @@ package pdf
 // # Structures
 //   PDF struct
 //   PDFColor struct
-//   PDFFont struct
-//   PDFImage struct
-//   PDFPage struct
 //   PDFPageSize struct
 //   PDFPageSizeOf(pageSize string) PDFPageSize
 //
 // # Constants
-//   const PDFNoPage = -1
 //   PDFBuiltInFontNames = []string
 //   PDFColorNames = map[string]PDFColor
+//   PDFNoPage = -1
 //   PDFStandardPageSizes = []PDFPageSize
+//
+// # Internal Structures
+//   pdfFont struct
+//   pdfImage struct
+//   pdfPage struct
+//
+// # Internal Constants
 //   pdfFontWidths = [][]int
+//   pdfPagesIndex = 3
 //
 // # Constructor
 //   NewPDF(pageSize string) PDF
@@ -145,10 +150,10 @@ type PDF struct {
 	docTitle          string        // 'title' metadata entry
 	pageSize          PDFPageSize   // page size used in this PDF
 	pageNo            int           // current page number
-	pagePtr           *PDFPage      // pointer to the current page
-	pages             []PDFPage     // all the pages added to this PDF
-	fonts             []PDFFont     // all the fonts used in this PDF
-	images            []PDFImage    // all the images used in this PDF
+	pagePtr           *pdfPage      // pointer to the current page
+	pages             []pdfPage     // all the pages added to this PDF
+	fonts             []pdfFont     // all the fonts used in this PDF
+	images            []pdfImage    // all the images used in this PDF
 	columnWidths      []float64     // user-set column widths (like tab stops)
 	columnNo          int           // index of the current column
 	unitName          string        // name of active measurement unit
@@ -171,40 +176,6 @@ type PDFColor struct {
 	Green uint8
 	Blue  uint8
 } //                                                                    PDFColor
-
-// PDFFont represents a font name and its appearance.
-type PDFFont struct {
-	fontID    int
-	fontName  string
-	isBuiltIn bool
-	isBold    bool
-	isItalic  bool
-} //                                                                     PDFFont
-
-// PDFImage represents an image.
-type PDFImage struct {
-	name      string
-	width     int
-	height    int
-	data      []byte
-	grayscale bool
-} //                                                                    PDFImage
-
-// PDFPage is an internal structure that holds details for each page.
-type PDFPage struct {
-	pageSize          PDFPageSize
-	pageContent       bytes.Buffer
-	fontIDs           []int
-	imageNos          []int
-	x                 float64
-	y                 float64
-	lineWidth         float64
-	fontSizePt        float64
-	fontID            int
-	strokeColor       PDFColor
-	nonStrokeColor    PDFColor
-	horizontalScaling uint16
-} //                                                                     PDFPage
 
 // PDFPageSize represents a page size name and its dimensions in points.
 type PDFPageSize struct {
@@ -415,6 +386,46 @@ var PDFStandardPageSizes = []PDFPageSize{
 	{"LETTER", 612, 792},
 	{"LETTER-L", 792, 612},
 } //                                                        PDFStandardPageSizes
+
+// -----------------------------------------------------------------------------
+// # Internal Structures
+
+// pdfFont represents a font name and its appearance.
+type pdfFont struct {
+	fontID    int
+	fontName  string
+	isBuiltIn bool
+	isBold    bool
+	isItalic  bool
+} //                                                                     pdfFont
+
+// pdfImage represents an image.
+type pdfImage struct {
+	name      string
+	width     int
+	height    int
+	data      []byte
+	grayscale bool
+} //                                                                    pdfImage
+
+// pdfPage holds details for each page.
+type pdfPage struct {
+	pageSize          PDFPageSize
+	pageContent       bytes.Buffer
+	fontIDs           []int
+	imageNos          []int
+	x                 float64
+	y                 float64
+	lineWidth         float64
+	fontSizePt        float64
+	fontID            int
+	strokeColor       PDFColor
+	nonStrokeColor    PDFColor
+	horizontalScaling uint16
+} //                                                                     pdfPage
+
+// -----------------------------------------------------------------------------
+// # Internal Constants
 
 // Built-in Font Widths:
 // 0 Helvetica
@@ -1002,7 +1013,7 @@ func (pdf *PDF) SetY(y float64) *PDF {
 // AddPage appends a new blank page to the document and makes it selected.
 func (pdf *PDF) AddPage() *PDF {
 	var i = len(pdf.pages)
-	pdf.pages = append(pdf.pages, PDFPage{})
+	pdf.pages = append(pdf.pages, pdfPage{})
 	var pg = &pdf.pages[i]
 	pdf.setCurrentPage(i)
 	pdf.pageNo = i
@@ -1141,8 +1152,8 @@ func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 		imgBuf = bytes.NewBuffer(val)
 	}
 	var pg = pdf.pagePtr
+	var img pdfImage
 	var imgNo = -1
-	var img PDFImage
 	for i, iter := range pdf.images {
 		if iter.name == imgName {
 			imgNo, img = i, iter
@@ -1165,7 +1176,7 @@ func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 				))
 			}
 		}
-		img = PDFImage{
+		img = pdfImage{
 			name:      imgName,
 			width:     w,
 			height:    h,
@@ -1247,8 +1258,7 @@ func (pdf *PDF) DrawTextAlignedToBox(
 		pdf.logError("No current page.")
 		return pdf
 	}
-	pdf.drawTextBox(x, y, width, height, false, align, text)
-	return pdf
+	return pdf.drawTextBox(x, y, width, height, false, align, text)
 } //                                                        DrawTextAlignedToBox
 
 // DrawTextAt draws text at the specified point (x, y).
@@ -1267,15 +1277,14 @@ func (pdf *PDF) DrawTextInBox(x, y, width, height float64, align, text string,
 		pdf.logError("No current page.")
 		return pdf
 	}
-	pdf.drawTextBox(x, y, width, height, true, align, text)
-	return pdf
+	return pdf.drawTextBox(x, y, width, height, true, align, text)
 } //                                                               DrawTextInBox
 
 // DrawUnitGrid draws a light-gray grid demarcated in the current
 // measurement unit. The grid fills the entire page.
 // It helps with item positioning.
 func (pdf *PDF) DrawUnitGrid() *PDF {
-	var x, y, pageWidth, pageHeight = 0.0, 0.0, pdf.PageWidth(), pdf.PageHeight()
+	var x, y, pgWidth, pgHeight = 0.0, 0.0, pdf.PageWidth(), pdf.PageHeight()
 	if pdf.pageNo < 0 { // ensure there is a current page
 		pdf.logError("No current page.")
 		return pdf
@@ -1288,8 +1297,8 @@ func (pdf *PDF) DrawUnitGrid() *PDF {
 	var i = 0
 	//
 	// draw vertical lines
-	for x = 0; x < pageWidth; x++ {
-		pdf.SetColorRGB(200, 200, 200).DrawLine(x, 0, x, pageHeight)
+	for x = 0; x < pgWidth; x++ {
+		pdf.SetColorRGB(200, 200, 200).DrawLine(x, 0, x, pgHeight)
 		if i > 0 {
 			pdf.SetColor("Indigo").SetXY(x+xh, y+yh).DrawText(strconv.Itoa(i))
 		}
@@ -1297,8 +1306,8 @@ func (pdf *PDF) DrawUnitGrid() *PDF {
 	}
 	// draw horizontal lines
 	i = 0
-	for y = 0; y < pageHeight; y++ {
-		pdf.SetColorRGB(200, 200, 200).DrawLine(0, y, pageWidth, y)
+	for y = 0; y < pgHeight; y++ {
+		pdf.SetColorRGB(200, 200, 200).DrawLine(0, y, pgWidth, y)
 		if i > 0 {
 			pdf.SetColor("Indigo").SetXY(xv, y+yv).DrawText(strconv.Itoa(i))
 		}
@@ -1324,23 +1333,17 @@ func (pdf *PDF) FillBox(x, y, width, height float64) *PDF {
 // I.e. the Y increases by the height of the font and
 // the X-coordinate is reset to zero.
 func (pdf *PDF) NextLine() *PDF {
-	var x = pdf.X()
-	var y = pdf.Y()
-	var lineHeight = pdf.FontSize() * pdf.pointsPerUnit
-	var pageHeight = pdf.pageSize.HeightPt * pdf.pointsPerUnit
-	y += lineHeight
-	if y > pageHeight {
+	var y = pdf.Y() + pdf.FontSize()*pdf.pointsPerUnit
+	if y > pdf.pageSize.HeightPt*pdf.pointsPerUnit {
 		pdf.AddPage()
 		y = 0
 	}
 	pdf.columnNo = 0
-	if len(pdf.columnWidths) == 0 {
-		x = 0
-	} else {
+	var x = 0.0
+	if len(pdf.columnWidths) > 0 {
 		x = pdf.columnWidths[0]
 	}
-	pdf.SetXY(x, y)
-	return pdf
+	return pdf.SetXY(x, y)
 } //                                                                    NextLine
 
 // Reset releases all resources and resets all variables.
@@ -1352,9 +1355,9 @@ func (pdf *PDF) Reset() *PDF {
 	}
 	pdf.docAuthor, pdf.docCreator, pdf.docKeywords = "", "", ""
 	pdf.docSubject, pdf.docTitle, pdf.unitName = "", "", ""
-	pdf.pages = []PDFPage{}
-	pdf.fonts = []PDFFont{}
-	pdf.images = []PDFImage{}
+	pdf.pages = []pdfPage{}
+	pdf.fonts = []pdfFont{}
+	pdf.images = []pdfImage{}
 	pdf.columnWidths = []float64{}
 	pdf.content.Reset()
 	return pdf
@@ -1504,7 +1507,7 @@ func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
 // called by drawTextLine()
 func (pdf *PDF) applyFont() {
 	var isValid = pdf.fontName != ""
-	var font PDFFont
+	var font pdfFont
 	if isValid {
 		isValid = false
 		for i, name := range PDFBuiltInFontNames {
