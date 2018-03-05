@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-05 12:16:59 0BD8F7                              [one_file_pdf.go]
+// :v: 2018-03-05 12:46:49 9FE3AA                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -107,11 +107,11 @@ package pdf
 // # Private Generation Methods
 //   (pdf *PDF) nextObject() int
 //   (pdf *PDF) write(format string, args ...interface{}) *PDF
-//   (pdf *PDF) writeEndobj()
-//   (pdf *PDF) writeObj(objectType string)
-//   (pdf *PDF) writePages(fontsIndex, imagesIndex int)
-//   (pdf *PDF) writeStream(content []byte)
-//   (pdf *PDF) writeStreamData(content []byte)
+//   (pdf *PDF) writeEndobj() *PDF
+//   (pdf *PDF) writeObj(objectType string) *PDF
+//   (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF
+//   (pdf *PDF) writeStream(content []byte) *PDF
+//   (pdf *PDF) writeStreamData(content []byte) *PDF
 //
 // # Private Functions
 //   (*PDF) escape(s string) []byte
@@ -1028,20 +1028,17 @@ func (pdf *PDF) Bytes() []byte {
 	var fontsIndex = pdfPagesIndex + len(pdf.pages)*2
 	var imagesIndex = fontsIndex + len(pdf.fonts)
 	var infoIndex = imagesIndex + len(pdf.images)
-	pdf.setCurrentPage(PDFNoPage)
 	pdf.content.Reset()
-	pdf.write("%%PDF-1.4\n")
-	pdf.writeObj("/Catalog")
-	pdf.write("/Pages 2 0 R")
-	pdf.writeEndobj()
+	pdf.setCurrentPage(PDFNoPage).write("%%PDF-1.4\n").
+		writeObj("/Catalog").write("/Pages 2 0 R").writeEndobj()
 	//
-	//  write /Pages object, page count and page size
-	pdf.writeObj("/Pages") // 2 0 obj
-	pdf.write("/Count %d/MediaBox[0 0 %d %d]", len(pdf.pages),
-		int(pdf.pageSize.WidthPt), int(pdf.pageSize.HeightPt))
-	//
-	// write page numbers and pages
-	pdf.writePages(fontsIndex, imagesIndex)
+	//  write /Pages object (2 0 obj), page count, page size and pages
+	pdf.writeObj("/Pages").
+		write("/Count %d/MediaBox[0 0 %d %d]",
+							len(pdf.pages),
+							int(pdf.pageSize.WidthPt),
+							int(pdf.pageSize.HeightPt)).
+		writePages(fontsIndex, imagesIndex) // page numbers and pages
 	//
 	// write fonts
 	for _, iter := range pdf.fonts {
@@ -1055,12 +1052,12 @@ func (pdf *PDF) Bytes() []byte {
 	}
 	// write images
 	for _, iter := range pdf.images {
-		pdf.writeObj("/XObject")
-		pdf.write("/Subtype/Image/Width %d/Height %d"+
-			"/ColorSpace/DeviceGray/BitsPerComponent 8",
-			iter.width, iter.height)
-		pdf.writeStreamData(iter.data)
-		pdf.write("\nendobj\n")
+		pdf.writeObj("/XObject").
+			write("/Subtype/Image/Width %d/Height %d"+
+				"/ColorSpace/DeviceGray/BitsPerComponent 8",
+				iter.width, iter.height).
+			writeStreamData(iter.data).
+			write("\nendobj\n")
 	}
 	// write info object
 	if pdf.docTitle != "" || pdf.docSubject != "" ||
@@ -1108,9 +1105,8 @@ func (pdf *PDF) DrawBox(x, y, width, height float64) *PDF {
 	y = pdf.pageSize.HeightPt - y*pdf.pointsPerUnit - height
 	pdf.applyLineWidth().applyStrokeColor()
 	//
-	// re = construct a rectangular path, S = stroke path
-	pdf.write("%.3f %.3f %.3f %.3f re S\n", x, y, width, height)
-	return pdf
+	// 're' = construct a rectangular path, 'S' = stroke path
+	return pdf.write("%.3f %.3f %.3f %.3f re S\n", x, y, width, height)
 } //                                                                     DrawBox
 
 // DrawImage draws an image.
@@ -1196,13 +1192,12 @@ func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 	var width = float64(img.width) / float64(img.height) * height
 	//
 	// write command to draw the image
-	pdf.write("q\n"+ // save graphics state
+	return pdf.write("q\n"+ // save graphics state
 		// w      h x  y
 		" %f 0 0 %f %f %f cm\n"+
 		"/Im%d Do\n"+
 		"Q\n", // restore graphics state
 		width, height, x, y, imgNo)
-	return pdf
 } //                                                                   DrawImage
 
 // DrawLine draws a straight line from point (x1, y1) to point (x2, y2).
@@ -1213,10 +1208,8 @@ func (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF {
 	x1, y1 = x1*pdf.pointsPerUnit, pdf.pageSize.HeightPt-y1*pdf.pointsPerUnit
 	x2, y2 = x2*pdf.pointsPerUnit, pdf.pageSize.HeightPt-y2*pdf.pointsPerUnit
 	pdf.applyLineWidth().applyStrokeColor()
-	//
-	// send command to draw the line
-	pdf.write("%.3f %.3f m %.3f %.3f l S\n", x1, y1, x2, y2)
-	return pdf
+	return pdf.write("%.3f %.3f m %.3f %.3f l S\n", x1, y1, x2, y2)
+	// 'm' = move, 'S' = stroke path
 } //                                                                    DrawLine
 
 // DrawText draws a text string at the current position (X, Y).
@@ -1322,11 +1315,9 @@ func (pdf *PDF) FillBox(x, y, width, height float64) *PDF {
 	width, height = width*pdf.pointsPerUnit, height*pdf.pointsPerUnit
 	x *= pdf.pointsPerUnit
 	y = pdf.pageSize.HeightPt - y*pdf.pointsPerUnit - height
-	//
-	// PDF command: 're' = construct a rectangular path, 'f' = fill
-	pdf.applyLineWidth().applyNonStrokeColor().
+	return pdf.applyLineWidth().applyNonStrokeColor().
 		write("%.3f %.3f %.3f %.3f re f\n", x, y, width, height)
-	return pdf
+	// 're' = construct a rectangular path, 'f' = fill
 } //                                                                     FillBox
 
 // NextLine advances the text writing position to the next line.
@@ -1568,6 +1559,7 @@ func (pdf *PDF) applyFont() {
 	pg.fontID = font.fontID
 	pg.fontSizePt = pdf.fontSizePt
 	pdf.write("BT /F%d %d Tf ET\n", pg.fontID, int(pg.fontSizePt))
+	// 'BT' = __, F = __, 'Tf' = __, 'ET' = __
 } //                                                                   applyFont
 
 // applyLineWidth writes a line-width PDF command ('w') to the current
@@ -1578,6 +1570,7 @@ func (pdf *PDF) applyLineWidth() *PDF {
 	if int(*val*10000) != int(pdf.lineWidth*10000) {
 		*val = pdf.lineWidth
 		pdf.write("%.3f w\n", float64(*val))
+		// 'w' = __
 	}
 	return pdf
 } //                                                              applyLineWidth
@@ -1591,7 +1584,7 @@ func (pdf *PDF) applyNonStrokeColor() *PDF {
 		return pdf
 	}
 	*val = pdf.color
-	pdf.write("%.3f %.3f %.3f rg\n", // non-stroking (text) color
+	pdf.write("%.3f %.3f %.3f rg\n", // 'rg' = set non-stroking (text) color
 		float64(val.Red)/255,
 		float64(val.Green)/255,
 		float64(val.Blue)/255)
@@ -1608,7 +1601,7 @@ func (pdf *PDF) applyStrokeColor() *PDF {
 		return pdf
 	}
 	*val = pdf.color
-	pdf.write("%.3f %.3f %.3f RG\n", // RG - stroke (line) color
+	pdf.write("%.3f %.3f %.3f RG\n", // 'RG' = stroke (line) color
 		float64(val.Red)/255,
 		float64(val.Green)/255,
 		float64(val.Blue)/255)
@@ -1622,21 +1615,19 @@ func (pdf *PDF) drawTextLine(text string) *PDF {
 	if text == "" {
 		return pdf
 	}
-	// applyHorizontalScaling sets the horizontal text scaling
-	var applyHorizontalScaling = func() {
-		if pdf.pagePtr.horizontalScaling != pdf.horizontalScaling {
-			pdf.pagePtr.horizontalScaling = pdf.horizontalScaling
-			pdf.write("BT %d Tz ET\n", pdf.pagePtr.horizontalScaling)
-		}
-	}
 	// draw the text:
 	pdf.applyFont()
-	applyHorizontalScaling()
+	if pdf.pagePtr.horizontalScaling != pdf.horizontalScaling {
+		pdf.pagePtr.horizontalScaling = pdf.horizontalScaling
+		pdf.write("BT %d Tz ET\n", pdf.pagePtr.horizontalScaling)
+		// 'BT' = __ 'Tz' = __ 'ET' = __
+	}
 	pdf.applyNonStrokeColor()
 	var pg = pdf.pagePtr
 	if pg.x < 0 || pg.y < 0 {
 		pdf.SetXY(0, 0)
 	}
+	// 'BT' = __, 'Td' = __, 'Tj' = __, 'ET' = __
 	pdf.write("BT %d %d Td (%s) Tj ET\n",
 		int(pg.x), int(pg.y), pdf.escape(text))
 	pg.x += pdf.textWidthPt1000(text)
@@ -1782,12 +1773,12 @@ func (pdf *PDF) write(format string, args ...interface{}) *PDF {
 } //                                                                       write
 
 // writeEndobj writes 'endobj' (PDF object end marker).
-func (pdf *PDF) writeEndobj() {
-	pdf.write(">>\nendobj\n")
+func (pdf *PDF) writeEndobj() *PDF {
+	return pdf.write(">>\nendobj\n")
 } //                                                                 writeEndobj
 
 // writeObj outputs an object header
-func (pdf *PDF) writeObj(objectType string) {
+func (pdf *PDF) writeObj(objectType string) *PDF {
 	pdf.setCurrentPage(PDFNoPage)
 	var objNo = pdf.nextObject()
 	if objectType == "" {
@@ -1797,10 +1788,11 @@ func (pdf *PDF) writeObj(objectType string) {
 	} else {
 		pdf.logError("objectType should begin with '/' or be a blank string.")
 	}
+	return pdf
 } //                                                                    writeObj
 
 // writePages writes all PDF pages.
-func (pdf *PDF) writePages(fontsIndex, imagesIndex int) {
+func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
 	if len(pdf.pages) > 0 { //                                write page numbers
 		var pageObjectNo = pdfPagesIndex
 		pdf.write("/Kids[")
@@ -1819,8 +1811,8 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) {
 			fmt.Printf("WARNING: Empty Page\n")
 			continue
 		}
-		pdf.writeObj("/Page")
-		pdf.write("/Parent 2 0 R/Contents %d 0 R", pdf.objNo+1)
+		pdf.writeObj("/Page").
+			write("/Parent 2 0 R/Contents %d 0 R", pdf.objNo+1)
 		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
 			pdf.write("/Resources<<")
 		}
@@ -1841,20 +1833,20 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) {
 		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
 			pdf.write(">>")
 		}
-		pdf.writeEndobj()
-		pdf.writeStream([]byte(pg.pageContent.String()))
+		pdf.writeEndobj().writeStream([]byte(pg.pageContent.String()))
 	}
+	return pdf
 } //                                                                  writePages
 
 // writeStream outputs a stream object to the document's main buffer.
-func (pdf *PDF) writeStream(content []byte) {
-	pdf.setCurrentPage(PDFNoPage)
-	pdf.write("%d 0 obj <<", pdf.nextObject())
-	pdf.writeStreamData(content)
+func (pdf *PDF) writeStream(content []byte) *PDF {
+	return pdf.setCurrentPage(PDFNoPage).
+		write("%d 0 obj <<", pdf.nextObject()).
+		writeStreamData(content)
 } //                                                                 writeStream
 
 // writeStreamData writes a stream or image stream.
-func (pdf *PDF) writeStreamData(content []byte) {
+func (pdf *PDF) writeStreamData(content []byte) *PDF {
 	pdf.setCurrentPage(PDFNoPage)
 	var filter string
 	if pdf.compressStreams {
@@ -1864,12 +1856,12 @@ func (pdf *PDF) writeStreamData(content []byte) {
 		var _, err = writer.Write([]byte(content))
 		if err != nil {
 			pdf.logError("Failed compressing:", err)
-			return
+			return pdf
 		}
 		writer.Close() // don't use defer, close immediately
 		content = buf.Bytes()
 	}
-	pdf.write("%s/Length %d>>stream\n%s\nendstream\n",
+	return pdf.write("%s/Length %d>>stream\n%s\nendstream\n",
 		filter, len(content), content)
 } //                                                             writeStreamData
 
