@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-06 00:31:59 64A664                              [one_file_pdf.go]
+// :v: 2018-03-06 00:37:22 69C87F                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1033,13 +1033,8 @@ func (pdf *PDF) Bytes() []byte {
 	pdf.setCurrentPage(PDFNoPage).write("%%PDF-1.4\n").
 		writeObj("/Catalog").write("/Pages 2 0 R").writeEndobj()
 	//
-	//  write /Pages object (2 0 obj), page count, page size and pages
-	pdf.writeObj("/Pages").
-		write("/Count %d/MediaBox[0 0 %d %d]",
-							len(pdf.pages),
-							int(pdf.pageSize.WidthPt),
-							int(pdf.pageSize.HeightPt)).
-		writePages(fontsIndex, imagesIndex) // page numbers and pages
+	//  write /Pages object (2 0 obj), page count, page size and the pages
+	pdf.writePages(fontsIndex, imagesIndex)
 	//
 	// write fonts
 	for _, iter := range pdf.fonts {
@@ -1792,7 +1787,12 @@ func (pdf *PDF) writeObj(objectType string) *PDF {
 
 // writePages writes all PDF pages.
 func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
-	if len(pdf.pages) > 0 { //                                write page numbers
+	pdf.writeObj("/Pages").write("/Count %d/MediaBox[0 0 %d %d]",
+		len(pdf.pages),
+		int(pdf.pageSize.WidthPt),
+		int(pdf.pageSize.HeightPt))
+	//                                                        write page numbers
+	if len(pdf.pages) > 0 {
 		var pageObjectNo = pdfPagesIndex
 		pdf.write("/Kids[")
 		for i := range pdf.pages {
@@ -1800,14 +1800,14 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
 				pdf.write(" ")
 			}
 			pdf.write("%d 0 R", pageObjectNo)
-			pageObjectNo += 2 // 1 for page, 1 for stream
+			pageObjectNo += 2 //                        1 for page, 1 for stream
 		}
 		pdf.write("]")
 	}
 	pdf.writeEndobj()
-	for _, pg := range pdf.pages { //                            write each page
+	for i, pg := range pdf.pages { //                            write each page
 		if pg.pageContent.Len() == 0 {
-			fmt.Printf("WARNING: Empty Page\n")
+			pdf.logError("Warning: empty page %d\n", i+1)
 			continue
 		}
 		pdf.writeObj("/Page").
