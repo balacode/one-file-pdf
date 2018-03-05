@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-06 00:28:18 6FA61A                              [one_file_pdf.go]
+// :v: 2018-03-06 00:31:59 64A664                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -130,6 +130,7 @@ import "compress/zlib" // standard
 import "fmt"           // standard
 import "image"         // standard
 import "io/ioutil"     // standard
+import "reflect"       // standard
 import "strconv"       // standard
 import "strings"       // standard
 import _ "image/png"   // standard
@@ -1112,7 +1113,7 @@ func (pdf *PDF) DrawBox(x, y, width, height float64) *PDF {
 	return pdf.write("%.3f %.3f %.3f %.3f re S\n", x, y, width, height)
 } //                                                                     DrawBox
 
-// DrawImage draws an image.
+// DrawImage draws a grayscale PNG image.
 // For now, only grayscale PNG images are supported.
 // 'x' and 'y' specify the position of the image.
 // 'height' specifies its height.
@@ -1142,6 +1143,11 @@ func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 		}
 		imgName = fmt.Sprintf("%x", val[:n])
 		imgBuf = bytes.NewBuffer(val)
+	default:
+		pdf.logError("Invalid type in",
+			"fileNameOrBytes:", reflect.TypeOf(fileNameOrBytes),
+			"value:", fileNameOrBytes)
+		return pdf
 	}
 	var pg = pdf.pagePtr
 	var img pdfImage
@@ -1154,7 +1160,7 @@ func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 	if imgNo == -1 {
 		var decoded, _, err = image.Decode(imgBuf)
 		if err != nil {
-			fmt.Printf("image not decoded: %v\n", err)
+			pdf.logError("Image not decoded: %v\n", err)
 			return pdf
 		}
 		var bounds = decoded.Bounds()
@@ -1194,13 +1200,11 @@ func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 	height *= pdf.pointsPerUnit
 	var width = float64(img.width) / float64(img.height) * height
 	//
-	// write command to draw the image
-	return pdf.write("q\n"+ // save graphics state
-		// w      h x  y
-		" %f 0 0 %f %f %f cm\n"+
-		"/Im%d Do\n"+
-		"Q\n", // restore graphics state
+	// draw the image      w      h  x  y
+	return pdf.write("q\n %f 0 0 %f %f %f cm\n/Im%d Do\nQ\n",
 		width, height, x, y, imgNo)
+	// 'q' = save graphics state
+	// 'Q' = restore graphics state
 } //                                                                   DrawImage
 
 // DrawLine draws a straight line from point (x1, y1) to point (x2, y2).
