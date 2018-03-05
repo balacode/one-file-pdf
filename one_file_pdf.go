@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-05 01:21:55 6CF64F                              [one_file_pdf.go]
+// :v: 2018-03-05 11:01:30 E3D097                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -8,7 +8,6 @@ package pdf
 // # Structures
 //   PDF struct
 //   PDFColor struct
-//   PDFColorName struct
 //   PDFFont struct
 //   PDFImage struct
 //   PDFPage struct
@@ -69,8 +68,7 @@ package pdf
 //   (pdf *PDF) AddPage() *PDF
 //   (pdf *PDF) Bytes() []byte
 //   (pdf *PDF) DrawBox(x, y, width, height float64) *PDF
-//   (pdf *PDF) DrawImage(
-//                 x, y, height float64, fileNameOrBytes interface{},
+//   (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 //              ) *PDF
 //   (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF
 //   (pdf *PDF) DrawText(text string) *PDF
@@ -78,8 +76,7 @@ package pdf
 //                 x, y, width, height float64, align, text string,
 //              ) *PDF
 //   (pdf *PDF) DrawTextAt(x, y float64, text string) *PDF
-//   (pdf *PDF) DrawTextInBox(
-//                 x, y, width, height float64, align, text string,
+//   (pdf *PDF) DrawTextInBox(x, y, width, height float64, align, text string,
 //              ) *PDF
 //   (pdf *PDF) DrawUnitGrid() *PDF
 //   (pdf *PDF) FillBox(x, y, width, height float64) *PDF
@@ -142,33 +139,31 @@ var PDFErrorHandler = fmt.Println
 
 // PDF is the main structure representing a PDF document.
 type PDF struct {
-	docAuthor         string
-	docCreator        string
-	docKeywords       string
-	docSubject        string
-	docTitle          string
-	pages             []PDFPage
-	fonts             []PDFFont
-	images            []PDFImage
-	pageSize          PDFPageSize
-	pageNo            int
-	pagePtr           *PDFPage
-	columnNo          int
-	color             PDFColor
-	fontName          string
-	fontSizePt        float64
-	lineWidth         float64
-	horizontalScaling uint16
+	docAuthor         string        // 'author' metadata entry
+	docCreator        string        // 'creator' metadata entry
+	docKeywords       string        // 'keywords' metadata entry
+	docSubject        string        // 'subject' metadata entry
+	docTitle          string        // 'title' metadata entry
+	pageSize          PDFPageSize   // page size used in this PDF
+	pageNo            int           // current page number
+	pagePtr           *PDFPage      // pointer to the current page
+	pages             []PDFPage     // all the pages added to this PDF
+	fonts             []PDFFont     // all the fonts used in this PDF
+	images            []PDFImage    // all the images used in this PDF
+	columnWidths      []float64     // user-set column widths (like tab stops)
+	columnNo          int           // index of the current column
+	unitName          string        // name of active measurement unit
+	pointsPerUnit     float64       // number of points per measurement unit
+	color             PDFColor      // current drawing color
+	lineWidth         float64       // current line width (in points)
+	fontName          string        // current font's name
+	fontSizePt        float64       // current font's size (in points)
+	horizontalScaling uint16        // horizontal scaling factor (in %)
 	compressStreams   bool          // enable stream compression?
 	content           bytes.Buffer  // content buffer where PDF is written
 	contentPtr        *bytes.Buffer // pointer to PDF/current page's buffer
 	objOffsets        []int         // used by Bytes() and write..()
 	objNo             int           // used by Bytes() and write..()
-	//
-	// extra features:
-	unitName      string  // name of measurement unit
-	pointsPerUnit float64 // number of points per measurement unit
-	columnWidths  []float64
 } //                                                                         PDF
 
 // PDFColor represents a color value.
@@ -714,7 +709,7 @@ func NewPDF(pageSize string) PDF {
 		horizontalScaling: 100,
 		compressStreams:   true,
 	}
-	// set default units, otherwise pointsPerUnit and x and y will be 0
+	// set default units, otherwise pointsPerUnit, x and y will be 0
 	pdf.SetUnits("point")
 	return pdf
 } //                                                                      NewPDF
@@ -886,7 +881,7 @@ func (pdf *PDF) SetColor(nameOrHTMLValue string) *PDF {
 // can range from 0 to 255. The current color is used
 // for subsequent text and line drawing and fills.
 func (pdf *PDF) SetColorRGB(red, green, blue int) *PDF {
-	pdf.color = PDFColor{Red: uint8(red), Green: uint8(green), Blue: uint8(blue)}
+	pdf.color = PDFColor{uint8(red), uint8(green), uint8(blue)}
 	return pdf
 } //                                                                 SetColorRGB
 
@@ -935,8 +930,7 @@ func (pdf *PDF) SetDocTitle(s string) *PDF {
 // standard font names, such as 'Helvetica'. This
 // font will be used for subsequent text drawing.
 func (pdf *PDF) SetFont(name string, points float64) *PDF {
-	pdf.SetFontName(name).SetFontSize(points)
-	return pdf
+	return pdf.SetFontName(name).SetFontSize(points)
 } //                                                                     SetFont
 
 // SetFontName changes the current font, while using the
@@ -1026,8 +1020,8 @@ func (pdf *PDF) AddPage() *PDF {
 // auxiliary objects and returns it in an array of bytes,
 // identical to the content of a PDF file. This method is where
 // you'll find the core structure of a PDF document.
+// Called by: SaveFile()
 func (pdf *PDF) Bytes() []byte {
-	// called by: SaveFile()
 	pdf.objOffsets = []int{}
 	pdf.objNo = 0
 	//
@@ -1114,6 +1108,7 @@ func (pdf *PDF) DrawBox(x, y, width, height float64) *PDF {
 	x *= pdf.pointsPerUnit
 	y = pdf.pageSize.HeightPt - y*pdf.pointsPerUnit - height
 	pdf.applyLineWidth().applyStrokeColor()
+	//
 	// re = construct a rectangular path, S = stroke path
 	pdf.write("%.3f %.3f %.3f %.3f re S\n", x, y, width, height)
 	return pdf
@@ -1126,9 +1121,7 @@ func (pdf *PDF) DrawBox(x, y, width, height float64) *PDF {
 // (width is scaled to match the image's aspect ratio).
 // fileNameOrBytes is either a string specifying a
 // file name, or a byte slice with PNG image data.
-func (pdf *PDF) DrawImage(
-	x, y, height float64,
-	fileNameOrBytes interface{},
+func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 ) *PDF {
 	if pdf.warnIfNoPage() {
 		return pdf
@@ -1276,8 +1269,7 @@ func (pdf *PDF) DrawTextAt(x, y float64, text string) *PDF {
 // the text is center-aligned both vertically and horizontally.
 // Specify 'L' or 'R' to align the text left or right, and 'T' or
 // 'B' to align the text to the top or bottom of the box.
-func (pdf *PDF) DrawTextInBox(
-	x, y, width, height float64, align, text string,
+func (pdf *PDF) DrawTextInBox(x, y, width, height float64, align, text string,
 ) *PDF {
 	if pdf.pageNo < 0 {
 		pdf.logError("No current page.")
@@ -1877,7 +1869,7 @@ func (pdf *PDF) writeStreamData(content []byte) {
 			pdf.logError("Failed compressing:", err)
 			return
 		}
-		writer.Close()
+		writer.Close() // don't use defer, close immediately
 		content = buf.Bytes()
 	}
 	pdf.write("%s/Length %d>>stream\n%s\nendstream\n",
