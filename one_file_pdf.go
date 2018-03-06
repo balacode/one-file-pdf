@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-06 00:59:29 EA649A                              [one_file_pdf.go]
+// :v: 2018-03-06 01:04:12 E5650E                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -992,18 +992,18 @@ func (pdf *PDF) SetY(y float64) *PDF {
 
 // AddPage appends a new blank page to the document and makes it selected.
 func (pdf *PDF) AddPage() *PDF {
-	var i = len(pdf.pages)
-	pdf.pages = append(pdf.pages, pdfPage{})
-	var pg = &pdf.pages[i]
-	pdf.setCurrentPage(i)
-	pdf.pageNo = i
-	pg.pageSize = pdf.pageSize
-	pg.horizontalScaling = 100
-	pg.pageContent.Reset()
-	pg.x, pg.y = -1, -1 // these variables must default to -1
-	pg.strokeColor, pg.nonStrokeColor = PDFColor{1, 1, 1}, PDFColor{1, 1, 1}
-	pdf.SetXY(0, 0)
-	return pdf
+	var pageNo = len(pdf.pages)
+	pdf.pages = append(pdf.pages, pdfPage{
+		pageSize:          pdf.pageSize,
+		x:                 -1, // must default to -1
+		y:                 -1,
+		strokeColor:       PDFColor{1, 1, 1},
+		nonStrokeColor:    PDFColor{1, 1, 1},
+		horizontalScaling: 100,
+	})
+	pdf.setCurrentPage(pageNo)
+	pdf.pageNo = pageNo
+	return pdf.SetXY(0, 0)
 } //                                                                     AddPage
 
 // Bytes generates the PDF document from various page and
