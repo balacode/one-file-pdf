@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-06 01:22:41 731D07                              [one_file_pdf.go]
+// :v: 2018-03-07 00:58:27 DF9F0C                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -92,7 +92,7 @@ package pdf
 //   (pdf *PDF) TextWidth(text string) float64
 //   (pdf *PDF) WrapTextLines(width float64, text string) []string
 //
-// # Functions:
+// # Functions
 //   (pdf *PDF) ToPoints(numberAndUnit string) float64
 //
 // # Private Methods
@@ -1015,7 +1015,7 @@ func (pdf *PDF) Bytes() []byte {
 	pdf.objOffsets = []int{}
 	pdf.objNo = 0
 	//
-	// free any existing generated content and write beginning of document
+	// free any existing generated content and write PDF header
 	var fontsIndex = pdfPagesIndex + len(pdf.pages)*2
 	var imagesIndex = fontsIndex + len(pdf.fonts)
 	var infoIndex int // set when metadata found
@@ -1066,7 +1066,7 @@ func (pdf *PDF) Bytes() []byte {
 					write("(").write(string(pdf.escape(iter.field))).write(")")
 			}
 		}
-		pdf.writeEndobj() // info
+		pdf.writeEndobj()
 	}
 	// write cross-reference table at end of document
 	var startXref = pdf.content.Len()
@@ -1094,7 +1094,7 @@ func (pdf *PDF) DrawBox(x, y, width, height float64) *PDF {
 	y = pdf.pageSize.HeightPt - y*pdf.pointsPerUnit - height
 	pdf.applyLineWidth().applyStrokeColor()
 	return pdf.write("%.3f %.3f %.3f %.3f re S\n", x, y, width, height)
-	// 're' = construct a rectangular path, 'S' = stroke path
+	// re = construct a rectangular path  S = stroke path
 } //                                                                     DrawBox
 
 // DrawImage draws a grayscale PNG image.
@@ -1187,8 +1187,10 @@ func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 	// draw the image      w      h  x  y
 	return pdf.write("q\n %f 0 0 %f %f %f cm\n/Im%d Do\nQ\n",
 		width, height, x, y, imgNo)
-	// 'q' = save graphics state
-	// 'Q' = restore graphics state
+	// q  = save graphics state
+	// cm = concatenate matrix to current transform matrix
+	// Do = invoke named XObject
+	// Q  = restore graphics state
 } //                                                                   DrawImage
 
 // DrawLine draws a straight line from point (x1, y1) to point (x2, y2).
@@ -1259,8 +1261,8 @@ func (pdf *PDF) DrawTextInBox(x, y, width, height float64, align, text string,
 	return pdf.drawTextBox(x, y, width, height, true, align, text)
 } //                                                               DrawTextInBox
 
-// DrawUnitGrid draws a light-gray grid demarcated in the current
-// measurement unit. The grid fills the entire page.
+// DrawUnitGrid draws a light-gray grid demarcated in the
+// current measurement unit. The grid fills the entire page.
 // It helps with item positioning.
 func (pdf *PDF) DrawUnitGrid() *PDF {
 	var x, y, pgWidth, pgHeight = 0.0, 0.0, pdf.PageWidth(), pdf.PageHeight()
@@ -1429,7 +1431,7 @@ func (pdf *PDF) WrapTextLines(width float64, text string) []string {
 } //                                                               WrapTextLines
 
 // -----------------------------------------------------------------------------
-// # Functions:
+// # Functions
 
 // ToPoints converts a string composed of a number and unit
 // to points. For example '1 cm' or '1cm' becomes 28.346 points.
@@ -1540,7 +1542,7 @@ func (pdf *PDF) applyFont() {
 	pg.fontID = font.fontID
 	pg.fontSizePt = pdf.fontSizePt
 	pdf.write("BT /F%d %d Tf ET\n", pg.fontID, int(pg.fontSizePt))
-	// 'BT' = __, F = __, 'Tf' = __, 'ET' = __
+	// BT = begin text   /F0 0 Tf = font index and name   ET = end text
 } //                                                                   applyFont
 
 // applyLineWidth writes a line-width PDF command ('w') to the current
@@ -1550,8 +1552,7 @@ func (pdf *PDF) applyLineWidth() *PDF {
 	var val = &pdf.pagePtr.lineWidth
 	if int(*val*10000) != int(pdf.lineWidth*10000) {
 		*val = pdf.lineWidth
-		pdf.write("%.3f w\n", float64(*val))
-		// 'w' = __
+		pdf.write("%.3f w\n", float64(*val)) // w = set line width
 	}
 	return pdf
 } //                                                              applyLineWidth
@@ -1580,7 +1581,7 @@ func (pdf *PDF) applyStrokeColor() *PDF {
 		return pdf
 	}
 	*clr = pdf.color
-	pdf.write("%.3f %.3f %.3f RG\n", // 'RG' = stroke (line) color
+	pdf.write("%.3f %.3f %.3f RG\n", // {r} {g} {b} RG = stroke (line) color
 		float64(clr.Red)/255, float64(clr.Green)/255, float64(clr.Blue)/255)
 	return pdf
 } //                                                            applyStrokeColor
@@ -1592,22 +1593,22 @@ func (pdf *PDF) drawTextLine(text string) *PDF {
 	if text == "" {
 		return pdf
 	}
-	// draw the text:
+	// draw the text
 	pdf.applyFont()
 	if pdf.pagePtr.horizontalScaling != pdf.horizontalScaling {
 		pdf.pagePtr.horizontalScaling = pdf.horizontalScaling
 		pdf.write("BT %d Tz ET\n", pdf.pagePtr.horizontalScaling)
-		// 'BT' = __ 'Tz' = __ 'ET' = __
+		// BT = begin text   n Tz = horizontal text scaling   ET = end text
 	}
 	pdf.applyNonStrokeColor()
 	var pg = pdf.pagePtr
 	if pg.x < 0 || pg.y < 0 {
 		pdf.SetXY(0, 0)
 	}
-	// 'BT' = __, 'Td' = __, 'Tj' = __, 'ET' = __
 	pdf.write("BT %d %d Td (%s) Tj ET\n",
 		int(pg.x), int(pg.y), pdf.escape(text))
 	pg.x += pdf.textWidthPt1000(text)
+	// BT = begin text  Td = move text position  Tj = show text  ET = end text
 	return pdf
 } //                                                                drawTextLine
 
@@ -1665,7 +1666,7 @@ func (pdf *PDF) drawTextBox(
 	return pdf
 } //                                                                 drawTextBox
 
-// setCurrentPage selects the currently-active page.
+// setCurrentPage selects the currently-active page
 // called by: AddPage(), Bytes()
 func (pdf *PDF) setCurrentPage(pageNo int) *PDF {
 	if pageNo != PDFNoPage && pageNo > (len(pdf.pages)-1) {
@@ -1681,7 +1682,7 @@ func (pdf *PDF) setCurrentPage(pageNo int) *PDF {
 	return pdf
 } //                                                              setCurrentPage
 
-// textWidthPt1000 returns the width of text in thousands of a point.
+// textWidthPt1000 returns the width of text in thousandths of a point
 // called by: drawTextLine(), drawTextBox(), TextWidth()
 func (pdf *PDF) textWidthPt1000(text string) float64 {
 	//
@@ -1706,8 +1707,8 @@ func (pdf *PDF) textWidthPt1000(text string) float64 {
 	return w * pdf.fontSizePt / 1000 * float64(pdf.horizontalScaling) / 100
 } //                                                             textWidthPt1000
 
-// warnIfNoPage outputs a warning and returns true if there is no
-// active page. This can only happen when the user didn't call AddPage().
+// warnIfNoPage outputs a warning and returns true if there is no active
+// page. This can only happen when the user didn't call AddPage().
 // called by: DrawBox(), DrawLine(), DrawText(), FillBox(),
 //            SetX(), SetXY(), SetY(), TextWidth(), X(), Y()
 func (pdf *PDF) warnIfNoPage() bool {
@@ -1749,7 +1750,7 @@ func (pdf *PDF) write(format string, args ...interface{}) *PDF {
 	return pdf
 } //                                                                       write
 
-// writeEndobj writes 'endobj' (PDF object end marker).
+// writeEndobj writes 'endobj' (PDF object end marker)
 func (pdf *PDF) writeEndobj() *PDF {
 	return pdf.write(">>\nendobj\n")
 } //                                                                 writeEndobj
@@ -1768,7 +1769,7 @@ func (pdf *PDF) writeObj(objectType string) *PDF {
 	return pdf
 } //                                                                    writeObj
 
-// writePages writes all PDF pages.
+// writePages writes all PDF pages
 func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
 	pdf.writeObj("/Pages").write("/Count %d/MediaBox[0 0 %d %d]",
 		len(pdf.pages),
@@ -1820,13 +1821,13 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
 	return pdf
 } //                                                                  writePages
 
-// writeStream outputs a stream object to the document's main buffer.
+// writeStream outputs a stream object to the document's main buffer
 func (pdf *PDF) writeStream(content []byte) *PDF {
 	return pdf.setCurrentPage(PDFNoPage).
 		write("%d 0 obj <<", pdf.nextObj()).writeStreamData(content)
 } //                                                                 writeStream
 
-// writeStreamData writes a stream or image stream.
+// writeStreamData writes a stream or image stream
 func (pdf *PDF) writeStreamData(content []byte) *PDF {
 	pdf.setCurrentPage(PDFNoPage)
 	var filter string
@@ -1867,26 +1868,25 @@ func (*PDF) escape(s string) []byte {
 	return []byte(s)
 } //                                                                      escape
 
-// getPointsPerUnit returns the number of points
-// per a named unit of measurement.
+// getPointsPerUnit returns number of points per named measurement unit.
 // called by: SetUnits(), ToPoints()
 func (*PDF) getPointsPerUnit(unitName string) float64 {
 	switch strings.Trim(strings.ToUpper(unitName), " \a\b\f\n\r\t\v") {
 	case "MM":
-		return 2.83464566929134 // 1 inch / 25.4mm per inch * 72 points per in.
+		return 2.83464566929134 //     1 inch / 25.4mm per " * 72 points per in.
 	case "CM":
-		return 28.3464566929134 // 1 inch / 2.54cm per inch * 72 points per in.
+		return 28.3464566929134 //     1 inch / 2.54cm per " * 72 points per in.
 	case "IN", "INCH", "INCHES", `"`:
-		return 72.0 // points per inch
+		return 72.0 //                                           points per inch
 	case "TW", "TWIP", "TWIPS":
-		return 0.05 // 1 point / 20 twips per point
+		return 0.05 //                              1 point / 20 twips per point
 	case "PT", "POINT", "POINTS":
 		return 1.0 // point
 	}
 	return 0
 } //                                                            getPointsPerUnit
 
-// isWhiteSpace returns true if all the chars. in 's' are white-spaces.
+// isWhiteSpace returns true if all the chars. in 's' are white-spaces
 func (*PDF) isWhiteSpace(s string) bool {
 	if s == "" {
 		return false
@@ -1900,7 +1900,7 @@ func (*PDF) isWhiteSpace(s string) bool {
 	return true
 } //                                                                isWhiteSpace
 
-// splitLines splits 's' into several lines using line breaks in 's'.
+// splitLines splits 's' into several lines using line breaks in 's'
 func (*PDF) splitLines(s string) []string {
 	var split = func(ar []string, sep string) (ret []string) {
 		for _, iter := range ar {
