@@ -19,8 +19,8 @@ The result is a single .go file with less than 1999 lines of code.
     go get github.com/balacode/one-file-pdf
 ```
 
-**Naming Convention:**  
-All types in the library are prefixed with PDF for pub\ic, and 'pdf' for private types.
+**Naming Convention:**   
+All types in the library are prefixed with PDF for public, and 'pdf' for private types.
 
 **Supported Features (the fundamentals):**
 - You can use all built-in PDF fonts: Courier, Helvetica, Symbol, Times, ZapfDingbats, and their variants
