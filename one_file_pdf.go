@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-06 01:04:12 E5650E                              [one_file_pdf.go]
+// :v: 2018-03-06 01:22:41 731D07                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -393,7 +393,7 @@ type pdfImage struct {
 // pdfPage holds details for each page.
 type pdfPage struct {
 	pageSize          PDFPageSize
-	pageContent       bytes.Buffer
+	content           bytes.Buffer
 	fontIDs           []int
 	imageNos          []int
 	x                 float64
@@ -1331,7 +1331,7 @@ func (pdf *PDF) Reset() *PDF {
 	for _, pg := range pdf.pages {
 		pg.fontIDs = []int{}
 		pg.imageNos = []int{}
-		pg.pageContent.Reset()
+		pg.content.Reset()
 	}
 	pdf.docAuthor, pdf.docCreator, pdf.docKeywords = "", "", ""
 	pdf.docSubject, pdf.docTitle, pdf.unitName = "", "", ""
@@ -1675,7 +1675,7 @@ func (pdf *PDF) setCurrentPage(pageNo int) *PDF {
 		pdf.contentPtr = &pdf.content
 	} else {
 		pdf.pagePtr = &pdf.pages[pageNo]
-		pdf.contentPtr = &pdf.pagePtr.pageContent
+		pdf.contentPtr = &pdf.pagePtr.content
 	}
 	pdf.pageNo = pageNo
 	return pdf
@@ -1743,7 +1743,7 @@ func (pdf *PDF) write(format string, args ...interface{}) *PDF {
 		pdf.logError("Invalid page number.")
 		return pdf
 	} else {
-		buf = &pdf.pagePtr.pageContent
+		buf = &pdf.pagePtr.content
 	}
 	buf.Write([]byte(fmt.Sprintf(format, args...)))
 	return pdf
@@ -1789,7 +1789,7 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
 	}
 	pdf.writeEndobj()
 	for i, pg := range pdf.pages { //                            write each page
-		if pg.pageContent.Len() == 0 {
+		if pg.content.Len() == 0 {
 			pdf.logError("Warning: empty page %d\n", i+1)
 			continue
 		}
@@ -1815,7 +1815,7 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
 		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
 			pdf.write(">>")
 		}
-		pdf.writeEndobj().writeStream([]byte(pg.pageContent.String()))
+		pdf.writeEndobj().writeStream([]byte(pg.content.String()))
 	}
 	return pdf
 } //                                                                  writePages
@@ -1839,7 +1839,7 @@ func (pdf *PDF) writeStreamData(content []byte) *PDF {
 			pdf.logError("Failed compressing:", err)
 			return pdf
 		}
-		writer.Close() // don't use defer, close immediately
+		writer.Close() // don't defer, close before reading Bytes()
 		content = buf.Bytes()
 	}
 	return pdf.write("%s/Length %d>>stream\n%s\nendstream\n",
