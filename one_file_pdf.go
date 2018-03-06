@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-06 00:47:11 E7BB1F                              [one_file_pdf.go]
+// :v: 2018-03-06 00:59:29 EA649A                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -981,9 +981,8 @@ func (pdf *PDF) SetXY(x, y float64) *PDF {
 
 // SetY changes the Y-coordinate of the current drawing position.
 func (pdf *PDF) SetY(y float64) *PDF {
-	if pdf.warnIfNoPage() {
-		pdf.pagePtr.y = (pdf.pageSize.HeightPt * pdf.pointsPerUnit) -
-			(y * pdf.pointsPerUnit)
+	if !pdf.warnIfNoPage() {
+		pdf.pagePtr.y = pdf.pageSize.HeightPt - y*pdf.pointsPerUnit
 	}
 	return pdf
 } //                                                                        SetY
