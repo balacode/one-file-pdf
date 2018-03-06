@@ -13,11 +13,11 @@ The result is a single .go file with less than 1999 lines of code.
 - It's easier to learn about the internals of the PDF format with a smaller library.
 - The current version of the file is indicated in the header (the timestamp).
 
-** To Install: **
+**To Install:**
 
     go get github.com/balacode/one-file-pdf
 
-** Naming Convention **
+**Naming Convention:**
 All types in the library are prefixed with PDF for pub\ic, and 'pdf' for private types.
 
 **Supported Features (the fundamentals):**
