@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-08 00:30:38 E9BB3B                              [one_file_pdf.go]
+// :v: 2018-03-08 00:35:30 8EEE8E                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1472,21 +1472,21 @@ func (pdf *PDF) applyFont() {
 			if strings.ToUpper(pdf.fontName) != name {
 				continue
 			}
-			font.fontName = pdfFontNames[i]
-			font.isBuiltIn = true
-			font.isBold = strings.Contains(name, "BOLD")
-			font.isItalic = strings.Contains(name, "OBLIQUE") ||
-				strings.Contains(name, "ITALIC")
+			var has = strings.Contains
+			font = pdfFont{
+				fontName:  pdfFontNames[i],
+				isBuiltIn: true,
+				isBold:    has(name, "BOLD"),
+				isItalic:  has(name, "OBLIQUE") || has(name, "ITALIC"),
+			}
 			isValid = true
 			break
 		}
 	}
 	// if there is no selected font or it's invalid, use Helvetica
 	if !isValid {
-		font.fontName = "Helvetica"
-		font.isBuiltIn = true
-		font.isBold = false
-		font.isItalic = false
+		pdf.logError("Invalid font name:", pdf.fontName)
+		font = pdfFont{fontName: "Helvetica", isBuiltIn: true}
 	}
 	// has the font been added to the global list? If not, add it:
 	for _, iter := range pdf.fonts {
