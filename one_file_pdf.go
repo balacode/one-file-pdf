@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-07 01:10:24 73B1FA                              [one_file_pdf.go]
+// :v: 2018-03-07 01:12:25 5FA59E                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1262,33 +1262,19 @@ func (pdf *PDF) DrawTextInBox(x, y, width, height float64, align, text string,
 // current measurement unit. The grid fills the entire page.
 // It helps with item positioning.
 func (pdf *PDF) DrawUnitGrid() *PDF {
-	var x, y, pgWidth, pgHeight = 0.0, 0.0, pdf.PageWidth(), pdf.PageHeight()
-	if pdf.pageNo < 0 { // ensure there is a current page
-		pdf.logError("No current page.")
+	if pdf.warnIfNoPage() {
 		return pdf
 	}
+	var pgWidth, pgHeight = pdf.PageWidth(), pdf.PageHeight()
 	pdf.SetLineWidth(0.1).SetFont("Helvetica", 8)
-	var xh = 0.1
-	var yh = 0.5
-	var xv = 0.3
-	var yv = 0.3
-	var i = 0
-	//
-	// draw vertical lines
-	for x = 0; x < pgWidth; x++ {
-		pdf.SetColorRGB(200, 200, 200).DrawLine(x, 0, x, pgHeight)
-		if i > 0 {
-			pdf.SetColor("Indigo").SetXY(x+xh, y+yh).DrawText(strconv.Itoa(i))
-		}
+	for i, x := 0, 0.0; x < pgWidth; x++ { //                   vertical lines |
+		pdf.SetColorRGB(200, 200, 200).DrawLine(x, 0, x, pgHeight).
+			SetColor("Indigo").SetXY(x+0.1, 0.3).DrawText(strconv.Itoa(i))
 		i++
 	}
-	// draw horizontal lines
-	i = 0
-	for y = 0; y < pgHeight; y++ {
-		pdf.SetColorRGB(200, 200, 200).DrawLine(0, y, pgWidth, y)
-		if i > 0 {
-			pdf.SetColor("Indigo").SetXY(xv, y+yv).DrawText(strconv.Itoa(i))
-		}
+	for i, y := 0, 0.0; y < pgHeight; y++ { //                horizontal lines -
+		pdf.SetColorRGB(200, 200, 200).DrawLine(0, y, pgWidth, y).
+			SetColor("Indigo").SetXY(0.1, y+0.3).DrawText(strconv.Itoa(i))
 		i++
 	}
 	return pdf
