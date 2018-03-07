@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-08 00:35:30 8EEE8E                              [one_file_pdf.go]
+// :v: 2018-03-08 00:38:17 29DF01                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1435,7 +1435,7 @@ func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
 	if unit != "" { //                       determine number of points per unit
 		var ppu = pdf.getPointsPerUnit(unit)
 		if int(ppu*1000000) == 0 {
-			pdf.logError("Unknown unit name.")
+			pdf.logError("Unknown unit name: '" + unit + "'")
 		}
 		ret *= ppu
 	}
