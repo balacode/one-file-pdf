@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-08 00:25:57 5E7199                              [one_file_pdf.go]
+// :v: 2018-03-08 00:30:38 E9BB3B                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1196,7 +1196,7 @@ func (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF {
 	x2, y2 = x2*pdf.ptPerUnit, pdf.pageSize.HeightPt-y2*pdf.ptPerUnit
 	pdf.applyLineWidth().applyStrokeColor()
 	return pdf.write("%.3f %.3f m %.3f %.3f l S\n", x1, y1, x2, y2)
-	// 'm' = move, 'S' = stroke path
+	// m = move  S = stroke path
 } //                                                                    DrawLine
 
 // DrawText draws a text string at the current position (X, Y).
@@ -1211,8 +1211,7 @@ func (pdf *PDF) DrawText(text string) *PDF {
 	for i := 0; i < pdf.columnNo; i++ {
 		x += pdf.columnWidths[i]
 	}
-	pdf.SetX(x)
-	pdf.drawTextLine(text)
+	pdf.SetX(x).drawTextLine(text)
 	if pdf.columnNo == (len(pdf.columnWidths) - 1) {
 		pdf.NextLine()
 	} else {
@@ -1428,9 +1427,7 @@ func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
 			num += string(ch)
 			continue
 		}
-		if (ch >= 'A' && ch <= 'Z') ||
-			(ch >= 'a' && ch <= 'z') ||
-			ch == '"' {
+		if (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || ch == '"' {
 			unit += strings.ToUpper(string(ch))
 		}
 	}
@@ -1466,8 +1463,8 @@ func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
 //
 // called by drawTextLine()
 func (pdf *PDF) applyFont() {
-	var isValid = pdf.fontName != ""
 	var font pdfFont
+	var isValid = pdf.fontName != ""
 	if isValid {
 		isValid = false
 		for i, name := range pdfFontNames {
@@ -1705,8 +1702,7 @@ func (pdf *PDF) nextObj() int {
 
 // write writes formatted strings (like fmt.Sprintf) to the current page's
 // content stream or to the final generated PDF, if there is no active page.
-// called by: Bytes(), DrawBox(), DrawLine(), drawTextLine(), FillBox()
-//            applyLineWidth(), applyNonStrokeColor(), applyStrokeColor()
+// called by: almost all Draw..() and write..() methods
 func (pdf *PDF) write(format string, args ...interface{}) *PDF {
 	var buf *bytes.Buffer
 	if pdf.pageNo == PDFNoPage {
