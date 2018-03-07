@@ -11,8 +11,16 @@ The result is a single .go file with less than 1999 lines of code.
 
 - All the basics for generating PDF documents, enough for generating mundane business reports.
 - It's easier to learn about the internals of the PDF format with a smaller library.
-- You can just drop *one_file_pdf.go* into your Go project. No need to manage dependencies. (But remember to change the package to 'main' or whatever package you are adding it to.)
 - The current version of the file is indicated in the header (the timestamp).
+
+**To Install:**  
+
+```bash
+    go get github.com/balacode/one-file-pdf
+```
+
+**Naming Convention:**   
+All types in the library are prefixed with PDF for public, and 'pdf' for private types.
 
 **Supported Features (the fundamentals):**
 - You can use all built-in PDF fonts: Courier, Helvetica, Symbol, Times, ZapfDingbats, and their variants
