@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-07 01:12:25 5FA59E                              [one_file_pdf.go]
+// :v: 2018-03-07 01:16:31 D6FEFE                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1667,14 +1667,7 @@ func (pdf *PDF) setCurrentPage(pageNo int) *PDF {
 // textWidthPt1000 returns the width of text in thousandths of a point
 // called by: drawTextLine(), drawTextBox(), TextWidth()
 func (pdf *PDF) textWidthPt1000(text string) float64 {
-	//
-	// warn and return if there is no current page
-	if pdf.pageNo == PDFNoPage || pdf.pageNo > (len(pdf.pages)-1) ||
-		pdf.pagePtr == nil {
-		pdf.logError("No current page.")
-		return 0
-	}
-	if text == "" {
+	if pdf.warnIfNoPage() || text == "" {
 		return 0
 	}
 	var w = 0.0
