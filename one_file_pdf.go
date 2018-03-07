@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-08 00:38:17 29DF01                              [one_file_pdf.go]
+// :v: 2018-03-08 00:41:25 0CE4AF                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -994,8 +994,8 @@ func (pdf *PDF) AddPage() *PDF {
 		pageSize:          pdf.pageSize,
 		x:                 -1, // must default to -1
 		y:                 -1,
-		strokeColor:       PDFColor{1, 1, 1},
-		nonStrokeColor:    PDFColor{1, 1, 1},
+		strokeColor:       PDFColor{1, 0, 1}, // default to an unlikely value
+		nonStrokeColor:    PDFColor{1, 0, 1},
 		horizontalScaling: 100,
 	})
 	pdf.setCurrentPage(pageNo)
@@ -1049,10 +1049,8 @@ func (pdf *PDF) Bytes() []byte {
 			label string
 			field string
 		}{
-			{"/Title ", pdf.docTitle},
-			{"/Subject ", pdf.docSubject},
-			{"/Keywords ", pdf.docKeywords},
-			{"/Author ", pdf.docAuthor},
+			{"/Title ", pdf.docTitle}, {"/Subject ", pdf.docSubject},
+			{"/Keywords ", pdf.docKeywords}, {"/Author ", pdf.docAuthor},
 			{"/Creator ", pdf.docCreator},
 		} {
 			if iter.field != "" {
