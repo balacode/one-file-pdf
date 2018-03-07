@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-08 00:17:38 7E2331                              [one_file_pdf.go]
+// :v: 2018-03-08 00:20:33 D764B9                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -838,12 +838,9 @@ func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 	//
 	// if name starts with '#' treat it as HTML color (#RRGGBB)
 	var s = strings.ToUpper(nameOrHTMLColor)
-	if s != "" && s[0] == '#' {
+	if len(s) >= 7 && s[0] == '#' {
 		var hex [6]uint8
-		for i, ch := range s[1:] {
-			if i > 6 {
-				break
-			}
+		for i, ch := range s[1:7] {
 			if ch >= '0' && ch <= '9' {
 				hex[i] = uint8(ch - '0')
 				continue
