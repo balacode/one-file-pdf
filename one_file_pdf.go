@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-07 01:16:31 D6FEFE                              [one_file_pdf.go]
+// :v: 2018-03-07 01:18:22 660159                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1687,8 +1687,7 @@ func (pdf *PDF) textWidthPt1000(text string) float64 {
 // called by: DrawBox(), DrawLine(), DrawText(), FillBox(),
 //            SetX(), SetXY(), SetY(), TextWidth(), X(), Y()
 func (pdf *PDF) warnIfNoPage() bool {
-	if len(pdf.pages) == 0 || pdf.pageNo > (len(pdf.pages)-1) ||
-		pdf.pagePtr == nil {
+	if pdf.pagePtr == nil || pdf.pageNo < 0 || pdf.pageNo > (len(pdf.pages)-1) {
 		pdf.logError("No current page.")
 		return true
 	}
@@ -1716,7 +1715,7 @@ func (pdf *PDF) write(format string, args ...interface{}) *PDF {
 	if pdf.pageNo == PDFNoPage {
 		buf = pdf.contentPtr
 	} else if pdf.pageNo > (len(pdf.pages) - 1) {
-		pdf.logError("Invalid page number.")
+		pdf.logError("Invalid page number: %d", pdf.pageNo)
 		return pdf
 	} else {
 		buf = &pdf.pagePtr.content
