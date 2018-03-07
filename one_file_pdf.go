@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-07 01:06:18 2EB9A8                              [one_file_pdf.go]
+// :v: 2018-03-07 01:10:24 73B1FA                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1182,7 +1182,7 @@ func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 	var width = float64(img.width) / float64(img.height) * height
 	//
 	// draw the image      w      h  x  y
-	return pdf.write("q\n %f 0 0 %f %f %f cm\n/Im%d Do\nQ\n",
+	return pdf.write("q\n %f 0 0 %f %f %f cm\n/IMG%d Do\nQ\n",
 		width, height, x, y, imgNo)
 	// q  = save graphics state
 	// cm = concatenate matrix to current transform matrix
@@ -1803,7 +1803,7 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
 		if len(pg.imageNos) > 0 {
 			pdf.write("/XObject<<")
 			for imageNo := range pg.imageNos {
-				pdf.write("/Im%d %d 0 R", imageNo, imagesIndex+imageNo)
+				pdf.write("/IMG%d %d 0 R", imageNo, imagesIndex+imageNo)
 			}
 			pdf.write(">>")
 		}
