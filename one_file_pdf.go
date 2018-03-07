@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-08 00:52:15 8930A7                              [one_file_pdf.go]
+// :v: 2018-03-08 00:54:21 64A8CA                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -73,6 +73,8 @@ package pdf
 //   (pdf *PDF) AddPage() *PDF
 //   (pdf *PDF) Bytes() []byte
 //   (pdf *PDF) DrawBox(x, y, width, height float64, fill ...bool) *PDF
+//   (pdf *PDF) DrawCircle(x, y, radius float64, fill ...bool) *PDF
+//   (pdf *PDF) DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF
 //   (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 //              ) *PDF
 //   (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF
@@ -85,6 +87,8 @@ package pdf
 //              ) *PDF
 //   (pdf *PDF) DrawUnitGrid() *PDF
 //   (pdf *PDF) FillBox(x, y, width, height float64) *PDF
+//   (pdf *PDF) FillCircle(x, y, radius float64) *PDF
+//   (pdf *PDF) FillEllipse(x, y, xRadius, yRadius float64) *PDF
 //   (pdf *PDF) NextLine() *PDF
 //   (pdf *PDF) Reset() *PDF
 //   (pdf *PDF) SaveFile(filename string) *PDF
@@ -109,6 +113,7 @@ package pdf
 // # Private Generation Methods
 //   (pdf *PDF) nextObj() int
 //   (pdf *PDF) write(format string, args ...interface{}) *PDF
+//   (pdf *PDF) writeCurve(xc, yc, xd, yd, xe, ye float64) *PDF
 //   (pdf *PDF) writeEndobj() *PDF
 //   (pdf *PDF) writeInit(fill ...bool) (mode string)
 //   (pdf *PDF) writeObj(objectType string) *PDF
@@ -1084,8 +1089,40 @@ func (pdf *PDF) DrawBox(x, y, width, height float64, fill ...bool) *PDF {
 	y = pdf.pageSize.HeightPt - y*pdf.ptPerUnit - height
 	var mode = pdf.writeInit(fill...)
 	return pdf.write("%.3f %.3f %.3f %.3f re %s\n", x, y, width, height, mode)
-	// re: construct a rectangular path
+	// re = construct a rectangular path
 } //                                                                     DrawBox
+
+// DrawCircle draws a circle of radius r centered on (x, y),
+// by drawing 4 Bezier curves (PDF has no circle primitive)
+func (pdf *PDF) DrawCircle(x, y, radius float64, fill ...bool) *PDF {
+	if !pdf.warnIfNoPage() {
+		pdf.DrawEllipse(x, y, radius, radius, fill...)
+	}
+	return pdf
+} //                                                                  DrawCircle
+
+// DrawEllipse draws an ellipse centered on (x, y),
+// with horizontal radius xRadius and vertical radius yRadius
+// by drawing 4 Bezier curves (PDF has no circle primitive)
+func (pdf *PDF) DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF {
+	if pdf.warnIfNoPage() {
+		return pdf
+	}
+	x, y = x*pdf.ptPerUnit, pdf.pageSize.HeightPt-y*pdf.ptPerUnit
+	const ratio = 0.552284749830794   // (4/3)*tan(PI/8)
+	var r = xRadius * pdf.ptPerUnit   // horizontal radius
+	var v = yRadius * pdf.ptPerUnit   // vertical radius
+	var m, n = r * ratio, v * ratio   // ratios for control points
+	var mode = pdf.writeInit(fill...) // prepare colors/line width
+	//
+	return pdf.write(" %.3f %.3f m", x-r, y). // start point
+		//         control-1 control-2 endpoint
+		writeCurve(x-r, y+n, x-m, y+v, x+0, y+v). // top left arc
+		writeCurve(x+m, y+v, x+r, y+n, x+r, y+0). // top right
+		writeCurve(x+r, y-n, x+m, y-v, x+0, y-v). // bottom right
+		writeCurve(x-m, y-v, x-r, y-n, x-r, y+0). // bottom left
+		write(" %s\n", mode)
+} //                                                                 DrawEllipse
 
 // DrawImage draws a grayscale PNG image.
 // For now, only grayscale PNG images are supported.
@@ -1279,6 +1316,18 @@ func (pdf *PDF) FillBox(x, y, width, height float64) *PDF {
 	}
 	return pdf
 } //                                                                     FillBox
+
+// FillCircle fills a circle of radius r centered on (x, y),
+// by drawing 4 Bezier curves (PDF has no circle primitive)
+func (pdf *PDF) FillCircle(x, y, radius float64) *PDF {
+	return pdf.DrawEllipse(x, y, radius, radius, true)
+} //                                                                  FillCircle
+
+// FillEllipse fills a Ellipse of radius r centered on (x, y),
+// by drawing 4 Bezier curves (PDF has no Ellipse primitive)
+func (pdf *PDF) FillEllipse(x, y, xRadius, yRadius float64) *PDF {
+	return pdf.DrawEllipse(x, y, xRadius, yRadius, true)
+} //                                                                 FillEllipse
 
 // NextLine advances the text writing position to the next line.
 // I.e. the Y increases by the height of the font and
@@ -1666,6 +1715,13 @@ func (pdf *PDF) write(format string, args ...interface{}) *PDF {
 	buf.Write([]byte(fmt.Sprintf(format, args...)))
 	return pdf
 } //                                                                       write
+
+// writeCurve writes a Bezier curve using the 'c' PDF primitive.
+// The starting point is the current (x, y) position.
+// (xc, yc) and (xd, yd) are the two control points, (xe, ye) the end point.
+func (pdf *PDF) writeCurve(xc, yc, xd, yd, xe, ye float64) *PDF {
+	return pdf.write(" %.3f %.3f %.3f %.3f %.3f %.3f c", xc, yc, xd, yd, xe, ye)
+} //                                                                  writeCurve
 
 // writeEndobj writes 'endobj' (PDF object end marker)
 func (pdf *PDF) writeEndobj() *PDF {
