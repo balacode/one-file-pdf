@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-07 00:58:27 DF9F0C                              [one_file_pdf.go]
+// :v: 2018-03-07 01:06:18 2EB9A8                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -100,7 +100,7 @@ package pdf
 //   (pdf *PDF) applyLineWidth() *PDF
 //   (pdf *PDF) applyNonStrokeColor() *PDF
 //   (pdf *PDF) applyStrokeColor() *PDF
-//   (pdf *PDF) drawTextLine(text string) *PDF
+//   (pdf *PDF) drawTextLine(s string) *PDF
 //   (pdf *PDF) drawTextBox(
 //                 x, y, width, height float64,
 //                 wrapText bool, align, text string,
@@ -1012,14 +1012,14 @@ func (pdf *PDF) AddPage() *PDF {
 // you'll find the core structure of a PDF document.
 // Called by: SaveFile()
 func (pdf *PDF) Bytes() []byte {
-	pdf.objOffsets = []int{}
-	pdf.objNo = 0
 	//
 	// free any existing generated content and write PDF header
 	var fontsIndex = pdfPagesIndex + len(pdf.pages)*2
 	var imagesIndex = fontsIndex + len(pdf.fonts)
 	var infoIndex int // set when metadata found
 	pdf.content.Reset()
+	pdf.objOffsets = []int{}
+	pdf.objNo = 0
 	pdf.setCurrentPage(PDFNoPage).write("%%PDF-1.4\n").
 		writeObj("/Catalog").write("/Pages 2 0 R").writeEndobj()
 	//
@@ -1030,20 +1030,17 @@ func (pdf *PDF) Bytes() []byte {
 	for _, iter := range pdf.fonts {
 		pdf.writeObj("/Font")
 		if iter.isBuiltIn {
-			pdf.write("/Subtype/Type1/Name/F%d"+
-				"/BaseFont/%s/Encoding/WinAnsiEncoding",
-				iter.fontID, iter.fontName)
+			pdf.write("/Subtype/Type1/Name/F%d/BaseFont/%s"+
+				"/Encoding/WinAnsiEncoding", iter.fontID, iter.fontName)
 		}
 		pdf.writeEndobj()
 	}
 	// write images
 	for _, iter := range pdf.images {
 		pdf.writeObj("/XObject").
-			write("/Subtype/Image/Width %d/Height %d"+
-				"/ColorSpace/DeviceGray/BitsPerComponent 8",
-				iter.width, iter.height).
-			writeStreamData(iter.data).
-			write("\nendobj\n")
+			write("/Subtype/Image/Width %d/Height %d/ColorSpace/DeviceGray/"+
+				"BitsPerComponent 8", iter.width, iter.height).
+			writeStreamData(iter.data).write("\nendobj\n")
 	}
 	// write info object
 	if pdf.docTitle != "" || pdf.docSubject != "" ||
@@ -1589,8 +1586,8 @@ func (pdf *PDF) applyStrokeColor() *PDF {
 // drawTextLine writes a line of text at the current coordinates to the
 // current page's content stream, using a sequence of raw PDF commands.
 // called by: DrawText(), drawTextBox()
-func (pdf *PDF) drawTextLine(text string) *PDF {
-	if text == "" {
+func (pdf *PDF) drawTextLine(s string) *PDF {
+	if s == "" {
 		return pdf
 	}
 	// draw the text
@@ -1605,10 +1602,9 @@ func (pdf *PDF) drawTextLine(text string) *PDF {
 	if pg.x < 0 || pg.y < 0 {
 		pdf.SetXY(0, 0)
 	}
-	pdf.write("BT %d %d Td (%s) Tj ET\n",
-		int(pg.x), int(pg.y), pdf.escape(text))
-	pg.x += pdf.textWidthPt1000(text)
 	// BT = begin text  Td = move text position  Tj = show text  ET = end text
+	pdf.write("BT %d %d Td (%s) Tj ET\n", int(pg.x), int(pg.y), pdf.escape(s))
+	pg.x += pdf.textWidthPt1000(s)
 	return pdf
 } //                                                                drawTextLine
 
@@ -1772,19 +1768,17 @@ func (pdf *PDF) writeObj(objectType string) *PDF {
 // writePages writes all PDF pages
 func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
 	pdf.writeObj("/Pages").write("/Count %d/MediaBox[0 0 %d %d]",
-		len(pdf.pages),
-		int(pdf.pageSize.WidthPt),
-		int(pdf.pageSize.HeightPt))
+		len(pdf.pages), int(pdf.pageSize.WidthPt), int(pdf.pageSize.HeightPt))
 	//                                                        write page numbers
 	if len(pdf.pages) > 0 {
-		var pageObjectNo = pdfPagesIndex
+		var pageObjNo = pdfPagesIndex
 		pdf.write("/Kids[")
 		for i := range pdf.pages {
 			if i > 0 {
 				pdf.write(" ")
 			}
-			pdf.write("%d 0 R", pageObjectNo)
-			pageObjectNo += 2 //                        1 for page, 1 for stream
+			pdf.write("%d 0 R", pageObjNo)
+			pageObjNo += 2 //                           1 for page, 1 for stream
 		}
 		pdf.write("]")
 	}
@@ -1888,16 +1882,13 @@ func (*PDF) getPointsPerUnit(unitName string) float64 {
 
 // isWhiteSpace returns true if all the chars. in 's' are white-spaces
 func (*PDF) isWhiteSpace(s string) bool {
-	if s == "" {
-		return false
-	}
 	for _, ch := range s {
 		if ch != ' ' && ch != '\a' && ch != '\b' && ch != '\f' &&
 			ch != '\n' && ch != '\r' && ch != '\t' && ch != '\v' {
 			return false
 		}
 	}
-	return true
+	return len(s) > 0
 } //                                                                isWhiteSpace
 
 // splitLines splits 's' into several lines using line breaks in 's'
