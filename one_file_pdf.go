@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-08 00:20:33 D764B9                              [one_file_pdf.go]
+// :v: 2018-03-08 00:25:57 5E7199                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1797,23 +1797,22 @@ func (pdf *PDF) writeStream(content []byte) *PDF {
 } //                                                                 writeStream
 
 // writeStreamData writes a stream or image stream
-func (pdf *PDF) writeStreamData(content []byte) *PDF {
+func (pdf *PDF) writeStreamData(ar []byte) *PDF {
 	pdf.setCurrentPage(PDFNoPage)
-	var filter string
+	var s string // filter
 	if pdf.compressStreams {
-		filter = "/Filter/FlateDecode"
 		var buf bytes.Buffer
-		var writer = zlib.NewWriter(&buf)
-		var _, err = writer.Write([]byte(content))
+		var w = zlib.NewWriter(&buf)
+		var _, err = w.Write([]byte(ar))
 		if err != nil {
 			pdf.logError("Failed compressing:", err)
 			return pdf
 		}
-		writer.Close() // don't defer, close before reading Bytes()
-		content = buf.Bytes()
+		w.Close() // don't defer, close before reading Bytes()
+		ar = buf.Bytes()
+		s = "/Filter/FlateDecode"
 	}
-	return pdf.write("%s/Length %d>>stream\n%s\nendstream\n",
-		filter, len(content), content)
+	return pdf.write("%s/Length %d>>stream\n%s\nendstream\n", s, len(ar), ar)
 } //                                                             writeStreamData
 
 // -----------------------------------------------------------------------------
