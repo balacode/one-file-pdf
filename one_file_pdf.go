@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-08 00:41:25 0CE4AF                              [one_file_pdf.go]
+// :v: 2018-03-08 00:52:15 8930A7                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -72,7 +72,7 @@ package pdf
 // # Methods
 //   (pdf *PDF) AddPage() *PDF
 //   (pdf *PDF) Bytes() []byte
-//   (pdf *PDF) DrawBox(x, y, width, height float64) *PDF
+//   (pdf *PDF) DrawBox(x, y, width, height float64, fill ...bool) *PDF
 //   (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 //              ) *PDF
 //   (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF
@@ -97,9 +97,6 @@ package pdf
 //
 // # Private Methods
 //   (pdf *PDF) applyFont()
-//   (pdf *PDF) applyLineWidth() *PDF
-//   (pdf *PDF) applyNonStrokeColor() *PDF
-//   (pdf *PDF) applyStrokeColor() *PDF
 //   (pdf *PDF) drawTextLine(s string) *PDF
 //   (pdf *PDF) drawTextBox(
 //                 x, y, width, height float64,
@@ -113,6 +110,7 @@ package pdf
 //   (pdf *PDF) nextObj() int
 //   (pdf *PDF) write(format string, args ...interface{}) *PDF
 //   (pdf *PDF) writeEndobj() *PDF
+//   (pdf *PDF) writeInit(fill ...bool) (mode string)
 //   (pdf *PDF) writeObj(objectType string) *PDF
 //   (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF
 //   (pdf *PDF) writeStream(content []byte) *PDF
@@ -1077,16 +1075,16 @@ func (pdf *PDF) Bytes() []byte {
 } //                                                                       Bytes
 
 // DrawBox draws a rectangle.
-func (pdf *PDF) DrawBox(x, y, width, height float64) *PDF {
+func (pdf *PDF) DrawBox(x, y, width, height float64, fill ...bool) *PDF {
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
 	width, height = width*pdf.ptPerUnit, height*pdf.ptPerUnit
 	x *= pdf.ptPerUnit
 	y = pdf.pageSize.HeightPt - y*pdf.ptPerUnit - height
-	pdf.applyLineWidth().applyStrokeColor()
-	return pdf.write("%.3f %.3f %.3f %.3f re S\n", x, y, width, height)
-	// re = construct a rectangular path  S = stroke path
+	var mode = pdf.writeInit(fill...)
+	return pdf.write("%.3f %.3f %.3f %.3f re %s\n", x, y, width, height, mode)
+	// re: construct a rectangular path
 } //                                                                     DrawBox
 
 // DrawImage draws a grayscale PNG image.
@@ -1192,7 +1190,7 @@ func (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF {
 	}
 	x1, y1 = x1*pdf.ptPerUnit, pdf.pageSize.HeightPt-y1*pdf.ptPerUnit
 	x2, y2 = x2*pdf.ptPerUnit, pdf.pageSize.HeightPt-y2*pdf.ptPerUnit
-	pdf.applyLineWidth().applyStrokeColor()
+	pdf.writeInit(true) // prepare color/line width
 	return pdf.write("%.3f %.3f m %.3f %.3f l S\n", x1, y1, x2, y2)
 	// m = move  S = stroke path
 } //                                                                    DrawLine
@@ -1276,15 +1274,10 @@ func (pdf *PDF) DrawUnitGrid() *PDF {
 
 // FillBox fills a rectangle with the current color.
 func (pdf *PDF) FillBox(x, y, width, height float64) *PDF {
-	if pdf.warnIfNoPage() {
-		return pdf
+	if !pdf.warnIfNoPage() {
+		pdf.DrawBox(x, y, width, height, true)
 	}
-	width, height = width*pdf.ptPerUnit, height*pdf.ptPerUnit
-	x *= pdf.ptPerUnit
-	y = pdf.pageSize.HeightPt - y*pdf.ptPerUnit - height
-	return pdf.applyLineWidth().applyNonStrokeColor().
-		write("%.3f %.3f %.3f %.3f re f\n", x, y, width, height)
-	// 're' = construct a rectangular path, 'f' = fill
+	return pdf
 } //                                                                     FillBox
 
 // NextLine advances the text writing position to the next line.
@@ -1520,47 +1513,6 @@ func (pdf *PDF) applyFont() {
 	// BT = begin text   /F0 0 Tf = font index and name   ET = end text
 } //                                                                   applyFont
 
-// applyLineWidth writes a line-width PDF command ('w') to the current
-// page's content stream, if the value changed since last call.
-// called by: DrawBox(), DrawLine(), FillBox()
-func (pdf *PDF) applyLineWidth() *PDF {
-	var val = &pdf.pagePtr.lineWidth
-	if int(*val*10000) != int(pdf.lineWidth*10000) {
-		*val = pdf.lineWidth
-		pdf.write("%.3f w\n", float64(*val)) // w = set line width
-	}
-	return pdf
-} //                                                              applyLineWidth
-
-// applyNonStrokeColor writes a text color selection PDF command ('rg') to
-// the current page's content stream, if the value changed since last call.
-// called by: drawTextLine(), FillBox()
-func (pdf *PDF) applyNonStrokeColor() *PDF {
-	var clr = &pdf.pagePtr.nonStrokeColor
-	if *clr == pdf.color {
-		return pdf
-	}
-	*clr = pdf.color
-	pdf.write("%.3f %.3f %.3f rg\n", // 'rg' = set non-stroking (text) color
-		float64(clr.Red)/255, float64(clr.Green)/255, float64(clr.Blue)/255)
-	return pdf
-} //                                                         applyNonStrokeColor
-
-// applyStrokeColor writes a line color selection PDF
-// command ('RG') to the current page's content
-// stream, if the value changed since last call.
-// called by: DrawBox(), DrawLine()
-func (pdf *PDF) applyStrokeColor() *PDF {
-	var clr = &pdf.pagePtr.strokeColor
-	if *clr == pdf.color {
-		return pdf
-	}
-	*clr = pdf.color
-	pdf.write("%.3f %.3f %.3f RG\n", // {r} {g} {b} RG = stroke (line) color
-		float64(clr.Red)/255, float64(clr.Green)/255, float64(clr.Blue)/255)
-	return pdf
-} //                                                            applyStrokeColor
-
 // drawTextLine writes a line of text at the current coordinates to the
 // current page's content stream, using a sequence of raw PDF commands.
 // called by: DrawText(), drawTextBox()
@@ -1575,7 +1527,7 @@ func (pdf *PDF) drawTextLine(s string) *PDF {
 		pdf.write("BT %d Tz ET\n", pdf.pagePtr.horizontalScaling)
 		// BT = begin text   n Tz = horizontal text scaling   ET = end text
 	}
-	pdf.applyNonStrokeColor()
+	pdf.writeInit(true) // fill/nonStroke
 	var pg = pdf.pagePtr
 	if pg.x < 0 || pg.y < 0 {
 		pdf.SetXY(0, 0)
@@ -1719,6 +1671,30 @@ func (pdf *PDF) write(format string, args ...interface{}) *PDF {
 func (pdf *PDF) writeEndobj() *PDF {
 	return pdf.write(">>\nendobj\n")
 } //                                                                 writeEndobj
+
+// writeInit sets the stroking or non-stroking color and line width.
+// 'fill' arg specifies non-stroking (true) or stroking mode (none/false).
+func (pdf *PDF) writeInit(fill ...bool) (mode string) {
+	mode = "S" // stroke (for lines)
+	if len(fill) > 0 && fill[0] {
+		mode = "b" // fill / text
+		if p := &pdf.pagePtr.nonStrokeColor; *p != pdf.color {
+			*p = pdf.color
+			pdf.write(" %.3f %.3f %.3f rg\n", // rg: set non-stroking/text color
+				float64(p.Red)/255, float64(p.Green)/255, float64(p.Blue)/255)
+		}
+	}
+	if p := &pdf.pagePtr.strokeColor; *p != pdf.color {
+		*p = pdf.color
+		pdf.write("%.3f %.3f %.3f RG\n", // RG: set stroke (line) color
+			float64(p.Red)/255, float64(p.Green)/255, float64(p.Blue)/255)
+	}
+	if p := &pdf.pagePtr.lineWidth; int(*p*10000) != int(pdf.lineWidth*10000) {
+		*p = pdf.lineWidth
+		pdf.write("%.3f w\n", float64(*p)) // w: set line width
+	}
+	return mode
+} //                                                                   writeInit
 
 // writeObj outputs an object header
 func (pdf *PDF) writeObj(objectType string) *PDF {
