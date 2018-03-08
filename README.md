@@ -102,4 +102,4 @@ func main() {
 - New demo demonstrating circles and text wrapping: corporate.pdf ("Synergy Ipsum")
 - SetColor(): now allows HTML color values like `"#4C9141 MayGreen"`, ignores the extra chars.
 - Log an error when the name of a selected font is unknown.
-- Log the specified measurement unit's name when its valus is not valid.
+- Log the specified measurement unit's name when its name is not valid.
