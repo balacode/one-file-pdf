@@ -98,10 +98,10 @@ func main() {
 ### Samples:
 
 #### Hello World
-!["Hello World!" sample image](demo/samples/hello.png)
+!["Hello World!" sample image](demo/samples/hello.pdf)
 
 #### "Synergy Ipsum"
-!["Synergy Ipsum" sample image](demo/samples/corporate.png)
+!["Synergy Ipsum" sample image](demo/samples/corporate.pdf)
 
 ### Changelog (excluding internal changes):
 
