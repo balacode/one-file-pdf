@@ -95,9 +95,13 @@ func main() {
 } //                                                                        main
 ```
 
-### Sample Output:
+### Samples:
 
+#### Hello World
 !["Hello World!" sample image](demo/samples/hello.png)
+
+#### "Synergy Ipsum"
+!["Synergy Ipsum" sample image](demo/samples/corporate.png)
 
 ### Changelog (excluding internal changes):
 
