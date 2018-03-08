@@ -95,6 +95,10 @@ func main() {
 } //                                                                        main
 ```
 
+### Sample Output:
+
+!["Hello World!" sample image](demo/samples/hello.png)
+
 ### Changelog (excluding internal changes):
 
 **2018-MAR-08**
