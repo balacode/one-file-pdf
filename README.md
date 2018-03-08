@@ -13,18 +13,18 @@ The result is a single .go file with less than 1999 lines of code.
 - It's easier to learn about the internals of the PDF format with a smaller library.
 - The current version of the file is indicated in the header (the timestamp).
 
-**To Install:**  
+### To Install:  
 
 ```bash
     go get github.com/balacode/one-file-pdf
 ```
 
-### Naming Convention:
+### Naming Convention:  
 All types in are prefixed with PDF for public, and 'pdf' for private types.
 The only type you really need to use is PDF, while PDFColor,
 PDFPageSize and PDFColorNames are left public for reference.
 
-### Supported Features (the fundamentals):
+### Supported Features (the fundamentals):  
 - You can use all built-in PDF fonts: Courier, Helvetica, Symbol, Times, ZapfDingbats, and their variants
 - Recognises 144 web colo(u)r names, or any RGB value
 - Stream compression can be turned on or off (normal PDF files compress streams to reduce file size, but turning compression off helps in debugging or learning about PDF commands)
@@ -37,13 +37,13 @@ PDFPageSize and PDFColorNames are left public for reference.
 - Set columns for outputting text (like arbitrary tab stops on the page)
 - Built-in grid that can be enabled to assist measurement and positioning
 
-### Not Supported (everything else):
+### Not Supported (everything else):  
 - Unicode (requires font embedding)
 - Font embedding
 - PDF encryption
 - Paths, curves and complex graphics
 
-### Hello World:
+### Hello World:  
 
 ```go
 package main 
