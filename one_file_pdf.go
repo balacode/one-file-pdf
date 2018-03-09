@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-10 00:09:44 AB56C0                              [one_file_pdf.go]
+// :v: 2018-03-10 00:11:16 942DE1                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -91,11 +91,11 @@ package pdf
 //   (pdf *PDF) SaveFile(filename string) error
 //   (pdf *PDF) SetColumnWidths(widths ...float64) *PDF
 //   (pdf *PDF) SetErrorLogger(fn func(a ...interface{}) (int, error)) *PDF
-//   (pdf *PDF) TextWidth(text string) float64
-//   (pdf *PDF) WrapTextLines(width float64, text string) (ret []string)
 //
-// # Functions
+// # Metrics Methods
+//   (pdf *PDF) TextWidth(s string) float64
 //   (pdf *PDF) ToPoints(numberAndUnit string) float64
+//   (pdf *PDF) WrapTextLines(width float64, text string) (ret []string)
 //
 // # Private Methods
 //   (pdf *PDF) applyFont()
@@ -1293,13 +1293,45 @@ func (pdf *PDF) SetErrorLogger(fn func(a ...interface{}) (int, error)) *PDF {
 	return pdf
 } //                                                              SetErrorLogger
 
+// -----------------------------------------------------------------------------
+// # Metrics Methods
+
 // TextWidth returns the width of the text in current units.
-func (pdf *PDF) TextWidth(text string) float64 {
+func (pdf *PDF) TextWidth(s string) float64 {
 	if pdf.warnIfNoPage() {
 		return 0
 	}
-	return pdf.textWidthPt1000(text) / pdf.ptPerUnit
+	return pdf.textWidthPt1000(s) / pdf.ptPerUnit
 } //                                                                   TextWidth
+
+// ToPoints converts a string composed of a number and unit
+// to points. For example '1 cm' or '1cm' becomes 28.346 points.
+// Recognised units are:
+// mm cm " in inch inches tw twip twips pt point points
+func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
+	var s = pdf.toUpperLettersDigits(numberAndUnit, `."`)
+	if s == "" {
+		return 0
+	}
+	var num, unit string //            read value and unit into separate strings
+	for _, ch := range s {
+		switch {
+		case ch >= '0' && ch <= '9', ch == '.', ch == '-':
+			num += string(ch)
+		case ch >= 'A' && ch <= 'Z', ch == '"':
+			unit += string(ch)
+		}
+	}
+	var ret, _ = strconv.ParseFloat(num, 64)
+	if unit != "" { //                       determine number of points per unit
+		var ppu = pdf.getPointsPerUnit(unit)
+		if int(ppu*1000000) == 0 {
+			pdf.logError("Unknown unit name: '" + unit + "'")
+		}
+		ret *= ppu
+	}
+	return ret
+} //                                                                    ToPoints
 
 // WrapTextLines splits a string into multiple lines so that the text
 // fits in the specified width. The text is wrapped on word boundaries.
@@ -1362,38 +1394,6 @@ func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
 	} // for
 	return ret
 } //                                                               WrapTextLines
-
-// -----------------------------------------------------------------------------
-// # Functions
-
-// ToPoints converts a string composed of a number and unit
-// to points. For example '1 cm' or '1cm' becomes 28.346 points.
-// Recognised units are:
-// mm cm " in inch inches tw twip twips pt point points
-func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
-	var s = pdf.toUpperLettersDigits(numberAndUnit, `."`)
-	if s == "" {
-		return 0
-	}
-	var num, unit string //            read value and unit into separate strings
-	for _, ch := range s {
-		switch {
-		case ch >= '0' && ch <= '9', ch == '.', ch == '-':
-			num += string(ch)
-		case ch >= 'A' && ch <= 'Z', ch == '"':
-			unit += string(ch)
-		}
-	}
-	var ret, _ = strconv.ParseFloat(num, 64)
-	if unit != "" { //                       determine number of points per unit
-		var ppu = pdf.getPointsPerUnit(unit)
-		if int(ppu*1000000) == 0 {
-			pdf.logError("Unknown unit name: '" + unit + "'")
-		}
-		ret *= ppu
-	}
-	return ret
-} //                                                                    ToPoints
 
 // -----------------------------------------------------------------------------
 // # Private Methods
