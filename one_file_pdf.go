@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 01:23:06 8279CE                              [one_file_pdf.go]
+// :v: 2018-03-09 01:27:51 DC52F5                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -115,7 +115,7 @@ package pdf
 //   (pdf *PDF) write(format string, args ...interface{}) *PDF
 //   (pdf *PDF) writeCurve(xc, yc, xd, yd, xe, ye float64) *PDF
 //   (pdf *PDF) writeEndobj() *PDF
-//   (pdf *PDF) writeInit(fill ...bool) (mode string)
+//   (pdf *PDF) writeMode(fill ...bool) (mode string)
 //   (pdf *PDF) writeObj(objectType string) *PDF
 //   (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF
 //   (pdf *PDF) writeStream(content []byte) *PDF
@@ -1086,7 +1086,7 @@ func (pdf *PDF) DrawBox(x, y, width, height float64, fill ...bool) *PDF {
 	width, height = width*pdf.ptPerUnit, height*pdf.ptPerUnit
 	x *= pdf.ptPerUnit
 	y = pdf.pageSize.HeightPt - y*pdf.ptPerUnit - height
-	var mode = pdf.writeInit(fill...)
+	var mode = pdf.writeMode(fill...)
 	return pdf.write("%.3f %.3f %.3f %.3f re %s\n", x, y, width, height, mode)
 	// re: construct a rectangular path
 } //                                                                     DrawBox
@@ -1112,7 +1112,7 @@ func (pdf *PDF) DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF {
 	var r = xRadius * pdf.ptPerUnit   // horizontal radius
 	var v = yRadius * pdf.ptPerUnit   // vertical radius
 	var m, n = r * ratio, v * ratio   // ratios for control points
-	var mode = pdf.writeInit(fill...) // prepare colors/line width
+	var mode = pdf.writeMode(fill...) // prepare colors/line width
 	//
 	return pdf.write(" %.3f %.3f m", x-r, y). // x0 y0 m: move to point (x0, y0)
 		//         control-1 control-2 endpoint
@@ -1226,7 +1226,7 @@ func (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF {
 	}
 	x1, y1 = x1*pdf.ptPerUnit, pdf.pageSize.HeightPt-y1*pdf.ptPerUnit
 	x2, y2 = x2*pdf.ptPerUnit, pdf.pageSize.HeightPt-y2*pdf.ptPerUnit
-	pdf.writeInit(true) // prepare color/line width
+	pdf.writeMode(true) // prepare color/line width
 	return pdf.write("%.3f %.3f m %.3f %.3f l S\n", x1, y1, x2, y2)
 	// m: move  S: stroke path (for lines)
 } //                                                                    DrawLine
@@ -1575,7 +1575,7 @@ func (pdf *PDF) drawTextLine(s string) *PDF {
 		pdf.write("BT %d Tz ET\n", pdf.pagePtr.horizontalScaling)
 		// BT: begin text   n0 Tz: set horiz. text scaling to n0%   ET: end text
 	}
-	pdf.writeInit(true) // fill/nonStroke
+	pdf.writeMode(true) // fill/nonStroke
 	var pg = pdf.pagePtr
 	if pg.x < 0 || pg.y < 0 {
 		pdf.SetXY(0, 0)
@@ -1727,9 +1727,9 @@ func (pdf *PDF) writeEndobj() *PDF {
 	return pdf.write(">>\nendobj\n")
 } //                                                                 writeEndobj
 
-// writeInit sets the stroking or non-stroking color and line width.
+// writeMode sets the stroking or non-stroking color and line width.
 // 'fill' arg specifies non-stroking (true) or stroking mode (none/false).
-func (pdf *PDF) writeInit(fill ...bool) (mode string) {
+func (pdf *PDF) writeMode(fill ...bool) (mode string) {
 	mode = "S" // stroke (for lines)
 	if len(fill) > 0 && fill[0] {
 		mode = "b" // fill / text
@@ -1749,7 +1749,7 @@ func (pdf *PDF) writeInit(fill ...bool) (mode string) {
 		pdf.write("%.3f w\n", float64(*p)) // w: set line width
 	}
 	return mode
-} //                                                                   writeInit
+} //                                                                   writeMode
 
 // writeObj outputs an object header
 func (pdf *PDF) writeObj(objectType string) *PDF {
