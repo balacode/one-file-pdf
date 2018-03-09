@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 01:45:00 E4726E                              [one_file_pdf.go]
+// :v: 2018-03-09 01:52:21 A813AA                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -112,7 +112,7 @@ package pdf
 // # Private Generation Methods
 //   (pdf *PDF) nextObj() int
 //   (pdf *PDF) write(format string, args ...interface{}) *PDF
-//   (pdf *PDF) writeCurve(xc, yc, xd, yd, xe, ye float64) *PDF
+//   (pdf *PDF) writeCurve(x1, y1, x2, y2, x3, y3 float64) *PDF
 //   (pdf *PDF) writeEndobj() *PDF
 //   (pdf *PDF) writeMode(fill ...bool) (mode string)
 //   (pdf *PDF) writeObj(objectType string) *PDF
@@ -1515,7 +1515,7 @@ func (pdf *PDF) applyFont() {
 	}
 	// if there is no selected font or it's invalid, use Helvetica
 	if !isValid {
-		pdf.logError("Invalid font name:", pdf.fontName)
+		pdf.logError("Invalid font name: '" + pdf.fontName + "'")
 		font = pdfFont{fontName: "Helvetica", isBuiltIn: true}
 	}
 	// has the font been added to the global list? If not, add it:
@@ -1656,7 +1656,7 @@ func (pdf *PDF) textWidthPt1000(text string) float64 {
 	var w = 0.0
 	for i, ch := range text {
 		if ch < 0 || ch > 255 {
-			pdf.logError("char out of range at %d: %d", i, ch)
+			pdf.logError("Rune out of range at", i, "('"+string(ch)+"')")
 			break
 		}
 		w += float64(pdfFontWidths[ch][0])
@@ -1671,7 +1671,7 @@ func (pdf *PDF) textWidthPt1000(text string) float64 {
 //            SetX(), SetXY(), SetY(), TextWidth(), X(), Y()
 func (pdf *PDF) warnIfNoPage() bool {
 	if pdf.pagePtr == nil || pdf.pageNo < 0 || pdf.pageNo > (len(pdf.pages)-1) {
-		pdf.logError("No current page.")
+		pdf.logError("No current page")
 		return true
 	}
 	return false
@@ -1708,9 +1708,10 @@ func (pdf *PDF) write(format string, args ...interface{}) *PDF {
 
 // writeCurve writes a Bézier curve using the 'c' PDF primitive.
 // The starting point is the current (x, y) position.
-// (xc, yc) and (xd, yd) are the two control points, (xe, ye) the end point.
-func (pdf *PDF) writeCurve(xc, yc, xd, yd, xe, ye float64) *PDF {
-	return pdf.write(" %.3f %.3f %.3f %.3f %.3f %.3f c", xc, yc, xd, yd, xe, ye)
+// (x1, y1) and (x2, y2) are the two control points, (x3, y3) the end point.
+func (pdf *PDF) writeCurve(x1, y1, x2, y2, x3, y3 float64) *PDF {
+	return pdf.write(" %.3f %.3f %.3f %.3f %.3f %.3f c", x1, y1, x2, y2, x3, y3)
+	// x1 y1 x2 y2 x3 y3 c: append cubic Bézier curve to the current path
 } //                                                                  writeCurve
 
 // writeEndobj writes 'endobj' (PDF object end marker)
@@ -1721,9 +1722,9 @@ func (pdf *PDF) writeEndobj() *PDF {
 // writeMode sets the stroking or non-stroking color and line width.
 // 'fill' arg specifies non-stroking (true) or stroking mode (none/false).
 func (pdf *PDF) writeMode(fill ...bool) (mode string) {
-	mode = "S" // stroke (for lines)
+	mode = "S" // S: stroke path (for lines)
 	if len(fill) > 0 && fill[0] {
-		mode = "b" // fill / text
+		mode = "b" // b: fill / text
 		if p := &pdf.pagePtr.nonStrokeColor; *p != pdf.color {
 			*p = pdf.color
 			pdf.write(" %.3f %.3f %.3f rg\n", // rg: set non-stroking/text color
@@ -1737,7 +1738,7 @@ func (pdf *PDF) writeMode(fill ...bool) (mode string) {
 	}
 	if p := &pdf.pagePtr.lineWidth; int(*p*10000) != int(pdf.lineWidth*10000) {
 		*p = pdf.lineWidth
-		pdf.write("%.3f w\n", float64(*p)) // w: set line width
+		pdf.write("%.3f w\n", float64(*p)) // n0 w: set line width to n0
 	}
 	return mode
 } //                                                                   writeMode
@@ -1751,7 +1752,7 @@ func (pdf *PDF) writeObj(objectType string) *PDF {
 	} else if objectType[0] == '/' {
 		pdf.write("%d 0 obj<</Type%s", objNo, objectType)
 	} else {
-		pdf.logError("objectType should begin with '/' or be a blank string.")
+		pdf.logError("objectType should begin with '/' or be a blank string")
 	}
 	return pdf
 } //                                                                    writeObj
@@ -1776,7 +1777,7 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
 	pdf.writeEndobj()
 	for i, pg := range pdf.pages { //                            write each page
 		if pg.content.Len() == 0 {
-			pdf.logError("Warning: empty page %d\n", i+1)
+			pdf.logError("Warning: empty page", i+1)
 			continue
 		}
 		pdf.writeObj("/Page").
