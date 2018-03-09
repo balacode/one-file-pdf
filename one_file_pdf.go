@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 02:09:40 58C282                              [one_file_pdf.go]
+// :v: 2018-03-09 02:12:01 9CF77C                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -680,23 +680,18 @@ var pdfStandardPageSizes = []pdfPageSize{
 
 // NewPDF creates and initializes a new PDF object.
 func NewPDF(pageSize string) PDF {
-	//
-	// get and store dimensions of specified page size (in points)
 	var pdf PDF
-	var size = pdf.getPageSize(pageSize)
-	if size.name == "" {
-		pdf.logError("Unknown page size ", pageSize, ". Setting to 'A4'.\n")
-		size = pdf.getPageSize("A4")
-	}
-	// create a new PDF object
 	pdf = PDF{
 		pageNo:            PDFNoPage,
-		pageSize:          size,
+		pageSize:          pdf.getPageSize(pageSize),
 		horizontalScaling: 100,
 		compressStreams:   true,
 	}
-	// set default units, otherwise ptPerUnit, x and y will be 0
-	pdf.SetUnits("point")
+	if pdf.pageSize.name == "" {
+		pdf.logError("Unknown page size '" + pageSize + "'; setting to 'A4'")
+		pdf.pageSize = pdf.getPageSize("A4")
+	}
+	pdf.SetUnits("point") // set default units, or ptPerUnit, x & y will be 0
 	return pdf
 } //                                                                      NewPDF
 
