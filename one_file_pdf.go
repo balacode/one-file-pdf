@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 02:42:10 67DEC1                              [one_file_pdf.go]
+// :v: 2018-03-09 02:45:16 438520                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1181,11 +1181,10 @@ func (pdf *PDF) DrawText(text string) *PDF {
 func (pdf *PDF) DrawTextAlignedToBox(
 	x, y, width, height float64, align, text string,
 ) *PDF {
-	if pdf.pageNo < 0 {
-		pdf.logError("No current page.")
-		return pdf
+	if !pdf.warnIfNoPage() {
+		pdf.drawTextBox(x, y, width, height, false, align, text)
 	}
-	return pdf.drawTextBox(x, y, width, height, false, align, text)
+	return pdf
 } //                                                        DrawTextAlignedToBox
 
 // DrawTextAt draws text at the specified point (x, y).
@@ -1200,11 +1199,10 @@ func (pdf *PDF) DrawTextAt(x, y float64, text string) *PDF {
 // 'B' to align the text to the top or bottom of the box.
 func (pdf *PDF) DrawTextInBox(x, y, width, height float64, align, text string,
 ) *PDF {
-	if pdf.pageNo < 0 {
-		pdf.logError("No current page.")
-		return pdf
+	if !pdf.warnIfNoPage() {
+		pdf.drawTextBox(x, y, width, height, true, align, text)
 	}
-	return pdf.drawTextBox(x, y, width, height, true, align, text)
+	return pdf
 } //                                                               DrawTextInBox
 
 // DrawUnitGrid draws a light-gray grid demarcated in the
