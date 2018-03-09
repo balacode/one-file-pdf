@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-10 00:06:54 F2D19F                              [one_file_pdf.go]
+// :v: 2018-03-10 00:09:44 AB56C0                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -72,8 +72,8 @@ package pdf
 //   (pdf *PDF) DrawBox(x, y, width, height float64, fill ...bool) *PDF
 //   (pdf *PDF) DrawCircle(x, y, radius float64, fill ...bool) *PDF
 //   (pdf *PDF) DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF
-//   (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
-//              ) *PDF
+//   (pdf *PDF) DrawImage(
+//                  x, y, height float64, fileNameOrBytes interface{}) *PDF
 //   (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF
 //   (pdf *PDF) DrawText(text string) *PDF
 //   (pdf *PDF) DrawTextAlignedToBox(
@@ -1098,43 +1098,41 @@ func (pdf *PDF) DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF {
 		write(" %s\n", mode)                      // b: fill or S: stroke
 } //                                                                 DrawEllipse
 
-// DrawImage draws a grayscale PNG image.
-// For now, only grayscale PNG images are supported.
-// 'x' and 'y' specify the position of the image.
-// 'height' specifies its height.
-// (width is scaled to match the image's aspect ratio).
-// fileNameOrBytes is either a string specifying a
-// file name, or a byte slice with PNG image data.
-func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
-) *PDF {
+// DrawImage draws a grayscale PNG image. For now, only grayscale PNG
+// images are supported. x, y and height specify the position and height
+// of the image. (width is scaled to match the image's aspect ratio).
+// fileNameOrBytes is either a string specifying a file name,
+// or a byte slice with PNG image data.
+func (pdf *PDF) DrawImage(
+	x, y, height float64, fileNameOrBytes interface{}) *PDF {
+	//
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
+	// add the image to the current page, if not already referenced
 	var pg = pdf.pagePtr
-	var img, imgNo = pdf.loadImage(fileNameOrBytes)
-	// add the image number to the current page, if not already referenced
+	var img, idx = pdf.loadImage(fileNameOrBytes)
 	var found bool
 	for _, iter := range pg.imageNos {
-		if iter == imgNo {
+		if iter == idx {
 			found = true
 			break
 		}
 	}
 	if !found {
-		pg.imageNos = append(pg.imageNos, imgNo)
+		pg.imageNos = append(pg.imageNos, idx)
 	}
+	// draw the image
 	x *= pdf.ptPerUnit
 	y = pdf.pageSize.heightPt - y*pdf.ptPerUnit - height
-	height *= pdf.ptPerUnit
-	var width = float64(img.width) / float64(img.height) * height
-	//
-	// draw the image      w      h  x  y
-	return pdf.write("q\n %f 0 0 %f %f %f cm\n/IMG%d Do\nQ\n",
-		width, height, x, y, imgNo)
-	//  q: save graphics state
-	// cm: concatenate matrix to current transform matrix
-	// Do: invoke named XObject (/IMGn)
-	//  Q: restore graphics state
+	var w = float64(img.width) / float64(img.height) * height
+	var h = height * pdf.ptPerUnit
+	return pdf.write("q\n %f 0 0 %f %f %f cm\n/IMG%d Do\nQ\n", w, h, x, y, idx)
+	//                     w      h  x  y
+	//                q: save graphics state
+	//               cm: concatenate matrix to current transform matrix
+	//               Do: invoke named XObject (/IMGn)
+	//                Q: restore graphics state
 } //                                                                   DrawImage
 
 // DrawLine draws a straight line from point (x1, y1) to point (x2, y2).
