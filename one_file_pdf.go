@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-10 00:24:53 BA15FD                              [one_file_pdf.go]
+// :v: 2018-03-10 00:26:17 8D2A32                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -703,8 +703,7 @@ func (pdf *PDF) CurrentPage() int {
 
 // PageHeight returns the height of the current page in selected units.
 func (pdf *PDF) PageHeight() float64 {
-	if pdf.pageNo < 0 || pdf.pageNo > (len(pdf.pages)-1) ||
-		pdf.pagePtr == nil {
+	if pdf.pageNo < 0 || pdf.pageNo > len(pdf.pages)-1 || pdf.pagePtr == nil {
 		return pdf.pageSize.heightPt / pdf.ptPerUnit
 	}
 	return pdf.pagePtr.pageSize.heightPt / pdf.ptPerUnit
@@ -712,8 +711,7 @@ func (pdf *PDF) PageHeight() float64 {
 
 // PageWidth returns the width of the current page in selected units.
 func (pdf *PDF) PageWidth() float64 {
-	if pdf.pageNo < 0 || pdf.pageNo > (len(pdf.pages)-1) ||
-		pdf.pagePtr == nil {
+	if pdf.pageNo < 0 || pdf.pageNo > len(pdf.pages)-1 || pdf.pagePtr == nil {
 		return pdf.pageSize.widthPt / pdf.ptPerUnit
 	}
 	return pdf.pagePtr.pageSize.widthPt / pdf.ptPerUnit
@@ -832,9 +830,9 @@ func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 			hex[0]*16+hex[1], hex[2]*16+hex[3], hex[4]*16+hex[5])
 	}
 	// otherwise search for color name
-	var clr, exists = PDFColorNames[s]
+	var color, exists = PDFColorNames[s]
 	if exists {
-		return pdf.SetColorRGB(clr.R, clr.G, clr.B)
+		return pdf.SetColorRGB(color.R, color.G, color.B)
 	}
 	return pdf.SetColorRGB(0, 0, 0).
 		logError("Color name '" + s + "' not known; setting to black")
@@ -1154,7 +1152,7 @@ func (pdf *PDF) DrawText(s string) *PDF {
 		x += pdf.columnWidths[i]
 	}
 	pdf.SetX(x).drawTextLine(s)
-	if pdf.columnNo >= (len(pdf.columnWidths) - 1) {
+	if pdf.columnNo >= len(pdf.columnWidths)-1 {
 		pdf.NextLine()
 	} else {
 		pdf.columnNo++
@@ -1305,7 +1303,7 @@ func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
 		}
 	}
 	var ppu = pdf.getPointsPerUnit(unit)
-	if int(ppu*1000000) == 0 && unit != "" {
+	if int(ppu*100) == 0 && unit != "" {
 		pdf.logError("Unknown unit name: '" + unit + "'")
 	}
 	var n, _ = strconv.ParseFloat(num, 64)
@@ -1353,8 +1351,7 @@ func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
 			n = fit(iter, 3, n, width)
 			//
 			// move to the last word (if white-space is found)
-			var found bool
-			var max = n
+			var found, max = false, n
 			for n > 0 {
 				if pdf.isWhiteSpace(iter[n-1 : n]) {
 					found = true
@@ -1398,28 +1395,28 @@ func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
 // called by drawTextLine()
 func (pdf *PDF) applyFont() {
 	var font pdfFont
-	var fontName = pdf.toUpperLettersDigits(pdf.fontName, "")
-	var isValid = fontName != ""
-	if isValid {
-		isValid = false
-		for i, name := range pdfFontNames {
-			name = pdf.toUpperLettersDigits(name, "")
-			if name != fontName {
+	var name = pdf.toUpperLettersDigits(pdf.fontName, "")
+	var valid = name != ""
+	if valid {
+		valid = false
+		for i, iter := range pdfFontNames {
+			iter = pdf.toUpperLettersDigits(iter, "")
+			if iter != name {
 				continue
 			}
 			var has = strings.Contains
 			font = pdfFont{
 				fontName:  pdfFontNames[i],
 				isBuiltIn: true,
-				isBold:    has(name, "BOLD"),
-				isItalic:  has(name, "OBLIQUE") || has(name, "ITALIC"),
+				isBold:    has(iter, "BOLD"),
+				isItalic:  has(iter, "OBLIQUE") || has(iter, "ITALIC"),
 			}
-			isValid = true
+			valid = true
 			break
 		}
 	}
 	// if there is no selected font or it's invalid, use Helvetica
-	if !isValid {
+	if !valid {
 		pdf.logError("Invalid font name: '" + pdf.fontName + "'")
 		font = pdfFont{fontName: "Helvetica", isBuiltIn: true}
 	}
@@ -1436,7 +1433,7 @@ func (pdf *PDF) applyFont() {
 	}
 	var pg = pdf.pagePtr
 	if pg.fontID == font.fontID &&
-		int(pg.fontSizePt*1000) == int(pdf.fontSizePt)*1000 {
+		int(pg.fontSizePt*100) == int(pdf.fontSizePt)*100 {
 		return
 	}
 	// add the font ID to the current page, if not already referenced
@@ -1603,7 +1600,7 @@ func (pdf *PDF) setCurrentPage(pageNo int) *PDF {
 	if pageNo < 0 {
 		pdf.pagePtr = nil
 		pdf.contentPtr = &pdf.content
-	} else if pageNo > (len(pdf.pages) - 1) {
+	} else if pageNo > len(pdf.pages)-1 {
 		return pdf.logError("Page number out of range:", pageNo)
 	} else {
 		pdf.pagePtr = &pdf.pages[pageNo]
@@ -1636,7 +1633,7 @@ func (pdf *PDF) textWidthPt1000(s string) float64 {
 // called by: DrawBox(), DrawLine(), DrawText(), FillBox(),
 //            SetX(), SetXY(), SetY(), TextWidth(), X(), Y()
 func (pdf *PDF) warnIfNoPage() bool {
-	if pdf.pagePtr == nil || pdf.pageNo < 0 || pdf.pageNo > (len(pdf.pages)-1) {
+	if pdf.pagePtr == nil || pdf.pageNo < 0 || pdf.pageNo > len(pdf.pages)-1 {
 		pdf.logError("No current page")
 		return true
 	}
@@ -1662,7 +1659,7 @@ func (pdf *PDF) write(format string, args ...interface{}) *PDF {
 	var buf *bytes.Buffer
 	if pdf.pageNo < 0 {
 		buf = pdf.contentPtr
-	} else if pdf.pageNo > (len(pdf.pages) - 1) {
+	} else if pdf.pageNo > len(pdf.pages)-1 {
 		return pdf.logError("Invalid page index:", pdf.pageNo)
 	} else {
 		buf = &pdf.pagePtr.content
@@ -1701,7 +1698,7 @@ func (pdf *PDF) writeMode(fill ...bool) (mode string) {
 		pdf.write("%.3f %.3f %.3f RG\n", // RG: set stroke (line) color
 			float64(p.R)/255, float64(p.G)/255, float64(p.B)/255)
 	}
-	if p := &pdf.pagePtr.lineWidth; int(*p*10000) != int(pdf.lineWidth*10000) {
+	if p := &pdf.pagePtr.lineWidth; int(*p*100) != int(pdf.lineWidth*100) {
 		*p = pdf.lineWidth
 		pdf.write("%.3f w\n", float64(*p)) // n0 w: set line width to n0
 	}
@@ -1803,8 +1800,8 @@ func (pdf *PDF) writeStreamData(ar []byte) *PDF {
 // in order to avoid them interfering with PDF commands.
 // called by: Bytes(), drawTextLine()
 func (*PDF) escape(s string) []byte {
-	var contains = strings.Contains
-	if !contains(s, "(") && !contains(s, ")") && !contains(s, "\\") {
+	var has = strings.Contains
+	if !has(s, "(") && !has(s, ")") && !has(s, "\\") {
 		return []byte(s)
 	}
 	var wr = bytes.NewBuffer(make([]byte, 0, len(s)))
@@ -1859,9 +1856,9 @@ func (*PDF) toUpperLettersDigits(s, extras string) string {
 // not found, returns a zero-initialized structure.
 func (pdf *PDF) getPageSize(pageSize string) pdfPageSize {
 	pageSize = pdf.toUpperLettersDigits(pageSize, "")
-	for _, size := range pdfStandardPageSizes {
-		if pageSize == size.name {
-			return size
+	for _, iter := range pdfStandardPageSizes {
+		if iter.name == pageSize {
+			return iter
 		}
 	}
 	return pdfPageSize{}
