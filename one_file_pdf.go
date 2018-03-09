@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-10 00:18:27 7F4B82                              [one_file_pdf.go]
+// :v: 2018-03-10 00:20:22 182BA1                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1168,8 +1168,7 @@ func (pdf *PDF) DrawText(s string) *PDF {
 // Specify 'L' or 'R' to align the text left or right, and 'T' or
 // 'B' to align the text to the top or bottom of the box.
 func (pdf *PDF) DrawTextAlignedToBox(
-	x, y, width, height float64, align, text string,
-) *PDF {
+	x, y, width, height float64, align, text string) *PDF {
 	return pdf.drawTextBox(x, y, width, height, false, align, text)
 } //                                                        DrawTextAlignedToBox
 
@@ -1186,8 +1185,8 @@ func (pdf *PDF) DrawTextAt(x, y float64, text string) *PDF {
 // the text is center-aligned both vertically and horizontally.
 // Specify 'L' or 'R' to align the text left or right, and 'T' or
 // 'B' to align the text to the top or bottom of the box.
-func (pdf *PDF) DrawTextInBox(x, y, width, height float64, align, text string,
-) *PDF {
+func (pdf *PDF) DrawTextInBox(
+	x, y, width, height float64, align, text string) *PDF {
 	return pdf.drawTextBox(x, y, width, height, true, align, text)
 } //                                                               DrawTextInBox
 
@@ -1492,8 +1491,8 @@ func (pdf *PDF) drawTextLine(s string) *PDF {
 // align: specify up to 2 flags: L R T B to align left, right, top or bottom
 //        the default (blank) is C center, both vertically and horizontally
 // called by: DrawTextAlignedToBox(), DrawTextInBox()
-func (pdf *PDF) drawTextBox(
-	x, y, width, height float64, wrapText bool, align, text string,
+func (pdf *PDF) drawTextBox(x, y, width, height float64,
+	wrapText bool, align, text string,
 ) *PDF {
 	if pdf.warnIfNoPage() || text == "" {
 		return pdf
