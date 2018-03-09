@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-10 00:26:17 8D2A32                              [one_file_pdf.go]
+// :v: 2018-03-10 00:28:29 F45FC2                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -94,6 +94,7 @@ package pdf
 // # Metrics Methods
 //   (pdf *PDF) TextWidth(s string) float64
 //   (pdf *PDF) ToPoints(numberAndUnit string) float64
+//   (pdf *PDF) ToUnits(points float64) float64
 //   (pdf *PDF) WrapTextLines(width float64, text string) (ret []string)
 //
 // # Private Methods
@@ -704,17 +705,17 @@ func (pdf *PDF) CurrentPage() int {
 // PageHeight returns the height of the current page in selected units.
 func (pdf *PDF) PageHeight() float64 {
 	if pdf.pageNo < 0 || pdf.pageNo > len(pdf.pages)-1 || pdf.pagePtr == nil {
-		return pdf.pageSize.heightPt / pdf.ptPerUnit
+		return pdf.ToUnits(pdf.pageSize.heightPt)
 	}
-	return pdf.pagePtr.pageSize.heightPt / pdf.ptPerUnit
+	return pdf.ToUnits(pdf.pagePtr.pageSize.heightPt)
 } //                                                                  PageHeight
 
 // PageWidth returns the width of the current page in selected units.
 func (pdf *PDF) PageWidth() float64 {
 	if pdf.pageNo < 0 || pdf.pageNo > len(pdf.pages)-1 || pdf.pagePtr == nil {
-		return pdf.pageSize.widthPt / pdf.ptPerUnit
+		return pdf.ToUnits(pdf.pageSize.widthPt)
 	}
-	return pdf.pagePtr.pageSize.widthPt / pdf.ptPerUnit
+	return pdf.ToUnits(pdf.pagePtr.pageSize.widthPt)
 } //                                                                   PageWidth
 
 // -----------------------------------------------------------------------------
@@ -790,7 +791,7 @@ func (pdf *PDF) X() float64 {
 	if pdf.warnIfNoPage() {
 		return 0
 	}
-	return pdf.pagePtr.x / pdf.ptPerUnit
+	return pdf.ToUnits(pdf.pagePtr.x)
 } //                                                                           X
 
 // Y returns the Y-coordinate of the current drawing position.
@@ -798,7 +799,7 @@ func (pdf *PDF) Y() float64 {
 	if pdf.warnIfNoPage() {
 		return 0
 	}
-	return (pdf.pageSize.heightPt - pdf.pagePtr.y) / pdf.ptPerUnit
+	return pdf.ToUnits(pdf.pageSize.heightPt - pdf.pagePtr.y)
 } //                                                                           Y
 
 // -----------------------------------------------------------------------------
@@ -1286,7 +1287,7 @@ func (pdf *PDF) TextWidth(s string) float64 {
 	if pdf.warnIfNoPage() {
 		return 0
 	}
-	return pdf.textWidthPt1000(s) / pdf.ptPerUnit
+	return pdf.ToUnits(pdf.textWidthPt1000(s))
 } //                                                                   TextWidth
 
 // ToPoints converts a string composed of a number and unit to points.
@@ -1312,6 +1313,14 @@ func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
 	}
 	return n * ppu
 } //                                                                    ToPoints
+
+// ToUnits converts points to the currently selected unit of measurement.
+func (pdf *PDF) ToUnits(points float64) float64 {
+	if int(pdf.ptPerUnit*100) == 0 {
+		return points
+	}
+	return points / pdf.ptPerUnit
+} //                                                                     ToUnits
 
 // WrapTextLines splits a string into multiple lines so that the text
 // fits in the specified width. The text is wrapped on word boundaries.
