@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-10 00:14:38 82E06B                              [one_file_pdf.go]
+// :v: 2018-03-10 00:16:19 8A9606                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1145,18 +1145,18 @@ func (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF {
 } //                                                                    DrawLine
 
 // DrawText draws a text string at the current position (X, Y).
-func (pdf *PDF) DrawText(text string) *PDF {
+func (pdf *PDF) DrawText(s string) *PDF {
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
 	if len(pdf.columnWidths) == 0 {
-		return pdf.drawTextLine(text)
+		return pdf.drawTextLine(s)
 	}
 	var x = 0.0
 	for i := 0; i < pdf.columnNo; i++ {
 		x += pdf.columnWidths[i]
 	}
-	pdf.SetX(x).drawTextLine(text)
+	pdf.SetX(x).drawTextLine(s)
 	if pdf.columnNo >= (len(pdf.columnWidths) - 1) {
 		pdf.NextLine()
 	} else {
@@ -1518,15 +1518,15 @@ func (pdf *PDF) drawTextBox(
 	//
 	// calculate x-axis position of text (left, right, center)
 	x, width = x*pdf.ptPerUnit, width*pdf.ptPerUnit
-	var alignX = func(text string) float64 {
+	var alignX = func(s string) float64 {
 		for _, ch := range align {
 			if ch == 'l' || ch == 'L' {
 				return pdf.fontSizePt / 6 // add margin
 			} else if ch == 'r' || ch == 'R' {
-				return width - pdf.textWidthPt1000(text) - pdf.fontSizePt/6
+				return width - pdf.textWidthPt1000(s) - pdf.fontSizePt/6
 			}
 		}
-		return width/2 - pdf.textWidthPt1000(text)/2 // center
+		return width/2 - pdf.textWidthPt1000(s)/2 // center
 	}
 	// calculate aligned y-axis position of text (top, bottom, center)
 	y, height = y*pdf.ptPerUnit, height*pdf.ptPerUnit
@@ -1630,12 +1630,12 @@ func (pdf *PDF) setCurrentPage(pageNo int) *PDF {
 
 // textWidthPt1000 returns the width of text in thousandths of a point
 // called by: drawTextLine(), drawTextBox(), TextWidth()
-func (pdf *PDF) textWidthPt1000(text string) float64 {
-	if pdf.warnIfNoPage() || text == "" {
+func (pdf *PDF) textWidthPt1000(s string) float64 {
+	if pdf.warnIfNoPage() || s == "" {
 		return 0
 	}
 	var w = 0.0
-	for i, ch := range text {
+	for i, ch := range s {
 		if ch < 0 || ch > 255 {
 			pdf.logError("Rune out of range at", i, "('"+string(ch)+"')")
 			break
@@ -1799,12 +1799,12 @@ func (pdf *PDF) writeStreamData(ar []byte) *PDF {
 	var s string // filter
 	if pdf.compressStreams {
 		var buf bytes.Buffer
-		var w = zlib.NewWriter(&buf)
-		var _, err = w.Write([]byte(ar))
+		var wr = zlib.NewWriter(&buf)
+		var _, err = wr.Write([]byte(ar))
 		if err != nil {
 			return pdf.logError("Failed compressing:", err)
 		}
-		w.Close() // don't defer, close before reading Bytes()
+		wr.Close() // don't defer, close before reading Bytes()
 		ar = buf.Bytes()
 		s = "/Filter/FlateDecode"
 	}
