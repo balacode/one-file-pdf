@@ -111,3 +111,12 @@ func main() {
 - SetColor(): now allows HTML color values like `"#4C9141 MayGreen"`, ignores the extra chars.
 - Log an error when the name of a selected font is unknown.
 - Log the specified measurement unit's name when its name is not valid.
+
+**2018-MAR-09**
+- Replaced PDFColor type with standard lib's color.RGBA (import "image/color")
+- SetColorRGB(): changed parameters from int to uint8
+- Changed PDFPageSize and PDFStandardPageSizes to private structures
+- SaveFile() now returns `error` instead of `*PDF`, to allow caller to check for IO errors
+- SetColumnWidths() is no longer limited to 100 columns
+- Font names and color names can be specified with spaces, underscores or '-' delimiting words
+- Removed module-global PDFErrorHandler, created SetErrorLogger() to set the handler for each PDF instance
