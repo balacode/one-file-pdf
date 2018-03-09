@@ -1,18 +1,17 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 01:32:16 FCBCD8                              [one_file_pdf.go]
+// :v: 2018-03-09 01:45:00 E4726E                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
 
 // # Structures
 //   PDF struct
-//   PDFColor struct
 //   PDFPageSize struct
 //   PDFPageSizeOf(pageSize string) PDFPageSize
 //
 // # Constants
-//   PDFColorNames = map[string]PDFColor
+//   PDFColorNames = map[string]color.RGBA
 //   PDFNoPage = -1
 //   PDFStandardPageSizes = []PDFPageSize
 //
@@ -35,7 +34,7 @@ package pdf
 //   (pdf *PDF) PageWidth() float64
 //
 // # Property Getters
-//   (pdf *PDF) Color() PDFColor
+//   (pdf *PDF) Color() color.RGBA
 //   (pdf *PDF) Compression() bool
 //   (pdf *PDF) DocAuthor() string
 //   (pdf *PDF) DocCreator() string
@@ -132,6 +131,7 @@ import "bytes"         // standard
 import "compress/zlib" // standard
 import "fmt"           // standard
 import "image"         // standard
+import "image/color"   // standard
 import "io/ioutil"     // standard
 import "reflect"       // standard
 import "strconv"       // standard
@@ -163,7 +163,7 @@ type PDF struct {
 	columnNo          int           // index of the current column
 	unitName          string        // name of active measurement unit
 	ptPerUnit         float64       // number of points per measurement unit
-	color             PDFColor      // current drawing color
+	color             color.RGBA    // current drawing color
 	lineWidth         float64       // current line width (in points)
 	fontName          string        // current font's name
 	fontSizePt        float64       // current font's size (in points)
@@ -175,14 +175,6 @@ type PDF struct {
 	objNo             int           // used by Bytes() and write..()
 } //                                                                         PDF
 
-// PDFColor represents a color value.
-type PDFColor struct {
-	Red   uint8
-	Green uint8
-	Blue  uint8
-} //                                                                    PDFColor
-
-// PDFPageSize represents a page size name and its dimensions in points.
 type PDFPageSize struct {
 	Name     string
 	WidthPt  float64 // width in points
@@ -210,152 +202,152 @@ const PDFNoPage = -1
 
 // PDFColorNames maps web (X11) color names to values.
 // (from https://en.wikipedia.org/wiki/X11_color_names)
-var PDFColorNames = map[string]PDFColor{
-	"ALICEBLUE":            {240, 248, 255}, // #F0F8FF
-	"ANTIQUEWHITE":         {250, 235, 215}, // #FAEBD7
-	"AQUA":                 {0, 255, 255},   // #00FFFF
-	"AQUAMARINE":           {127, 255, 212}, // #7FFFD4
-	"AZURE":                {240, 255, 255}, // #F0FFFF
-	"BEIGE":                {245, 245, 220}, // #F5F5DC
-	"BISQUE":               {255, 228, 196}, // #FFE4C4
-	"BLACK":                {0, 0, 0},       // #000000
-	"BLANCHEDALMOND":       {255, 235, 205}, // #FFEBCD
-	"BLUE":                 {0, 0, 255},     // #0000FF
-	"BLUEVIOLET":           {138, 43, 226},  // #8A2BE2
-	"BROWN":                {165, 42, 42},   // #A52A2A
-	"BURLYWOOD":            {222, 184, 135}, // #DEB887
-	"CADETBLUE":            {95, 158, 160},  // #5F9EA0
-	"CHARTREUSE":           {127, 255, 0},   // #7FFF00
-	"CHOCOLATE":            {210, 105, 30},  // #D2691E
-	"CORAL":                {255, 127, 80},  // #FF7F50
-	"CORNFLOWERBLUE":       {100, 149, 237}, // #6495ED
-	"CORNSILK":             {255, 248, 220}, // #FFF8DC
-	"CRIMSON":              {220, 20, 60},   // #DC143C
-	"CYAN":                 {0, 255, 255},   // #00FFFF
-	"DARKBLUE":             {0, 0, 139},     // #00008B
-	"DARKCYAN":             {0, 139, 139},   // #008B8B
-	"DARKGOLDENROD":        {184, 134, 11},  // #B8860B
-	"DARKGRAY":             {169, 169, 169}, // #A9A9A9
-	"DARKGREEN":            {0, 100, 0},     // #006400
-	"DARKKHAKI":            {189, 183, 107}, // #BDB76B
-	"DARKMAGENTA":          {139, 0, 139},   // #8B008B
-	"DARKOLIVEGREEN":       {85, 107, 47},   // #556B2F
-	"DARKORANGE":           {255, 140, 0},   // #FF8C00
-	"DARKORCHID":           {153, 50, 204},  // #9932CC
-	"DARKRED":              {139, 0, 0},     // #8B0000
-	"DARKSALMON":           {233, 150, 122}, // #E9967A
-	"DARKSEAGREEN":         {143, 188, 143}, // #8FBC8F
-	"DARKSLATEBLUE":        {72, 61, 139},   // #483D8B
-	"DARKSLATEGRAY":        {47, 79, 79},    // #2F4F4F
-	"DARKTURQUOISE":        {0, 206, 209},   // #00CED1
-	"DARKVIOLET":           {148, 0, 211},   // #9400D3
-	"DEEPPINK":             {255, 20, 147},  // #FF1493
-	"DEEPSKYBLUE":          {0, 191, 255},   // #00BFFF
-	"DIMGRAY":              {105, 105, 105}, // #696969
-	"DODGERBLUE":           {30, 144, 255},  // #1E90FF
-	"FIREBRICK":            {178, 34, 34},   // #B22222
-	"FLORALWHITE":          {255, 250, 240}, // #FFFAF0
-	"FORESTGREEN":          {34, 139, 34},   // #228B22
-	"FUCHSIA":              {255, 0, 255},   // #FF00FF
-	"GAINSBORO":            {220, 220, 220}, // #DCDCDC
-	"GHOSTWHITE":           {248, 248, 255}, // #F8F8FF
-	"GOLD":                 {255, 215, 0},   // #FFD700
-	"GOLDENROD":            {218, 165, 32},  // #DAA520
-	"GRAY":                 {190, 190, 190}, // #BEBEBE X11 Version
-	"GREEN":                {0, 255, 0},     // #00FF00 X11 Version
-	"GREENYELLOW":          {173, 255, 47},  // #ADFF2F
-	"HONEYDEW":             {240, 255, 240}, // #F0FFF0
-	"HOTPINK":              {255, 105, 180}, // #FF69B4
-	"INDIANRED":            {205, 92, 92},   // #CD5C5C
-	"INDIGO":               {75, 0, 130},    // #4B0082
-	"IVORY":                {255, 255, 240}, // #FFFFF0
-	"KHAKI":                {240, 230, 140}, // #F0E68C
-	"LAVENDER":             {230, 230, 250}, // #E6E6FA
-	"LAVENDERBLUSH":        {255, 240, 245}, // #FFF0F5
-	"LAWNGREEN":            {124, 252, 0},   // #7CFC00
-	"LEMONCHIFFON":         {255, 250, 205}, // #FFFACD
-	"LIGHTBLUE":            {173, 216, 230}, // #ADD8E6
-	"LIGHTCORAL":           {240, 128, 128}, // #F08080
-	"LIGHTCYAN":            {224, 255, 255}, // #E0FFFF
-	"LIGHTGOLDENRODYELLOW": {250, 250, 210}, // #FAFAD2
-	"LIGHTGRAY":            {211, 211, 211}, // #D3D3D3
-	"LIGHTGREEN":           {144, 238, 144}, // #90EE90
-	"LIGHTPINK":            {255, 182, 193}, // #FFB6C1
-	"LIGHTSALMON":          {255, 160, 122}, // #FFA07A
-	"LIGHTSEAGREEN":        {32, 178, 170},  // #20B2AA
-	"LIGHTSKYBLUE":         {135, 206, 250}, // #87CEFA
-	"LIGHTSLATEGRAY":       {119, 136, 153}, // #778899
-	"LIGHTSTEELBLUE":       {176, 196, 222}, // #B0C4DE
-	"LIGHTYELLOW":          {255, 255, 224}, // #FFFFE0
-	"LIME":                 {0, 255, 0},     // #00FF00
-	"LIMEGREEN":            {50, 205, 50},   // #32CD32
-	"LINEN":                {250, 240, 230}, // #FAF0E6
-	"MAGENTA":              {255, 0, 255},   // #FF00FF
-	"MAROON":               {176, 48, 96},   // #B03060 X11 Version
-	"MEDIUMAQUAMARINE":     {102, 205, 170}, // #66CDAA
-	"MEDIUMBLUE":           {0, 0, 205},     // #0000CD
-	"MEDIUMORCHID":         {186, 85, 211},  // #BA55D3
-	"MEDIUMPURPLE":         {147, 112, 219}, // #9370DB
-	"MEDIUMSEAGREEN":       {60, 179, 113},  // #3CB371
-	"MEDIUMSLATEBLUE":      {123, 104, 238}, // #7B68EE
-	"MEDIUMSPRINGGREEN":    {0, 250, 154},   // #00FA9A
-	"MEDIUMTURQUOISE":      {72, 209, 204},  // #48D1CC
-	"MEDIUMVIOLETRED":      {199, 21, 133},  // #C71585
-	"MIDNIGHTBLUE":         {25, 25, 112},   // #191970
-	"MINTCREAM":            {245, 255, 250}, // #F5FFFA
-	"MISTYROSE":            {255, 228, 225}, // #FFE4E1
-	"MOCCASIN":             {255, 228, 181}, // #FFE4B5
-	"NAVAJOWHITE":          {255, 222, 173}, // #FFDEAD
-	"NAVY":                 {0, 0, 128},     // #000080
-	"OLDLACE":              {253, 245, 230}, // #FDF5E6
-	"OLIVE":                {128, 128, 0},   // #808000
-	"OLIVEDRAB":            {107, 142, 35},  // #6B8E23
-	"ORANGE":               {255, 165, 0},   // #FFA500
-	"ORANGERED":            {255, 69, 0},    // #FF4500
-	"ORCHID":               {218, 112, 214}, // #DA70D6
-	"PALEGOLDENROD":        {238, 232, 170}, // #EEE8AA
-	"PALEGREEN":            {152, 251, 152}, // #98FB98
-	"PALETURQUOISE":        {175, 238, 238}, // #AFEEEE
-	"PALEVIOLETRED":        {219, 112, 147}, // #DB7093
-	"PAPAYAWHIP":           {255, 239, 213}, // #FFEFD5
-	"PEACHPUFF":            {255, 218, 185}, // #FFDAB9
-	"PERU":                 {205, 133, 63},  // #CD853F
-	"PINK":                 {255, 192, 203}, // #FFC0CB
-	"PLUM":                 {221, 160, 221}, // #DDA0DD
-	"POWDERBLUE":           {176, 224, 230}, // #B0E0E6
-	"PURPLE":               {160, 32, 240},  // #A020F0 X11 Version
-	"REBECCAPURPLE":        {102, 51, 153},  // #663399
-	"RED":                  {255, 0, 0},     // #FF0000
-	"ROSYBROWN":            {188, 143, 143}, // #BC8F8F
-	"ROYALBLUE":            {65, 105, 225},  // #4169E1
-	"SADDLEBROWN":          {139, 69, 19},   // #8B4513
-	"SALMON":               {250, 128, 114}, // #FA8072
-	"SANDYBROWN":           {244, 164, 96},  // #F4A460
-	"SEAGREEN":             {46, 139, 87},   // #2E8B57
-	"SEASHELL":             {255, 245, 238}, // #FFF5EE
-	"SIENNA":               {160, 82, 45},   // #A0522D
-	"SILVER":               {192, 192, 192}, // #C0C0C0
-	"SKYBLUE":              {135, 206, 235}, // #87CEEB
-	"SLATEBLUE":            {106, 90, 205},  // #6A5ACD
-	"SLATEGRAY":            {112, 128, 144}, // #708090
-	"SNOW":                 {255, 250, 250}, // #FFFAFA
-	"SPRINGGREEN":          {0, 255, 127},   // #00FF7F
-	"STEELBLUE":            {70, 130, 180},  // #4682B4
-	"TAN":                  {210, 180, 140}, // #D2B48C
-	"TEAL":                 {0, 128, 128},   // #008080
-	"THISTLE":              {216, 191, 216}, // #D8BFD8
-	"TOMATO":               {255, 99, 71},   // #FF6347
-	"TURQUOISE":            {64, 224, 208},  // #40E0D0
-	"VIOLET":               {238, 130, 238}, // #EE82EE
-	"WEBGRAY":              {128, 128, 128}, // #808080 Web Version
-	"WEBGREEN":             {0, 128, 0},     // #008000 Web Version
-	"WEBMAROON":            {127, 0, 0},     // #7F0000 Web Version
-	"WEBPURPLE":            {127, 0, 127},   // #7F007F Web Version
-	"WHEAT":                {245, 222, 179}, // #F5DEB3
-	"WHITE":                {255, 255, 255}, // #FFFFFF
-	"WHITESMOKE":           {245, 245, 245}, // #F5F5F5
-	"YELLOW":               {255, 255, 0},   // #FFFF00
-	"YELLOWGREEN":          {154, 205, 50},  // #9ACD32
+var PDFColorNames = map[string]color.RGBA{
+	"ALICEBLUE":            {R: 240, G: 248, B: 255}, // #F0F8FF
+	"ANTIQUEWHITE":         {R: 250, G: 235, B: 215}, // #FAEBD7
+	"AQUA":                 {R: 000, G: 255, B: 255}, // #00FFFF
+	"AQUAMARINE":           {R: 127, G: 255, B: 212}, // #7FFFD4
+	"AZURE":                {R: 240, G: 255, B: 255}, // #F0FFFF
+	"BEIGE":                {R: 245, G: 245, B: 220}, // #F5F5DC
+	"BISQUE":               {R: 255, G: 228, B: 196}, // #FFE4C4
+	"BLACK":                {R: 000, G: 000, B: 000}, // #000000
+	"BLANCHEDALMOND":       {R: 255, G: 235, B: 205}, // #FFEBCD
+	"BLUE":                 {R: 000, G: 000, B: 255}, // #0000FF
+	"BLUEVIOLET":           {R: 138, G: 43, B: 226},  // #8A2BE2
+	"BROWN":                {R: 165, G: 42, B: 42},   // #A52A2A
+	"BURLYWOOD":            {R: 222, G: 184, B: 135}, // #DEB887
+	"CADETBLUE":            {R: 95, G: 158, B: 160},  // #5F9EA0
+	"CHARTREUSE":           {R: 127, G: 255, B: 000}, // #7FFF00
+	"CHOCOLATE":            {R: 210, G: 105, B: 30},  // #D2691E
+	"CORAL":                {R: 255, G: 127, B: 80},  // #FF7F50
+	"CORNFLOWERBLUE":       {R: 100, G: 149, B: 237}, // #6495ED
+	"CORNSILK":             {R: 255, G: 248, B: 220}, // #FFF8DC
+	"CRIMSON":              {R: 220, G: 20, B: 60},   // #DC143C
+	"CYAN":                 {R: 000, G: 255, B: 255}, // #00FFFF
+	"DARKBLUE":             {R: 000, G: 000, B: 139}, // #00008B
+	"DARKCYAN":             {R: 000, G: 139, B: 139}, // #008B8B
+	"DARKGOLDENROD":        {R: 184, G: 134, B: 11},  // #B8860B
+	"DARKGRAY":             {R: 169, G: 169, B: 169}, // #A9A9A9
+	"DARKGREEN":            {R: 000, G: 100, B: 000}, // #006400
+	"DARKKHAKI":            {R: 189, G: 183, B: 107}, // #BDB76B
+	"DARKMAGENTA":          {R: 139, G: 000, B: 139}, // #8B008B
+	"DARKOLIVEGREEN":       {R: 85, G: 107, B: 47},   // #556B2F
+	"DARKORANGE":           {R: 255, G: 140, B: 000}, // #FF8C00
+	"DARKORCHID":           {R: 153, G: 50, B: 204},  // #9932CC
+	"DARKRED":              {R: 139, G: 000, B: 000}, // #8B0000
+	"DARKSALMON":           {R: 233, G: 150, B: 122}, // #E9967A
+	"DARKSEAGREEN":         {R: 143, G: 188, B: 143}, // #8FBC8F
+	"DARKSLATEBLUE":        {R: 72, G: 61, B: 139},   // #483D8B
+	"DARKSLATEGRAY":        {R: 47, G: 79, B: 79},    // #2F4F4F
+	"DARKTURQUOISE":        {R: 000, G: 206, B: 209}, // #00CED1
+	"DARKVIOLET":           {R: 148, G: 000, B: 211}, // #9400D3
+	"DEEPPINK":             {R: 255, G: 20, B: 147},  // #FF1493
+	"DEEPSKYBLUE":          {R: 000, G: 191, B: 255}, // #00BFFF
+	"DIMGRAY":              {R: 105, G: 105, B: 105}, // #696969
+	"DODGERBLUE":           {R: 30, G: 144, B: 255},  // #1E90FF
+	"FIREBRICK":            {R: 178, G: 34, B: 34},   // #B22222
+	"FLORALWHITE":          {R: 255, G: 250, B: 240}, // #FFFAF0
+	"FORESTGREEN":          {R: 34, G: 139, B: 34},   // #228B22
+	"FUCHSIA":              {R: 255, G: 000, B: 255}, // #FF00FF
+	"GAINSBORO":            {R: 220, G: 220, B: 220}, // #DCDCDC
+	"GHOSTWHITE":           {R: 248, G: 248, B: 255}, // #F8F8FF
+	"GOLD":                 {R: 255, G: 215, B: 000}, // #FFD700
+	"GOLDENROD":            {R: 218, G: 165, B: 32},  // #DAA520
+	"GRAY":                 {R: 190, G: 190, B: 190}, // #BEBEBE X11 Version
+	"GREEN":                {R: 000, G: 255, B: 000}, // #00FF00 X11 Version
+	"GREENYELLOW":          {R: 173, G: 255, B: 47},  // #ADFF2F
+	"HONEYDEW":             {R: 240, G: 255, B: 240}, // #F0FFF0
+	"HOTPINK":              {R: 255, G: 105, B: 180}, // #FF69B4
+	"INDIANRED":            {R: 205, G: 92, B: 92},   // #CD5C5C
+	"INDIGO":               {R: 75, G: 000, B: 130},  // #4B0082
+	"IVORY":                {R: 255, G: 255, B: 240}, // #FFFFF0
+	"KHAKI":                {R: 240, G: 230, B: 140}, // #F0E68C
+	"LAVENDER":             {R: 230, G: 230, B: 250}, // #E6E6FA
+	"LAVENDERBLUSH":        {R: 255, G: 240, B: 245}, // #FFF0F5
+	"LAWNGREEN":            {R: 124, G: 252, B: 000}, // #7CFC00
+	"LEMONCHIFFON":         {R: 255, G: 250, B: 205}, // #FFFACD
+	"LIGHTBLUE":            {R: 173, G: 216, B: 230}, // #ADD8E6
+	"LIGHTCORAL":           {R: 240, G: 128, B: 128}, // #F08080
+	"LIGHTCYAN":            {R: 224, G: 255, B: 255}, // #E0FFFF
+	"LIGHTGOLDENRODYELLOW": {R: 250, G: 250, B: 210}, // #FAFAD2
+	"LIGHTGRAY":            {R: 211, G: 211, B: 211}, // #D3D3D3
+	"LIGHTGREEN":           {R: 144, G: 238, B: 144}, // #90EE90
+	"LIGHTPINK":            {R: 255, G: 182, B: 193}, // #FFB6C1
+	"LIGHTSALMON":          {R: 255, G: 160, B: 122}, // #FFA07A
+	"LIGHTSEAGREEN":        {R: 32, G: 178, B: 170},  // #20B2AA
+	"LIGHTSKYBLUE":         {R: 135, G: 206, B: 250}, // #87CEFA
+	"LIGHTSLATEGRAY":       {R: 119, G: 136, B: 153}, // #778899
+	"LIGHTSTEELBLUE":       {R: 176, G: 196, B: 222}, // #B0C4DE
+	"LIGHTYELLOW":          {R: 255, G: 255, B: 224}, // #FFFFE0
+	"LIME":                 {R: 000, G: 255, B: 000}, // #00FF00
+	"LIMEGREEN":            {R: 50, G: 205, B: 50},   // #32CD32
+	"LINEN":                {R: 250, G: 240, B: 230}, // #FAF0E6
+	"MAGENTA":              {R: 255, G: 000, B: 255}, // #FF00FF
+	"MAROON":               {R: 176, G: 48, B: 96},   // #B03060 X11 Version
+	"MEDIUMAQUAMARINE":     {R: 102, G: 205, B: 170}, // #66CDAA
+	"MEDIUMBLUE":           {R: 000, G: 000, B: 205}, // #0000CD
+	"MEDIUMORCHID":         {R: 186, G: 85, B: 211},  // #BA55D3
+	"MEDIUMPURPLE":         {R: 147, G: 112, B: 219}, // #9370DB
+	"MEDIUMSEAGREEN":       {R: 60, G: 179, B: 113},  // #3CB371
+	"MEDIUMSLATEBLUE":      {R: 123, G: 104, B: 238}, // #7B68EE
+	"MEDIUMSPRINGGREEN":    {R: 000, G: 250, B: 154}, // #00FA9A
+	"MEDIUMTURQUOISE":      {R: 72, G: 209, B: 204},  // #48D1CC
+	"MEDIUMVIOLETRED":      {R: 199, G: 21, B: 133},  // #C71585
+	"MIDNIGHTBLUE":         {R: 25, G: 25, B: 112},   // #191970
+	"MINTCREAM":            {R: 245, G: 255, B: 250}, // #F5FFFA
+	"MISTYROSE":            {R: 255, G: 228, B: 225}, // #FFE4E1
+	"MOCCASIN":             {R: 255, G: 228, B: 181}, // #FFE4B5
+	"NAVAJOWHITE":          {R: 255, G: 222, B: 173}, // #FFDEAD
+	"NAVY":                 {R: 000, G: 000, B: 128}, // #000080
+	"OLDLACE":              {R: 253, G: 245, B: 230}, // #FDF5E6
+	"OLIVE":                {R: 128, G: 128, B: 000}, // #808000
+	"OLIVEDRAB":            {R: 107, G: 142, B: 35},  // #6B8E23
+	"ORANGE":               {R: 255, G: 165, B: 000}, // #FFA500
+	"ORANGERED":            {R: 255, G: 69, B: 000},  // #FF4500
+	"ORCHID":               {R: 218, G: 112, B: 214}, // #DA70D6
+	"PALEGOLDENROD":        {R: 238, G: 232, B: 170}, // #EEE8AA
+	"PALEGREEN":            {R: 152, G: 251, B: 152}, // #98FB98
+	"PALETURQUOISE":        {R: 175, G: 238, B: 238}, // #AFEEEE
+	"PALEVIOLETRED":        {R: 219, G: 112, B: 147}, // #DB7093
+	"PAPAYAWHIP":           {R: 255, G: 239, B: 213}, // #FFEFD5
+	"PEACHPUFF":            {R: 255, G: 218, B: 185}, // #FFDAB9
+	"PERU":                 {R: 205, G: 133, B: 63},  // #CD853F
+	"PINK":                 {R: 255, G: 192, B: 203}, // #FFC0CB
+	"PLUM":                 {R: 221, G: 160, B: 221}, // #DDA0DD
+	"POWDERBLUE":           {R: 176, G: 224, B: 230}, // #B0E0E6
+	"PURPLE":               {R: 160, G: 32, B: 240},  // #A020F0 X11 Version
+	"REBECCAPURPLE":        {R: 102, G: 51, B: 153},  // #663399
+	"RED":                  {R: 255, G: 000, B: 000}, // #FF0000
+	"ROSYBROWN":            {R: 188, G: 143, B: 143}, // #BC8F8F
+	"ROYALBLUE":            {R: 65, G: 105, B: 225},  // #4169E1
+	"SADDLEBROWN":          {R: 139, G: 69, B: 19},   // #8B4513
+	"SALMON":               {R: 250, G: 128, B: 114}, // #FA8072
+	"SANDYBROWN":           {R: 244, G: 164, B: 96},  // #F4A460
+	"SEAGREEN":             {R: 46, G: 139, B: 87},   // #2E8B57
+	"SEASHELL":             {R: 255, G: 245, B: 238}, // #FFF5EE
+	"SIENNA":               {R: 160, G: 82, B: 45},   // #A0522D
+	"SILVER":               {R: 192, G: 192, B: 192}, // #C0C0C0
+	"SKYBLUE":              {R: 135, G: 206, B: 235}, // #87CEEB
+	"SLATEBLUE":            {R: 106, G: 90, B: 205},  // #6A5ACD
+	"SLATEGRAY":            {R: 112, G: 128, B: 144}, // #708090
+	"SNOW":                 {R: 255, G: 250, B: 250}, // #FFFAFA
+	"SPRINGGREEN":          {R: 000, G: 255, B: 127}, // #00FF7F
+	"STEELBLUE":            {R: 70, G: 130, B: 180},  // #4682B4
+	"TAN":                  {R: 210, G: 180, B: 140}, // #D2B48C
+	"TEAL":                 {R: 000, G: 128, B: 128}, // #008080
+	"THISTLE":              {R: 216, G: 191, B: 216}, // #D8BFD8
+	"TOMATO":               {R: 255, G: 99, B: 71},   // #FF6347
+	"TURQUOISE":            {R: 64, G: 224, B: 208},  // #40E0D0
+	"VIOLET":               {R: 238, G: 130, B: 238}, // #EE82EE
+	"WEBGRAY":              {R: 128, G: 128, B: 128}, // #808080 Web Version
+	"WEBGREEN":             {R: 000, G: 128, B: 000}, // #008000 Web Version
+	"WEBMAROON":            {R: 127, G: 000, B: 000}, // #7F0000 Web Version
+	"WEBPURPLE":            {R: 127, G: 000, B: 127}, // #7F007F Web Version
+	"WHEAT":                {R: 245, G: 222, B: 179}, // #F5DEB3
+	"WHITE":                {R: 255, G: 255, B: 255}, // #FFFFFF
+	"WHITESMOKE":           {R: 245, G: 245, B: 245}, // #F5F5F5
+	"YELLOW":               {R: 255, G: 255, B: 000}, // #FFFF00
+	"YELLOWGREEN":          {R: 154, G: 205, B: 50},  // #9ACD32
 } //                                                               PDFColorNames
 
 // PDFStandardPageSizes is an array of standard page sizes,
@@ -405,8 +397,8 @@ type pdfPage struct {
 	lineWidth         float64
 	fontSizePt        float64
 	fontID            int
-	strokeColor       PDFColor
-	nonStrokeColor    PDFColor
+	strokeColor       color.RGBA
+	nonStrokeColor    color.RGBA
 	horizontalScaling uint16
 } //                                                                     pdfPage
 
@@ -749,7 +741,7 @@ func (pdf *PDF) PageWidth() float64 {
 // # Property Getters
 
 // Color returns the current color, which is used for text, lines and fills.
-func (pdf *PDF) Color() PDFColor {
+func (pdf *PDF) Color() color.RGBA {
 	return pdf.color
 } //                                                                       Color
 
@@ -856,14 +848,12 @@ func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 			return pdf.SetColorRGB(0, 0, 0)
 		}
 		return pdf.SetColorRGB(
-			int(hex[0]*16+hex[1]),
-			int(hex[2]*16+hex[3]),
-			int(hex[4]*16+hex[5]))
+			hex[0]*16+hex[1], hex[2]*16+hex[3], hex[4]*16+hex[5])
 	}
 	// otherwise search for color name
 	var clr, exists = PDFColorNames[s]
 	if exists {
-		return pdf.SetColorRGB(int(clr.Red), int(clr.Green), int(clr.Blue))
+		return pdf.SetColorRGB(clr.R, clr.G, clr.B)
 	}
 	pdf.logError("Color name '" + s + "' not known. Setting to black.")
 	return pdf.SetColorRGB(0, 0, 0)
@@ -873,8 +863,8 @@ func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 // red, green and blue values. Each component value
 // can range from 0 to 255. The current color is used
 // for subsequent text and line drawing and fills.
-func (pdf *PDF) SetColorRGB(red, green, blue int) *PDF {
-	pdf.color = PDFColor{uint8(red), uint8(green), uint8(blue)}
+func (pdf *PDF) SetColorRGB(r, g, b uint8) *PDF {
+	pdf.color = color.RGBA{r, g, b, 0xFF}
 	return pdf
 } //                                                                 SetColorRGB
 
@@ -997,8 +987,8 @@ func (pdf *PDF) AddPage() *PDF {
 		pageSize:          pdf.pageSize,
 		x:                 -1, // must default to -1
 		y:                 -1,
-		strokeColor:       PDFColor{1, 0, 1}, // default to an unlikely value
-		nonStrokeColor:    PDFColor{1, 0, 1},
+		strokeColor:       color.RGBA{1, 0, 1, 0x01}, // default: unlikely value
+		nonStrokeColor:    color.RGBA{1, 0, 1, 0x01},
 		horizontalScaling: 100,
 	})
 	pdf.setCurrentPage(pageNo)
@@ -1737,13 +1727,13 @@ func (pdf *PDF) writeMode(fill ...bool) (mode string) {
 		if p := &pdf.pagePtr.nonStrokeColor; *p != pdf.color {
 			*p = pdf.color
 			pdf.write(" %.3f %.3f %.3f rg\n", // rg: set non-stroking/text color
-				float64(p.Red)/255, float64(p.Green)/255, float64(p.Blue)/255)
+				float64(p.R)/255, float64(p.G)/255, float64(p.B)/255)
 		}
 	}
 	if p := &pdf.pagePtr.strokeColor; *p != pdf.color {
 		*p = pdf.color
 		pdf.write("%.3f %.3f %.3f RG\n", // RG: set stroke (line) color
-			float64(p.Red)/255, float64(p.Green)/255, float64(p.Blue)/255)
+			float64(p.R)/255, float64(p.G)/255, float64(p.B)/255)
 	}
 	if p := &pdf.pagePtr.lineWidth; int(*p*10000) != int(pdf.lineWidth*10000) {
 		*p = pdf.lineWidth
