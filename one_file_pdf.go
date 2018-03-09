@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 02:40:34 B31512                              [one_file_pdf.go]
+// :v: 2018-03-09 02:42:10 67DEC1                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -104,6 +104,7 @@ package pdf
 //                  x, y, width, height float64,
 //                  wrapText bool, align, text string,
 //              ) *PDF
+//   (pdf *PDF) loadImage(fileNameOrBytes interface{}) (img pdfImage, idx int)
 //   (pdf *PDF) setCurrentPage(pageNo int) *PDF
 //   (pdf *PDF) textWidthPt1000(text string) float64
 //   (pdf *PDF) warnIfNoPage() bool
@@ -1112,65 +1113,8 @@ func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
-	var imgName string
-	var imgBuf *bytes.Buffer
-	switch val := fileNameOrBytes.(type) {
-	case string:
-		var data, err = ioutil.ReadFile(val)
-		if err != nil {
-			pdf.logError("File", val, ":", err)
-			return pdf
-		}
-		imgName = val
-		imgBuf = bytes.NewBuffer(data)
-	case []byte:
-		var n = len(val)
-		if n > 32 {
-			n = 32
-		}
-		imgName = fmt.Sprintf("%x", val[:n])
-		imgBuf = bytes.NewBuffer(val)
-	default:
-		pdf.logError("Invalid type in",
-			"fileNameOrBytes:", reflect.TypeOf(fileNameOrBytes),
-			"value:", fileNameOrBytes)
-		return pdf
-	}
 	var pg = pdf.pagePtr
-	var img pdfImage
-	var imgNo = -1
-	for i, iter := range pdf.images {
-		if iter.name == imgName {
-			imgNo, img = i, iter
-		}
-	}
-	if imgNo == -1 {
-		var decoded, _, err = image.Decode(imgBuf)
-		if err != nil {
-			pdf.logError("Image not decoded: %v\n", err)
-			return pdf
-		}
-		var bounds = decoded.Bounds()
-		var w, h = bounds.Max.X, bounds.Max.Y
-		var data []byte
-		for y := 0; y < h; y++ {
-			for x := 0; x < w; x++ {
-				var rd, gr, bl, _ = decoded.At(x, y).RGBA()
-				data = append(data, byte(
-					float64(rd)*0.2126+float64(gr)*0.7152+float64(bl)*0.0722,
-				))
-			}
-		}
-		img = pdfImage{
-			name:      imgName,
-			width:     w,
-			height:    h,
-			data:      data,
-			grayscale: true, //TODO: determine actual grayscale mode
-		}
-		imgNo = len(pdf.images)
-		pdf.images = append(pdf.images, img)
-	}
+	var img, imgNo = pdf.loadImage(fileNameOrBytes)
 	// add the image number to the current page, if not already referenced
 	var found bool
 	for _, iter := range pg.imageNos {
@@ -1607,6 +1551,69 @@ func (pdf *PDF) drawTextBox(
 	}
 	return pdf
 } //                                                                 drawTextBox
+
+// loadImage reads an image from a file or byte array, stores its data in
+// the PDF's images array, and returns a pdfImage and its reference index
+func (pdf *PDF) loadImage(fileNameOrBytes interface{}) (img pdfImage, idx int) {
+	idx = -1
+	var name string
+	var buf *bytes.Buffer
+	switch val := fileNameOrBytes.(type) {
+	case string:
+		var data, err = ioutil.ReadFile(val)
+		if err != nil {
+			pdf.logError("File "+val+":", err)
+			return pdfImage{}, -1
+		}
+		name = val
+		buf = bytes.NewBuffer(data)
+	case []byte:
+		var n = len(val)
+		if n > 32 {
+			n = 32
+		}
+		name = fmt.Sprintf("%x", val[:n])
+		buf = bytes.NewBuffer(val)
+	default:
+		pdf.logError("Invalid type in fileNameOrBytes:",
+			reflect.TypeOf(fileNameOrBytes), "value:", fileNameOrBytes)
+		return pdfImage{}, -1
+	}
+	for i, iter := range pdf.images {
+		if iter.name == name {
+			img, idx = iter, i
+			break
+		}
+	}
+	if idx == -1 {
+		var decoded, _, err = image.Decode(buf)
+		if err != nil {
+			pdf.logError("Image not decoded:", err)
+			return pdfImage{}, -1
+		}
+		var bounds = decoded.Bounds()
+		var w, h = bounds.Max.X, bounds.Max.Y
+		var data []byte
+		for y := 0; y < h; y++ {
+			for x := 0; x < w; x++ {
+				var rd, gr, bl, _ = decoded.At(x, y).RGBA()
+				data = append(data, byte(
+					float64(rd)*0.2126+float64(gr)*0.7152+float64(bl)*0.0722,
+				))
+			}
+		}
+		img = pdfImage{
+			name:      name,
+			width:     w,
+			height:    h,
+			data:      data,
+			grayscale: true, //TODO: determine actual grayscale mode
+		}
+		idx = len(pdf.images)
+		pdf.images = append(pdf.images, img)
+	}
+	return img, idx
+} //                                                                   loadImage
 
 // setCurrentPage selects the currently-active page
 // called by: AddPage(), Bytes()
