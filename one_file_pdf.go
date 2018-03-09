@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-10 00:23:31 3C6A5D                              [one_file_pdf.go]
+// :v: 2018-03-10 00:24:53 BA15FD                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1296,9 +1296,9 @@ func (pdf *PDF) TextWidth(s string) float64 {
 // Recognised units: mm cm " in inch inches tw twip twips pt point points
 func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
 	var num, unit string //                              extract number and unit
-	for _, ch := range pdf.toUpperLettersDigits(numberAndUnit, `."`) {
+	for _, ch := range pdf.toUpperLettersDigits(numberAndUnit, `-."`) {
 		switch {
-		case ch == '.', ch == '-', unicode.IsDigit(ch):
+		case ch == '-', ch == '.', unicode.IsDigit(ch):
 			num += string(ch)
 		case ch == '"', unicode.IsLetter(ch):
 			unit += string(ch)
@@ -1309,6 +1309,9 @@ func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
 		pdf.logError("Unknown unit name: '" + unit + "'")
 	}
 	var n, _ = strconv.ParseFloat(num, 64)
+	if unit == "" {
+		return n
+	}
 	return n * ppu
 } //                                                                    ToPoints
 
