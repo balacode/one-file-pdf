@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 03:13:58 A4F9D4                              [one_file_pdf.go]
+// :v: 2018-03-09 03:27:25 C145FE                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -125,7 +125,7 @@ package pdf
 //   (*PDF) escape(s string) []byte
 //   (*PDF) isWhiteSpace(s string) bool
 //   (*PDF) splitLines(s string) []string
-//   (*PDF) toUpperLetterDigits(s, extras string) string
+//   (*PDF) toUpperLettersDigits(s, extras string) string
 //   (pdf *PDF) getPageSize(pageSize string) pdfPageSize
 //   (pdf *PDF) getPointsPerUnit(unitName string) float64
 //   (pdf *PDF) logError(a ...interface{}) *PDF
@@ -821,7 +821,7 @@ func (pdf *PDF) Y() float64 {
 func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 	//
 	// if name starts with '#' treat it as HTML color (#RRGGBB)
-	var s = pdf.toUpperLetterDigits(nameOrHTMLColor, "#")
+	var s = pdf.toUpperLettersDigits(nameOrHTMLColor, "#")
 	if len(s) >= 7 && s[0] == '#' {
 		var hex [6]uint8
 		for i, ch := range s[1:7] {
@@ -936,7 +936,7 @@ func (pdf *PDF) SetLineWidth(points float64) *PDF {
 // Can be upper/lowercase:
 // MM CM " IN INCH INCHES TW TWIP TWIPS PT POINT POINTS.
 func (pdf *PDF) SetUnits(unitName string) *PDF {
-	pdf.unitName = pdf.toUpperLetterDigits(unitName, "")
+	pdf.unitName = pdf.toUpperLettersDigits(unitName, "")
 	pdf.ptPerUnit = pdf.getPointsPerUnit(pdf.unitName)
 	return pdf
 } //                                                                    SetUnits
@@ -1377,7 +1377,7 @@ func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
 // Recognised units are:
 // mm cm " in inch inches tw twip twips pt point points
 func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
-	var s = pdf.toUpperLetterDigits(numberAndUnit, `."`)
+	var s = pdf.toUpperLettersDigits(numberAndUnit, `."`)
 	if s == "" {
 		return 0
 	}
@@ -1423,12 +1423,12 @@ func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
 // called by drawTextLine()
 func (pdf *PDF) applyFont() {
 	var font pdfFont
-	var fontName = pdf.toUpperLetterDigits(pdf.fontName, "")
+	var fontName = pdf.toUpperLettersDigits(pdf.fontName, "")
 	var isValid = fontName != ""
 	if isValid {
 		isValid = false
 		for i, name := range pdfFontNames {
-			name = pdf.toUpperLetterDigits(name, "")
+			name = pdf.toUpperLettersDigits(name, "")
 			if name != fontName {
 				continue
 			}
@@ -1865,8 +1865,8 @@ func (*PDF) splitLines(s string) []string {
 	return split(split(split([]string{s}, "\r\n"), "\r"), "\n")
 } //                                                                  splitLines
 
-// toUpperLetterDigits returns letters and digits from s, in upper case
-func (*PDF) toUpperLetterDigits(s, extras string) string {
+// toUpperLettersDigits returns letters and digits from s, in upper case
+func (*PDF) toUpperLettersDigits(s, extras string) string {
 	var buf = bytes.NewBuffer(make([]byte, 0, len(s)))
 	for _, ch := range strings.ToUpper(s) {
 		if unicode.IsLetter(ch) || unicode.IsDigit(ch) ||
@@ -1875,13 +1875,13 @@ func (*PDF) toUpperLetterDigits(s, extras string) string {
 		}
 	}
 	return buf.String()
-} //                                                         toUpperLetterDigits
+} //                                                        toUpperLettersDigits
 
 // getPageSize returns a pdfPageSize struct based on
 // the specified page size string. If the page size is
 // not found, returns a zero-initialized structure.
 func (pdf *PDF) getPageSize(pageSize string) pdfPageSize {
-	pageSize = pdf.toUpperLetterDigits(pageSize, "")
+	pageSize = pdf.toUpperLettersDigits(pageSize, "")
 	for _, size := range pdfStandardPageSizes {
 		if pageSize == size.name {
 			return size
@@ -1893,7 +1893,7 @@ func (pdf *PDF) getPageSize(pageSize string) pdfPageSize {
 // getPointsPerUnit returns number of points per named measurement unit.
 // called by: SetUnits(), ToPoints()
 func (pdf *PDF) getPointsPerUnit(unitName string) float64 {
-	switch pdf.toUpperLetterDigits(unitName, `"`) {
+	switch pdf.toUpperLettersDigits(unitName, `"`) {
 	case "MM":
 		return 2.83464566929134 //     1 inch / 25.4mm per " * 72 points per in.
 	case "CM":
