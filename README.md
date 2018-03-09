@@ -21,8 +21,7 @@ The result is a single .go file with less than 1999 lines of code.
 
 ### Naming Convention:  
 All types in are prefixed with PDF for public, and 'pdf' for private types.
-The only type you really need to use is PDF, while PDFColor,
-PDFPageSize and PDFColorNames are left public for reference.
+The only type you really need to use is PDF, while PDFColorNames are left public for reference.
 
 ### Supported Features (the fundamentals):  
 - You can use all built-in PDF fonts: Courier, Helvetica, Symbol, Times, ZapfDingbats, and their variants
