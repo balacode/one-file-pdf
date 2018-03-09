@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-10 00:16:19 8A9606                              [one_file_pdf.go]
+// :v: 2018-03-10 00:18:27 7F4B82                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -944,10 +944,10 @@ func (pdf *PDF) SetX(x float64) *PDF {
 
 // SetXY changes both X- and Y-coordinates of the current drawing position.
 func (pdf *PDF) SetXY(x, y float64) *PDF {
-	if !pdf.warnIfNoPage() {
-		return pdf.SetX(x).SetY(y)
+	if pdf.warnIfNoPage() {
+		return pdf
 	}
-	return pdf
+	return pdf.SetX(x).SetY(y)
 } //                                                                       SetXY
 
 // SetY changes the Y-coordinate of the current drawing position.
@@ -1066,10 +1066,7 @@ func (pdf *PDF) DrawBox(x, y, width, height float64, fill ...bool) *PDF {
 // DrawCircle draws a circle of radius r centered on (x, y),
 // by drawing 4 Bézier curves (PDF has no circle primitive)
 func (pdf *PDF) DrawCircle(x, y, radius float64, fill ...bool) *PDF {
-	if !pdf.warnIfNoPage() {
-		pdf.DrawEllipse(x, y, radius, radius, fill...)
-	}
-	return pdf
+	return pdf.DrawEllipse(x, y, radius, radius, fill...)
 } //                                                                  DrawCircle
 
 // DrawEllipse draws an ellipse centered on (x, y),
@@ -1173,14 +1170,14 @@ func (pdf *PDF) DrawText(s string) *PDF {
 func (pdf *PDF) DrawTextAlignedToBox(
 	x, y, width, height float64, align, text string,
 ) *PDF {
-	if !pdf.warnIfNoPage() {
-		pdf.drawTextBox(x, y, width, height, false, align, text)
-	}
-	return pdf
+	return pdf.drawTextBox(x, y, width, height, false, align, text)
 } //                                                        DrawTextAlignedToBox
 
 // DrawTextAt draws text at the specified point (x, y).
 func (pdf *PDF) DrawTextAt(x, y float64, text string) *PDF {
+	if pdf.warnIfNoPage() {
+		return pdf
+	}
 	return pdf.SetXY(x, y).DrawText(text)
 } //                                                                  DrawTextAt
 
@@ -1191,10 +1188,7 @@ func (pdf *PDF) DrawTextAt(x, y float64, text string) *PDF {
 // 'B' to align the text to the top or bottom of the box.
 func (pdf *PDF) DrawTextInBox(x, y, width, height float64, align, text string,
 ) *PDF {
-	if !pdf.warnIfNoPage() {
-		pdf.drawTextBox(x, y, width, height, true, align, text)
-	}
-	return pdf
+	return pdf.drawTextBox(x, y, width, height, true, align, text)
 } //                                                               DrawTextInBox
 
 // DrawUnitGrid draws a light-gray grid demarcated in the
@@ -1221,10 +1215,7 @@ func (pdf *PDF) DrawUnitGrid() *PDF {
 
 // FillBox fills a rectangle with the current color.
 func (pdf *PDF) FillBox(x, y, width, height float64) *PDF {
-	if !pdf.warnIfNoPage() {
-		pdf.DrawBox(x, y, width, height, true)
-	}
-	return pdf
+	return pdf.DrawBox(x, y, width, height, true)
 } //                                                                     FillBox
 
 // FillCircle fills a circle of radius r centered on (x, y),
@@ -1504,7 +1495,7 @@ func (pdf *PDF) drawTextLine(s string) *PDF {
 func (pdf *PDF) drawTextBox(
 	x, y, width, height float64, wrapText bool, align, text string,
 ) *PDF {
-	if text == "" || pdf.warnIfNoPage() {
+	if pdf.warnIfNoPage() || text == "" {
 		return pdf
 	}
 	var lines []string
