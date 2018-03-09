@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-10 00:21:52 226BE7                              [one_file_pdf.go]
+// :v: 2018-03-10 00:23:31 3C6A5D                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1345,14 +1345,13 @@ func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
 	for _, iter := range pdf.splitLines(text) {
 		for pdf.TextWidth(iter) > width {
 			// reduce, then increase, then reduce n, to get best fit
-			var max = len(iter)
-			var n = fit(iter, 1, max, width)
+			var n = fit(iter, 1, len(iter), width)
 			n = fit(iter, 2, n, width)
 			n = fit(iter, 3, n, width)
 			//
 			// move to the last word (if white-space is found)
 			var found bool
-			max = n
+			var max = n
 			for n > 0 {
 				if pdf.isWhiteSpace(iter[n-1 : n]) {
 					found = true
