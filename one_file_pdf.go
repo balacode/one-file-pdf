@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 02:29:58 B5F9C0                              [one_file_pdf.go]
+// :v: 2018-03-09 02:35:36 63803B                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -123,10 +123,10 @@ package pdf
 //   (*PDF) escape(s string) []byte
 //   (*PDF) isWhiteSpace(s string) bool
 //   (*PDF) splitLines(s string) []string
-//   (PDF) logError(a ...interface{})
 //   (*PDF) toUpperLetterDigits(s, extras string) string
 //   (pdf *PDF) getPageSize(pageSize string) pdfPageSize
 //   (pdf *PDF) getPointsPerUnit(unitName string) float64
+//   (pdf *PDF) logError(a ...interface{}) *PDF
 
 import "bytes"         // standard
 import "compress/zlib" // standard
@@ -139,10 +139,6 @@ import "strconv"       // standard
 import "strings"       // standard
 import "unicode"       // standard   only uses IsSpace(), IsLetter(), IsDigit()
 import _ "image/png"   // standard
-
-// PDFErrorHandler is the function that handles errors.
-// You can redefine it as needed or set to nil to mute error messages.
-var PDFErrorHandler = fmt.Println
 
 // -----------------------------------------------------------------------------
 // # Main Structure
@@ -174,6 +170,11 @@ type PDF struct {
 	contentPtr        *bytes.Buffer // pointer to PDF/current page's buffer
 	objOffsets        []int         // used by Bytes() and write..()
 	objNo             int           // used by Bytes() and write..()
+	//
+	// Function that handles error logging: it is set to fmt.Println
+	// by default (by NewPDF). You can redefine it as needed or
+	// set to nil to mute error messages per each PDF instance.
+	errorLogger func(a ...interface{}) (n int, err error)
 } //                                                                         PDF
 
 // -----------------------------------------------------------------------------
@@ -687,6 +688,7 @@ func NewPDF(pageSize string) PDF {
 		pageSize:          pdf.getPageSize(pageSize),
 		horizontalScaling: 100,
 		compressStreams:   true,
+		errorLogger:       fmt.Println,
 	}
 	if pdf.pageSize.name == "" {
 		pdf.logError("Unknown page size '" + pageSize + "'; setting to 'A4'")
@@ -840,8 +842,8 @@ func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 	if exists {
 		return pdf.SetColorRGB(clr.R, clr.G, clr.B)
 	}
-	pdf.logError("Color name '" + s + "' not known. Setting to black.")
-	return pdf.SetColorRGB(0, 0, 0)
+	return pdf.SetColorRGB(0, 0, 0).
+		logError("Color name '" + s + "' not known; setting to black")
 } //                                                                    SetColor
 
 // SetColorRGB sets the current color using separate
@@ -1611,7 +1613,7 @@ func (pdf *PDF) drawTextBox(
 // called by: AddPage(), Bytes()
 func (pdf *PDF) setCurrentPage(pageNo int) *PDF {
 	if pageNo != PDFNoPage && pageNo > (len(pdf.pages)-1) {
-		pdf.logError("Page number out of range.")
+		return pdf.logError("Page number out of range:", pageNo)
 	} else if pageNo == PDFNoPage {
 		pdf.pagePtr = nil
 		pdf.contentPtr = &pdf.content
@@ -1673,8 +1675,7 @@ func (pdf *PDF) write(format string, args ...interface{}) *PDF {
 	if pdf.pageNo == PDFNoPage {
 		buf = pdf.contentPtr
 	} else if pdf.pageNo > (len(pdf.pages) - 1) {
-		pdf.logError("Invalid page number: %d", pdf.pageNo)
-		return pdf
+		return pdf.logError("Invalid page index:", pdf.pageNo)
 	} else {
 		buf = &pdf.pagePtr.content
 	}
@@ -1798,8 +1799,7 @@ func (pdf *PDF) writeStreamData(ar []byte) *PDF {
 		var w = zlib.NewWriter(&buf)
 		var _, err = w.Write([]byte(ar))
 		if err != nil {
-			pdf.logError("Failed compressing:", err)
-			return pdf
+			return pdf.logError("Failed compressing:", err)
 		}
 		w.Close() // don't defer, close before reading Bytes()
 		ar = buf.Bytes()
@@ -1854,14 +1854,6 @@ func (*PDF) splitLines(s string) []string {
 	return split(split(split([]string{s}, "\r\n"), "\r"), "\n")
 } //                                                                  splitLines
 
-// logError reports an error by calling PDFErrorHandler,
-// which is set to fmt.Println by default.
-func (PDF) logError(a ...interface{}) {
-	if PDFErrorHandler != nil {
-		PDFErrorHandler(a...)
-	}
-} //                                                                    logError
-
 // toUpperLetterDigits returns letters and digits from s, in upper case
 func (*PDF) toUpperLetterDigits(s, extras string) string {
 	var buf = bytes.NewBuffer(make([]byte, 0, len(s)))
@@ -1904,5 +1896,13 @@ func (pdf *PDF) getPointsPerUnit(unitName string) float64 {
 	}
 	return 0
 } //                                                            getPointsPerUnit
+
+// logError calls errorLogger (set to fmt.Println by default) to log an error
+func (pdf *PDF) logError(a ...interface{}) *PDF {
+	if pdf.errorLogger != nil {
+		pdf.errorLogger(a...)
+	}
+	return pdf
+} //                                                                    logError
 
 //end
