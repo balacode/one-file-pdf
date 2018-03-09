@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 02:15:52 11B9CB                              [one_file_pdf.go]
+// :v: 2018-03-09 02:25:09 E74647                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -121,11 +121,12 @@ package pdf
 //
 // # Private Functions (just attached to PDF, but not using it)
 //   (*PDF) escape(s string) []byte
-//   (*PDF) getPointsPerUnit(unitName string) float64
 //   (*PDF) isWhiteSpace(s string) bool
 //   (*PDF) splitLines(s string) []string
 //   (PDF) logError(a ...interface{})
+//   (*PDF) toUpperLetterDigits(s, extras string) string
 //   (pdf *PDF) getPageSize(pageSize string) pdfPageSize
+//   (pdf *PDF) getPointsPerUnit(unitName string) float64
 
 import "bytes"         // standard
 import "compress/zlib" // standard
@@ -136,7 +137,7 @@ import "io/ioutil"     // standard
 import "reflect"       // standard
 import "strconv"       // standard
 import "strings"       // standard
-import "unicode"       // standard   only uses IsSpace()
+import "unicode"       // standard   only uses IsSpace(), IsLetter(), IsDigit()
 import _ "image/png"   // standard
 
 // PDFErrorHandler is the function that handles errors.
@@ -816,7 +817,7 @@ func (pdf *PDF) Y() float64 {
 func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 	//
 	// if name starts with '#' treat it as HTML color (#RRGGBB)
-	var s = strings.ToUpper(nameOrHTMLColor)
+	var s = pdf.toUpperLetterDigits(nameOrHTMLColor, "#")
 	if len(s) >= 7 && s[0] == '#' {
 		var hex [6]uint8
 		for i, ch := range s[1:7] {
@@ -932,7 +933,7 @@ func (pdf *PDF) SetLineWidth(points float64) *PDF {
 // Can be upper/lowercase:
 // MM CM " IN INCH INCHES TW TWIP TWIPS PT POINT POINTS.
 func (pdf *PDF) SetUnits(unitName string) *PDF {
-	pdf.unitName = strings.ToUpper(strings.Trim(unitName, " \a\b\f\n\r\t\v"))
+	pdf.unitName = pdf.toUpperLetterDigits(unitName, "")
 	pdf.ptPerUnit = pdf.getPointsPerUnit(pdf.unitName)
 	return pdf
 } //                                                                    SetUnits
@@ -1432,7 +1433,7 @@ func (pdf *PDF) WrapTextLines(width float64, text string) []string {
 // Recognised units are:
 // mm cm " in inch inches tw twip twips pt point points
 func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
-	var s = strings.ToUpper(strings.Trim(numberAndUnit, " \a\b\f\n\r\t\v"))
+	var s = pdf.toUpperLetterDigits(numberAndUnit, `."`)
 	if s == "" {
 		return 0
 	}
@@ -1479,12 +1480,13 @@ func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
 // called by drawTextLine()
 func (pdf *PDF) applyFont() {
 	var font pdfFont
-	var isValid = pdf.fontName != ""
+	var fontName = pdf.toUpperLetterDigits(pdf.fontName, "")
+	var isValid = fontName != ""
 	if isValid {
 		isValid = false
 		for i, name := range pdfFontNames {
-			name = strings.ToUpper(name)
-			if strings.ToUpper(pdf.fontName) != name {
+			name = pdf.toUpperLetterDigits(name, "")
+			if name != fontName {
 				continue
 			}
 			var has = strings.Contains
@@ -1838,24 +1840,6 @@ func (*PDF) escape(s string) []byte {
 	return []byte(s)
 } //                                                                      escape
 
-// getPointsPerUnit returns number of points per named measurement unit.
-// called by: SetUnits(), ToPoints()
-func (*PDF) getPointsPerUnit(unitName string) float64 {
-	switch strings.Trim(strings.ToUpper(unitName), " \a\b\f\n\r\t\v") {
-	case "MM":
-		return 2.83464566929134 //     1 inch / 25.4mm per " * 72 points per in.
-	case "CM":
-		return 28.3464566929134 //     1 inch / 2.54cm per " * 72 points per in.
-	case "IN", "INCH", "INCHES", `"`:
-		return 72.0 //                                           points per inch
-	case "TW", "TWIP", "TWIPS":
-		return 0.05 //                              1 point / 20 twips per point
-	case "PT", "POINT", "POINTS":
-		return 1.0 // point
-	}
-	return 0
-} //                                                            getPointsPerUnit
-
 // isWhiteSpace returns true if all the chars. in 's' are white-spaces
 func (*PDF) isWhiteSpace(s string) bool {
 	for _, ch := range s {
@@ -1889,11 +1873,23 @@ func (PDF) logError(a ...interface{}) {
 	}
 } //                                                                    logError
 
+// toUpperLetterDigits returns letters and digits from s, in upper case
+func (*PDF) toUpperLetterDigits(s, extras string) string {
+	var buf = bytes.NewBuffer(make([]byte, 0, len(s)))
+	for _, ch := range strings.ToUpper(s) {
+		if unicode.IsLetter(ch) || unicode.IsDigit(ch) ||
+			strings.ContainsRune(extras, ch) {
+			buf.WriteRune(ch)
+		}
+	}
+	return buf.String()
+} //                                                         toUpperLetterDigits
+
 // getPageSize returns a pdfPageSize struct based on
 // the specified page size string. If the page size is
 // not found, returns a zero-initialized structure.
 func (pdf *PDF) getPageSize(pageSize string) pdfPageSize {
-	pageSize = strings.ToUpper(pageSize)
+	pageSize = pdf.toUpperLetterDigits(pageSize, "")
 	for _, size := range pdfStandardPageSizes {
 		if pageSize == size.name {
 			return size
@@ -1901,5 +1897,23 @@ func (pdf *PDF) getPageSize(pageSize string) pdfPageSize {
 	}
 	return pdfPageSize{}
 } //                                                                 getPageSize
+
+// getPointsPerUnit returns number of points per named measurement unit.
+// called by: SetUnits(), ToPoints()
+func (pdf *PDF) getPointsPerUnit(unitName string) float64 {
+	switch pdf.toUpperLetterDigits(unitName, `"`) {
+	case "MM":
+		return 2.83464566929134 //     1 inch / 25.4mm per " * 72 points per in.
+	case "CM":
+		return 28.3464566929134 //          " / 2.54cm per " * 72 points per in.
+	case "IN", "INCH", "INCHES", `"`:
+		return 72.0 //                                           points per inch
+	case "TW", "TWIP", "TWIPS":
+		return 0.05 //                              1 point / 20 twips per point
+	case "PT", "POINT", "POINTS":
+		return 1.0 // point
+	}
+	return 0
+} //                                                            getPointsPerUnit
 
 //end
