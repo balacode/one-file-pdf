@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 03:27:25 C145FE                              [one_file_pdf.go]
+// :v: 2018-03-09 23:54:02 1230FE                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -10,7 +10,6 @@ package pdf
 //
 // # Constants
 //   PDFColorNames = map[string]color.RGBA
-//   PDFNoPage = -1
 //
 // # Internal Structures
 //   pdfFont struct
@@ -181,9 +180,6 @@ type PDF struct {
 
 // -----------------------------------------------------------------------------
 // # Constants
-
-// PDFNoPage specifies there is no current page.
-const PDFNoPage = -1
 
 // PDFColorNames maps web (X11) color names to values.
 // (from https://en.wikipedia.org/wiki/X11_color_names)
@@ -686,7 +682,7 @@ var pdfStandardPageSizes = []pdfPageSize{
 func NewPDF(pageSize string) PDF {
 	var pdf PDF
 	pdf = PDF{
-		pageNo:            PDFNoPage,
+		pageNo:            -1,
 		pageSize:          pdf.getPageSize(pageSize),
 		horizontalScaling: 100,
 		compressStreams:   true,
@@ -710,7 +706,7 @@ func (pdf *PDF) CurrentPage() int {
 
 // PageHeight returns the height of the current page in selected units.
 func (pdf *PDF) PageHeight() float64 {
-	if pdf.pageNo == PDFNoPage || pdf.pageNo > (len(pdf.pages)-1) ||
+	if pdf.pageNo < 0 || pdf.pageNo > (len(pdf.pages)-1) ||
 		pdf.pagePtr == nil {
 		return pdf.pageSize.heightPt / pdf.ptPerUnit
 	}
@@ -719,7 +715,7 @@ func (pdf *PDF) PageHeight() float64 {
 
 // PageWidth returns the width of the current page in selected units.
 func (pdf *PDF) PageWidth() float64 {
-	if pdf.pageNo == PDFNoPage || pdf.pageNo > (len(pdf.pages)-1) ||
+	if pdf.pageNo < 0 || pdf.pageNo > (len(pdf.pages)-1) ||
 		pdf.pagePtr == nil {
 		return pdf.pageSize.widthPt / pdf.ptPerUnit
 	}
@@ -998,7 +994,7 @@ func (pdf *PDF) Bytes() []byte {
 	pdf.content.Reset()
 	pdf.objOffsets = []int{}
 	pdf.objNo = 0
-	pdf.setCurrentPage(PDFNoPage).write("%%PDF-1.4\n").
+	pdf.setCurrentPage(-1).write("%%PDF-1.4\n").
 		writeObj("/Catalog").write("/Pages 2 0 R").writeEndobj()
 	//
 	//  write /Pages object (2 0 obj), page count, page size and the pages
@@ -1043,7 +1039,7 @@ func (pdf *PDF) Bytes() []byte {
 	}
 	// write cross-reference table at end of document
 	var startXref = pdf.content.Len()
-	pdf.setCurrentPage(PDFNoPage).
+	pdf.setCurrentPage(-1).
 		write("xref\n0 %d\n0000000000 65535 f \n", len(pdf.objOffsets))
 	for _, offset := range pdf.objOffsets[1:] {
 		pdf.write("%010d 00000 n \n", offset)
@@ -1623,11 +1619,11 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}) (img pdfImage, idx int) {
 // setCurrentPage selects the currently-active page
 // called by: AddPage(), Bytes()
 func (pdf *PDF) setCurrentPage(pageNo int) *PDF {
-	if pageNo != PDFNoPage && pageNo > (len(pdf.pages)-1) {
-		return pdf.logError("Page number out of range:", pageNo)
-	} else if pageNo == PDFNoPage {
+	if pageNo < 0 {
 		pdf.pagePtr = nil
 		pdf.contentPtr = &pdf.content
+	} else if pageNo > (len(pdf.pages) - 1) {
+		return pdf.logError("Page number out of range:", pageNo)
 	} else {
 		pdf.pagePtr = &pdf.pages[pageNo]
 		pdf.contentPtr = &pdf.pagePtr.content
@@ -1683,7 +1679,7 @@ func (pdf *PDF) nextObj() int {
 // called by: almost all Draw..() and write..() methods
 func (pdf *PDF) write(format string, args ...interface{}) *PDF {
 	var buf *bytes.Buffer
-	if pdf.pageNo == PDFNoPage {
+	if pdf.pageNo < 0 {
 		buf = pdf.contentPtr
 	} else if pdf.pageNo > (len(pdf.pages) - 1) {
 		return pdf.logError("Invalid page index:", pdf.pageNo)
@@ -1733,7 +1729,7 @@ func (pdf *PDF) writeMode(fill ...bool) (mode string) {
 
 // writeObj outputs an object header
 func (pdf *PDF) writeObj(objectType string) *PDF {
-	pdf.setCurrentPage(PDFNoPage)
+	pdf.setCurrentPage(-1)
 	var objNo = pdf.nextObj()
 	if objectType == "" {
 		pdf.write("%d 0 obj<<", objNo)
@@ -1797,13 +1793,13 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
 
 // writeStream outputs a stream object to the document's main buffer
 func (pdf *PDF) writeStream(content []byte) *PDF {
-	return pdf.setCurrentPage(PDFNoPage).
+	return pdf.setCurrentPage(-1).
 		write("%d 0 obj <<", pdf.nextObj()).writeStreamData(content)
 } //                                                                 writeStream
 
 // writeStreamData writes a stream or image stream
 func (pdf *PDF) writeStreamData(ar []byte) *PDF {
-	pdf.setCurrentPage(PDFNoPage)
+	pdf.setCurrentPage(-1)
 	var s string // filter
 	if pdf.compressStreams {
 		var buf bytes.Buffer
