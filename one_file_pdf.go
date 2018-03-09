@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-10 00:11:16 942DE1                              [one_file_pdf.go]
+// :v: 2018-03-10 00:14:38 82E06B                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -75,13 +75,12 @@ package pdf
 //   (pdf *PDF) DrawImage(
 //                  x, y, height float64, fileNameOrBytes interface{}) *PDF
 //   (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF
-//   (pdf *PDF) DrawText(text string) *PDF
+//   (pdf *PDF) DrawText(s string) *PDF
 //   (pdf *PDF) DrawTextAlignedToBox(
-//                  x, y, width, height float64, align, text string,
-//              ) *PDF
+//                  x, y, width, height float64, align, text string) *PDF
 //   (pdf *PDF) DrawTextAt(x, y float64, text string) *PDF
-//   (pdf *PDF) DrawTextInBox(x, y, width, height float64, align, text string,
-//              ) *PDF
+//   (pdf *PDF) DrawTextInBox(
+//                  x, y, width, height float64, align, text string ) *PDF
 //   (pdf *PDF) DrawUnitGrid() *PDF
 //   (pdf *PDF) FillBox(x, y, width, height float64) *PDF
 //   (pdf *PDF) FillCircle(x, y, radius float64) *PDF
@@ -100,13 +99,11 @@ package pdf
 // # Private Methods
 //   (pdf *PDF) applyFont()
 //   (pdf *PDF) drawTextLine(s string) *PDF
-//   (pdf *PDF) drawTextBox(
-//                  x, y, width, height float64,
-//                  wrapText bool, align, text string,
-//              ) *PDF
+//   (pdf *PDF) drawTextBox(x, y, width, height float64,
+//                  wrapText bool, align, text string) *PDF
 //   (pdf *PDF) loadImage(fileNameOrBytes interface{}) (img pdfImage, idx int)
 //   (pdf *PDF) setCurrentPage(pageNo int) *PDF
-//   (pdf *PDF) textWidthPt1000(text string) float64
+//   (pdf *PDF) textWidthPt1000(s string) float64
 //   (pdf *PDF) warnIfNoPage() bool
 //
 // # Private Generation Methods
@@ -370,7 +367,7 @@ type pdfPage struct {
 
 // pdfPageSize represents a page size name and its dimensions in points
 type pdfPageSize struct {
-	name     string
+	name     string  // paper size: e.g. 'Letter', 'A4', etc.
 	widthPt  float64 // width in points
 	heightPt float64 // height in points
 } //                                                                 pdfPageSize
@@ -692,7 +689,7 @@ func NewPDF(pageSize string) PDF {
 		pdf.logError("Unknown page size '" + pageSize + "'; setting to 'A4'")
 		pdf.pageSize = pdf.getPageSize("A4")
 	}
-	pdf.SetUnits("point") // set default units, or ptPerUnit, x & y will be 0
+	pdf.SetUnits("point") // set default units: or ptPerUnit, x & y will be 0
 	return pdf
 } //                                                                      NewPDF
 
@@ -1286,8 +1283,8 @@ func (pdf *PDF) SetColumnWidths(widths ...float64) *PDF {
 } //                                                             SetColumnWidths
 
 // SetErrorLogger sets the handler function for error logging.
-// By default, NewPDF() sets it to fmt.Println. You can set it to nil
-// to disable error logging to console, or to any suitable function.
+// By default, NewPDF() sets it to fmt.Println. You can set it
+// to a custom function, or set to nil to disable logging.
 func (pdf *PDF) SetErrorLogger(fn func(a ...interface{}) (int, error)) *PDF {
 	pdf.errorLogger = fn
 	return pdf
@@ -1304,16 +1301,15 @@ func (pdf *PDF) TextWidth(s string) float64 {
 	return pdf.textWidthPt1000(s) / pdf.ptPerUnit
 } //                                                                   TextWidth
 
-// ToPoints converts a string composed of a number and unit
-// to points. For example '1 cm' or '1cm' becomes 28.346 points.
-// Recognised units are:
-// mm cm " in inch inches tw twip twips pt point points
+// ToPoints converts a string composed of a number and unit to points.
+// For example '1 cm' or '1cm' becomes 28.346 points.
+// Recognised units: mm cm " in inch inches tw twip twips pt point points
 func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
 	var s = pdf.toUpperLettersDigits(numberAndUnit, `."`)
 	if s == "" {
 		return 0
 	}
-	var num, unit string //            read value and unit into separate strings
+	var num, unit string //                              extract number and unit
 	for _, ch := range s {
 		switch {
 		case ch >= '0' && ch <= '9', ch == '.', ch == '-':
@@ -1353,11 +1349,11 @@ func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
 				} else {
 					n -= 1
 				}
-			case 2:
+			case 2: // increase n until n chars won't fit in width
 				if w > width {
 					return n
 				}
-				n = int((float64(n) * 1.2)) // increase by 20%
+				n = int((float64(n) * 1.2)) // increase n by 20%
 			}
 		}
 		return 0
@@ -1365,7 +1361,7 @@ func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
 	// split text into lines. then break lines based on text width
 	for _, iter := range pdf.splitLines(text) {
 		for pdf.TextWidth(iter) > width {
-			// reducing, increase, then reduce n, until text fits
+			// reduce, then increase, then reduce n, to get best fit
 			var max = len(iter)
 			var n = fit(iter, 1, max, width)
 			n = fit(iter, 2, n, width)
@@ -1391,7 +1387,7 @@ func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
 			iter = iter[n-1:]
 		}
 		ret = append(ret, iter)
-	} // for
+	}
 	return ret
 } //                                                               WrapTextLines
 
@@ -1502,6 +1498,8 @@ func (pdf *PDF) drawTextLine(s string) *PDF {
 } //                                                                drawTextLine
 
 // drawTextBox draws a line of text, or a word-wrapped block of text.
+// align: specify up to 2 flags: L R T B to align left, right, top or bottom
+//        the default (blank) is C center, both vertically and horizontally
 // called by: DrawTextAlignedToBox(), DrawTextInBox()
 func (pdf *PDF) drawTextBox(
 	x, y, width, height float64, wrapText bool, align, text string,
