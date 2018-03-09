@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 02:45:16 438520                              [one_file_pdf.go]
+// :v: 2018-03-09 02:49:04 845C4C                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1165,7 +1165,7 @@ func (pdf *PDF) DrawText(text string) *PDF {
 		x += pdf.columnWidths[i]
 	}
 	pdf.SetX(x).drawTextLine(text)
-	if pdf.columnNo == (len(pdf.columnWidths) - 1) {
+	if pdf.columnNo >= (len(pdf.columnWidths) - 1) {
 		pdf.NextLine()
 	} else {
 		pdf.columnNo++
