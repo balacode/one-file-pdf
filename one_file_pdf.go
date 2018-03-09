@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 02:12:01 9CF77C                              [one_file_pdf.go]
+// :v: 2018-03-09 02:15:52 11B9CB                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -89,7 +89,7 @@ package pdf
 //   (pdf *PDF) FillEllipse(x, y, xRadius, yRadius float64) *PDF
 //   (pdf *PDF) NextLine() *PDF
 //   (pdf *PDF) Reset() *PDF
-//   (pdf *PDF) SaveFile(filename string) *PDF
+//   (pdf *PDF) SaveFile(filename string) error
 //   (pdf *PDF) SetColumnWidths(widths ...float64) *PDF
 //   (pdf *PDF) TextWidth(text string) float64
 //   (pdf *PDF) WrapTextLines(width float64, text string) []string
@@ -1339,12 +1339,13 @@ func (pdf *PDF) Reset() *PDF {
 } //                                                                       Reset
 
 // SaveFile generates and saves the PDF document to a file.
-func (pdf *PDF) SaveFile(filename string) *PDF {
+func (pdf *PDF) SaveFile(filename string) error {
 	var err = ioutil.WriteFile(filename, pdf.Bytes(), 0644)
 	if err != nil {
-		pdf.logError("Failed writing to file", filename, ":", err)
+		pdf.logError("Failed writing to file "+filename+":", err)
+		return err
 	}
-	return pdf
+	return nil
 } //                                                                    SaveFile
 
 // SetColumnWidths creates columns along the X-axis.
