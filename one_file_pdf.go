@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 23:54:02 1230FE                              [one_file_pdf.go]
+// :v: 2018-03-10 00:06:54 F2D19F                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1822,18 +1822,18 @@ func (pdf *PDF) writeStreamData(ar []byte) *PDF {
 // in order to avoid them interfering with PDF commands.
 // called by: Bytes(), drawTextLine()
 func (*PDF) escape(s string) []byte {
-	var has = strings.Contains
-	if has(s, "(") || has(s, ")") || has(s, "\\") {
-		var writer = bytes.NewBuffer(make([]byte, 0, len(s)))
-		for _, ch := range s {
-			if ch == '(' || ch == ')' || ch == '\\' {
-				writer.WriteRune('\\')
-			}
-			writer.WriteRune(ch)
-		}
-		return writer.Bytes()
+	var contains = strings.Contains
+	if !contains(s, "(") && !contains(s, ")") && !contains(s, "\\") {
+		return []byte(s)
 	}
-	return []byte(s)
+	var wr = bytes.NewBuffer(make([]byte, 0, len(s)))
+	for _, ch := range s {
+		if ch == '(' || ch == ')' || ch == '\\' {
+			wr.WriteRune('\\')
+		}
+		wr.WriteRune(ch)
+	}
+	return wr.Bytes()
 } //                                                                      escape
 
 // isWhiteSpace returns true if all the chars. in 's' are white-spaces
