@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-10 00:20:22 182BA1                              [one_file_pdf.go]
+// :v: 2018-03-10 00:21:52 226BE7                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1295,28 +1295,21 @@ func (pdf *PDF) TextWidth(s string) float64 {
 // For example '1 cm' or '1cm' becomes 28.346 points.
 // Recognised units: mm cm " in inch inches tw twip twips pt point points
 func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
-	var s = pdf.toUpperLettersDigits(numberAndUnit, `."`)
-	if s == "" {
-		return 0
-	}
 	var num, unit string //                              extract number and unit
-	for _, ch := range s {
+	for _, ch := range pdf.toUpperLettersDigits(numberAndUnit, `."`) {
 		switch {
-		case ch >= '0' && ch <= '9', ch == '.', ch == '-':
+		case ch == '.', ch == '-', unicode.IsDigit(ch):
 			num += string(ch)
-		case ch >= 'A' && ch <= 'Z', ch == '"':
+		case ch == '"', unicode.IsLetter(ch):
 			unit += string(ch)
 		}
 	}
-	var ret, _ = strconv.ParseFloat(num, 64)
-	if unit != "" { //                       determine number of points per unit
-		var ppu = pdf.getPointsPerUnit(unit)
-		if int(ppu*1000000) == 0 {
-			pdf.logError("Unknown unit name: '" + unit + "'")
-		}
-		ret *= ppu
+	var ppu = pdf.getPointsPerUnit(unit)
+	if int(ppu*1000000) == 0 && unit != "" {
+		pdf.logError("Unknown unit name: '" + unit + "'")
 	}
-	return ret
+	var n, _ = strconv.ParseFloat(num, 64)
+	return n * ppu
 } //                                                                    ToPoints
 
 // WrapTextLines splits a string into multiple lines so that the text
