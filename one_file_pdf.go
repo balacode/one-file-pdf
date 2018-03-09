@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 02:54:18 BAA5FC                              [one_file_pdf.go]
+// :v: 2018-03-08 15:16:31 B4585E                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1374,12 +1374,11 @@ func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
 	}
 	var num, unit string //            read value and unit into separate strings
 	for _, ch := range s {
-		if (ch >= '0' && ch <= '9') || ch == '.' || ch == '-' {
+		switch {
+		case ch >= '0' && ch <= '9', ch == '.', ch == '-':
 			num += string(ch)
-			continue
-		}
-		if (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || ch == '"' {
-			unit += strings.ToUpper(string(ch))
+		case ch >= 'A' && ch <= 'Z', ch == '"':
+			unit += string(ch)
 		}
 	}
 	var ret, _ = strconv.ParseFloat(num, 64)
@@ -1470,7 +1469,7 @@ func (pdf *PDF) applyFont() {
 	}
 	pg.fontID = font.fontID
 	pg.fontSizePt = pdf.fontSizePt
-	pdf.write("BT /F%d %d Tf ET\n", pg.fontID, int(pg.fontSizePt))
+	pdf.write("BT /FNT%d %d Tf ET\n", pg.fontID, int(pg.fontSizePt))
 	// BT: begin text   /FNT0 i0 Tf: set font to FNT0 index i0   ET: end text
 } //                                                                   applyFont
 
@@ -1504,11 +1503,7 @@ func (pdf *PDF) drawTextLine(s string) *PDF {
 func (pdf *PDF) drawTextBox(
 	x, y, width, height float64, wrapText bool, align, text string,
 ) *PDF {
-	if text == "" {
-		return pdf
-	}
-	if pdf.pageNo < 0 {
-		pdf.logError("No current page.")
+	if text == "" || pdf.warnIfNoPage() {
 		return pdf
 	}
 	var lines []string
@@ -1772,7 +1767,7 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
 		if len(pg.fontIDs) > 0 {
 			pdf.write("/Font <<")
 			for fontNo := range pdf.fonts {
-				pdf.write("/F%d %d 0 R", fontNo+1, fontsIndex+fontNo)
+				pdf.write("/FNT%d %d 0 R", fontNo+1, fontsIndex+fontNo)
 			}
 			pdf.write(">>")
 		}
