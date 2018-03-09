@@ -1,29 +1,28 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 01:52:21 A813AA                              [one_file_pdf.go]
+// :v: 2018-03-09 02:09:40 58C282                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
 
-// # Structures
+// # Main Structure
 //   PDF struct
-//   PDFPageSize struct
-//   PDFPageSizeOf(pageSize string) PDFPageSize
 //
 // # Constants
 //   PDFColorNames = map[string]color.RGBA
 //   PDFNoPage = -1
-//   PDFStandardPageSizes = []PDFPageSize
 //
 // # Internal Structures
 //   pdfFont struct
 //   pdfImage struct
 //   pdfPage struct
+//   pdfPageSize struct
 //
 // # Internal Constants
 //   pdfFontNames = []string
 //   pdfFontWidths = [][]int
 //   pdfPagesIndex = 3
+//   pdfStandardPageSizes = []pdfPageSize
 //
 // # Constructor
 //   NewPDF(pageSize string) PDF
@@ -126,6 +125,7 @@ package pdf
 //   (*PDF) isWhiteSpace(s string) bool
 //   (*PDF) splitLines(s string) []string
 //   (PDF) logError(a ...interface{})
+//   (pdf *PDF) getPageSize(pageSize string) pdfPageSize
 
 import "bytes"         // standard
 import "compress/zlib" // standard
@@ -144,7 +144,7 @@ import _ "image/png"   // standard
 var PDFErrorHandler = fmt.Println
 
 // -----------------------------------------------------------------------------
-// # Structures
+// # Main Structure
 
 // PDF is the main structure representing a PDF document.
 type PDF struct {
@@ -153,7 +153,7 @@ type PDF struct {
 	docKeywords       string        // 'keywords' metadata entry
 	docSubject        string        // 'subject' metadata entry
 	docTitle          string        // 'title' metadata entry
-	pageSize          PDFPageSize   // page size used in this PDF
+	pageSize          pdfPageSize   // page size used in this PDF
 	pageNo            int           // current page number
 	pagePtr           *pdfPage      // pointer to the current page
 	pages             []pdfPage     // all the pages added to this PDF
@@ -174,25 +174,6 @@ type PDF struct {
 	objOffsets        []int         // used by Bytes() and write..()
 	objNo             int           // used by Bytes() and write..()
 } //                                                                         PDF
-
-type PDFPageSize struct {
-	Name     string
-	WidthPt  float64 // width in points
-	HeightPt float64 // height in points
-} //                                                                 PDFPageSize
-
-// PDFPageSizeOf returns a PDFPageSize struct based on
-// the specified page size string. If the page size is
-// not found, returns a zero-initialized structure.
-func PDFPageSizeOf(pageSize string) PDFPageSize {
-	pageSize = strings.Trim(strings.ToUpper(pageSize), " \a\b\f\n\r\t\v")
-	for _, size := range PDFStandardPageSizes {
-		if pageSize == size.Name {
-			return size
-		}
-	}
-	return PDFPageSize{}
-} //                                                               PDFPageSizeOf
 
 // -----------------------------------------------------------------------------
 // # Constants
@@ -350,21 +331,6 @@ var PDFColorNames = map[string]color.RGBA{
 	"YELLOWGREEN":          {R: 154, G: 205, B: 50},  // #9ACD32
 } //                                                               PDFColorNames
 
-// PDFStandardPageSizes is an array of standard page sizes,
-// specifying the size name, width and height in points.
-var PDFStandardPageSizes = []PDFPageSize{
-	{"A3", 841.89, 1190.55},
-	{"A3-L", 1190.55, 841.89}, // A3-Landscape, etc.
-	{"A4", 595.28, 841.89},
-	{"A4-L", 841.89, 595.28},
-	{"A5", 420.94, 595.28},
-	{"A5-L", 595.28, 420.94},
-	{"LEGAL", 612, 1008},
-	{"LEGAL-L", 1008, 612},
-	{"LETTER", 612, 792},
-	{"LETTER-L", 792, 612},
-} //                                                        PDFStandardPageSizes
-
 // -----------------------------------------------------------------------------
 // # Internal Structures
 
@@ -388,7 +354,7 @@ type pdfImage struct {
 
 // pdfPage holds details for each page.
 type pdfPage struct {
-	pageSize          PDFPageSize
+	pageSize          pdfPageSize
 	content           bytes.Buffer
 	fontIDs           []int
 	imageNos          []int
@@ -401,6 +367,13 @@ type pdfPage struct {
 	nonStrokeColor    color.RGBA
 	horizontalScaling uint16
 } //                                                                     pdfPage
+
+// pdfPageSize represents a page size name and its dimensions in points
+type pdfPageSize struct {
+	name     string
+	widthPt  float64 // width in points
+	heightPt float64 // height in points
+} //                                                                 pdfPageSize
 
 // -----------------------------------------------------------------------------
 // # Internal Constants
@@ -687,6 +660,21 @@ var pdfFontWidths = [][]int{
 // pdfPagesIndex is the starting page object index (after Catalog and Pages)
 const pdfPagesIndex = 3
 
+// pdfStandardPageSizes is an array of standard page sizes,
+// specifying the size name, width and height in points.
+var pdfStandardPageSizes = []pdfPageSize{
+	{"A3", 841.89, 1190.55},
+	{"A3-L", 1190.55, 841.89}, // A3-Landscape, etc.
+	{"A4", 595.28, 841.89},
+	{"A4-L", 841.89, 595.28},
+	{"A5", 420.94, 595.28},
+	{"A5-L", 595.28, 420.94},
+	{"LEGAL", 612, 1008},
+	{"LEGAL-L", 1008, 612},
+	{"LETTER", 612, 792},
+	{"LETTER-L", 792, 612},
+} //                                                        pdfStandardPageSizes
+
 // -----------------------------------------------------------------------------
 // # Constructor
 
@@ -694,13 +682,14 @@ const pdfPagesIndex = 3
 func NewPDF(pageSize string) PDF {
 	//
 	// get and store dimensions of specified page size (in points)
-	var size = PDFPageSizeOf(pageSize)
-	if size.Name == "" {
-		PDF{}.logError("Unknown page size ", pageSize, ". Setting to 'A4'.\n")
-		size = PDFPageSizeOf("A4")
+	var pdf PDF
+	var size = pdf.getPageSize(pageSize)
+	if size.name == "" {
+		pdf.logError("Unknown page size ", pageSize, ". Setting to 'A4'.\n")
+		size = pdf.getPageSize("A4")
 	}
 	// create a new PDF object
-	var pdf = PDF{
+	pdf = PDF{
 		pageNo:            PDFNoPage,
 		pageSize:          size,
 		horizontalScaling: 100,
@@ -723,18 +712,18 @@ func (pdf *PDF) CurrentPage() int {
 func (pdf *PDF) PageHeight() float64 {
 	if pdf.pageNo == PDFNoPage || pdf.pageNo > (len(pdf.pages)-1) ||
 		pdf.pagePtr == nil {
-		return pdf.pageSize.HeightPt / pdf.ptPerUnit
+		return pdf.pageSize.heightPt / pdf.ptPerUnit
 	}
-	return pdf.pagePtr.pageSize.HeightPt / pdf.ptPerUnit
+	return pdf.pagePtr.pageSize.heightPt / pdf.ptPerUnit
 } //                                                                  PageHeight
 
 // PageWidth returns the width of the current page in selected units.
 func (pdf *PDF) PageWidth() float64 {
 	if pdf.pageNo == PDFNoPage || pdf.pageNo > (len(pdf.pages)-1) ||
 		pdf.pagePtr == nil {
-		return pdf.pageSize.WidthPt / pdf.ptPerUnit
+		return pdf.pageSize.widthPt / pdf.ptPerUnit
 	}
-	return pdf.pagePtr.pageSize.WidthPt / pdf.ptPerUnit
+	return pdf.pagePtr.pageSize.widthPt / pdf.ptPerUnit
 } //                                                                   PageWidth
 
 // -----------------------------------------------------------------------------
@@ -818,7 +807,7 @@ func (pdf *PDF) Y() float64 {
 	if pdf.warnIfNoPage() {
 		return 0
 	}
-	return (pdf.pageSize.HeightPt - pdf.pagePtr.y) / pdf.ptPerUnit
+	return (pdf.pageSize.heightPt - pdf.pagePtr.y) / pdf.ptPerUnit
 } //                                                                           Y
 
 // -----------------------------------------------------------------------------
@@ -972,7 +961,7 @@ func (pdf *PDF) SetXY(x, y float64) *PDF {
 // SetY changes the Y-coordinate of the current drawing position.
 func (pdf *PDF) SetY(y float64) *PDF {
 	if !pdf.warnIfNoPage() {
-		pdf.pagePtr.y = pdf.pageSize.HeightPt - y*pdf.ptPerUnit
+		pdf.pagePtr.y = pdf.pageSize.heightPt - y*pdf.ptPerUnit
 	}
 	return pdf
 } //                                                                        SetY
@@ -1076,7 +1065,7 @@ func (pdf *PDF) DrawBox(x, y, width, height float64, fill ...bool) *PDF {
 	}
 	width, height = width*pdf.ptPerUnit, height*pdf.ptPerUnit
 	x *= pdf.ptPerUnit
-	y = pdf.pageSize.HeightPt - y*pdf.ptPerUnit - height
+	y = pdf.pageSize.heightPt - y*pdf.ptPerUnit - height
 	var mode = pdf.writeMode(fill...)
 	return pdf.write("%.3f %.3f %.3f %.3f re %s\n", x, y, width, height, mode)
 	// re: construct a rectangular path
@@ -1098,7 +1087,7 @@ func (pdf *PDF) DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF {
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
-	x, y = x*pdf.ptPerUnit, pdf.pageSize.HeightPt-y*pdf.ptPerUnit
+	x, y = x*pdf.ptPerUnit, pdf.pageSize.heightPt-y*pdf.ptPerUnit
 	const ratio = 0.552284749830794   // (4/3) * tan(PI/8)
 	var r = xRadius * pdf.ptPerUnit   // horizontal radius
 	var v = yRadius * pdf.ptPerUnit   // vertical radius
@@ -1197,7 +1186,7 @@ func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 		pg.imageNos = append(pg.imageNos, imgNo)
 	}
 	x *= pdf.ptPerUnit
-	y = pdf.pageSize.HeightPt - y*pdf.ptPerUnit - height
+	y = pdf.pageSize.heightPt - y*pdf.ptPerUnit - height
 	height *= pdf.ptPerUnit
 	var width = float64(img.width) / float64(img.height) * height
 	//
@@ -1215,8 +1204,8 @@ func (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF {
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
-	x1, y1 = x1*pdf.ptPerUnit, pdf.pageSize.HeightPt-y1*pdf.ptPerUnit
-	x2, y2 = x2*pdf.ptPerUnit, pdf.pageSize.HeightPt-y2*pdf.ptPerUnit
+	x1, y1 = x1*pdf.ptPerUnit, pdf.pageSize.heightPt-y1*pdf.ptPerUnit
+	x2, y2 = x2*pdf.ptPerUnit, pdf.pageSize.heightPt-y2*pdf.ptPerUnit
 	pdf.writeMode(true) // prepare color/line width
 	return pdf.write("%.3f %.3f m %.3f %.3f l S\n", x1, y1, x2, y2)
 	// m: move  S: stroke path (for lines)
@@ -1324,7 +1313,7 @@ func (pdf *PDF) FillEllipse(x, y, xRadius, yRadius float64) *PDF {
 // the X-coordinate is reset to zero.
 func (pdf *PDF) NextLine() *PDF {
 	var y = pdf.Y() + pdf.FontSize()*pdf.ptPerUnit
-	if y > pdf.pageSize.HeightPt*pdf.ptPerUnit {
+	if y > pdf.pageSize.heightPt*pdf.ptPerUnit {
 		pdf.AddPage()
 		y = 0
 	}
@@ -1622,7 +1611,7 @@ func (pdf *PDF) drawTextBox(
 		}
 		return height/2 - allLinesHeight/2 - pdf.fontSizePt*0.15 // center
 	})() // IIFE
-	y = pdf.pageSize.HeightPt - y
+	y = pdf.pageSize.heightPt - y
 	for _, line := range lines {
 		pdf.pagePtr.x, pdf.pagePtr.y = x+alignX(line), y
 		pdf.drawTextLine(line)
@@ -1760,7 +1749,7 @@ func (pdf *PDF) writeObj(objectType string) *PDF {
 // writePages writes all PDF pages
 func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
 	pdf.writeObj("/Pages").write("/Count %d/MediaBox[0 0 %d %d]",
-		len(pdf.pages), int(pdf.pageSize.WidthPt), int(pdf.pageSize.HeightPt))
+		len(pdf.pages), int(pdf.pageSize.widthPt), int(pdf.pageSize.heightPt))
 	//                                                        write page numbers
 	if len(pdf.pages) > 0 {
 		var pageObjNo = pdfPagesIndex
@@ -1903,5 +1892,18 @@ func (PDF) logError(a ...interface{}) {
 		PDFErrorHandler(a...)
 	}
 } //                                                                    logError
+
+// getPageSize returns a pdfPageSize struct based on
+// the specified page size string. If the page size is
+// not found, returns a zero-initialized structure.
+func (pdf *PDF) getPageSize(pageSize string) pdfPageSize {
+	pageSize = strings.ToUpper(pageSize)
+	for _, size := range pdfStandardPageSizes {
+		if pageSize == size.name {
+			return size
+		}
+	}
+	return pdfPageSize{}
+} //                                                                 getPageSize
 
 //end
