@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 02:59:38 E0BF64                              [one_file_pdf.go]
+// :v: 2018-03-09 03:13:58 A4F9D4                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -91,6 +91,7 @@ package pdf
 //   (pdf *PDF) Reset() *PDF
 //   (pdf *PDF) SaveFile(filename string) error
 //   (pdf *PDF) SetColumnWidths(widths ...float64) *PDF
+//   (pdf *PDF) SetErrorLogger(fn func(a ...interface{}) (int, error)) *PDF
 //   (pdf *PDF) TextWidth(text string) float64
 //   (pdf *PDF) WrapTextLines(width float64, text string) (ret []string)
 //
@@ -1289,6 +1290,14 @@ func (pdf *PDF) SetColumnWidths(widths ...float64) *PDF {
 	pdf.columnWidths = widths
 	return pdf
 } //                                                             SetColumnWidths
+
+// SetErrorLogger sets the handler function for error logging.
+// By default, NewPDF() sets it to fmt.Println. You can set it to nil
+// to disable error logging to console, or to any suitable function.
+func (pdf *PDF) SetErrorLogger(fn func(a ...interface{}) (int, error)) *PDF {
+	pdf.errorLogger = fn
+	return pdf
+} //                                                              SetErrorLogger
 
 // TextWidth returns the width of the text in current units.
 func (pdf *PDF) TextWidth(text string) float64 {
