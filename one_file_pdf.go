@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 02:51:13 68F84C                              [one_file_pdf.go]
+// :v: 2018-03-09 02:54:18 BAA5FC                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -92,7 +92,7 @@ package pdf
 //   (pdf *PDF) SaveFile(filename string) error
 //   (pdf *PDF) SetColumnWidths(widths ...float64) *PDF
 //   (pdf *PDF) TextWidth(text string) float64
-//   (pdf *PDF) WrapTextLines(width float64, text string) []string
+//   (pdf *PDF) WrapTextLines(width float64, text string) (ret []string)
 //
 // # Functions
 //   (pdf *PDF) ToPoints(numberAndUnit string) float64
@@ -1303,49 +1303,57 @@ func (pdf *PDF) TextWidth(text string) float64 {
 // Newline characters (CR and "\n") also cause text to be split.
 // You can find out the number of lines needed to wrap some
 // text by checking the length of the returned array.
-func (pdf *PDF) WrapTextLines(width float64, text string) []string {
+func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
 	//
-	// first handle the newlines...
-	var ar = pdf.splitLines(text)
-	//
-	// ...then break lines based on text width
-	var ret []string
-	for _, iter := range ar {
+	var fit = func(s string, step, n int, width float64) int {
+		for max := len(s); n > 0 && n <= max; {
+			var w = pdf.TextWidth(s[:n])
+			switch step {
+			case 1, 3: // keep halving (or - 1) until n chars fit in width
+				if w <= width {
+					return n
+				}
+				if step == 1 {
+					n /= 2
+				} else {
+					n -= 1
+				}
+			case 2:
+				if w > width {
+					return n
+				}
+				n = int((float64(n) * 1.2)) // increase by 20%
+			}
+		}
+		return 0
+	}
+	// split text into lines. then break lines based on text width
+	for _, iter := range pdf.splitLines(text) {
 		for pdf.TextWidth(iter) > width {
+			// reducing, increase, then reduce n, until text fits
 			var max = len(iter)
-			var ln = max
-			for ln > 0 { //                    take half less text until it fits
-				ln /= 2
-				if pdf.TextWidth(iter[:ln]) <= width {
-					break
-				}
-			}
-			var inc = ln / 2 //         take half more text until it doesn't fit
-			ln += inc
-			for ln > 0 && ln < max && pdf.TextWidth(iter[:ln]) <= width {
-				if inc > 1 {
-					inc /= 2
-				}
-				ln += inc
-			}
-			ln-- //                     take less by 1 character until text fits
-			for ln > 0 && pdf.TextWidth(iter[:ln]) > width {
-				ln--
-			}
-			var found bool //    move to the last word (if white-space is found)
-			max = ln
-			for ln > 0 {
-				if pdf.isWhiteSpace(iter[ln-1 : ln]) {
+			var n = fit(iter, 1, max, width)
+			n = fit(iter, 2, n, width)
+			n = fit(iter, 3, n, width)
+			//
+			// move to the last word (if white-space is found)
+			var found bool
+			max = n
+			for n > 0 {
+				if pdf.isWhiteSpace(iter[n-1 : n]) {
 					found = true
 					break
 				}
-				ln--
+				n--
 			}
 			if !found {
-				ln = max
+				n = max
 			}
-			ret = append(ret, iter[:ln])
-			iter = iter[ln-1:]
+			if n <= 0 {
+				break
+			}
+			ret = append(ret, iter[:n])
+			iter = iter[n-1:]
 		}
 		ret = append(ret, iter)
 	} // for
