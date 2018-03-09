@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 02:49:04 845C4C                              [one_file_pdf.go]
+// :v: 2018-03-09 02:51:13 68F84C                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1284,12 +1284,7 @@ func (pdf *PDF) SaveFile(filename string) error {
 // SetColumnWidths creates columns along the X-axis.
 func (pdf *PDF) SetColumnWidths(widths ...float64) *PDF {
 	if len(widths) < 1 {
-		pdf.logError("len(widths) < 1")
-		return pdf
-	}
-	if len(widths) > 100 {
-		pdf.logError("len(widths) > 100")
-		return pdf
+		return pdf.logError("Argument not specified: widths")
 	}
 	pdf.columnWidths = widths
 	return pdf
