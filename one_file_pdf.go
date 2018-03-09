@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 02:25:09 E74647                              [one_file_pdf.go]
+// :v: 2018-03-09 02:29:58 B5F9C0                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1321,21 +1321,10 @@ func (pdf *PDF) NextLine() *PDF {
 	return pdf.SetXY(x, y)
 } //                                                                    NextLine
 
-// Reset releases all resources and resets all variables.
+// Reset releases all resources and resets all variables, except page size.
 func (pdf *PDF) Reset() *PDF {
-	// TODO: If replaced with one-line *pdf=PDF{} will Go release everything?
-	for _, pg := range pdf.pages {
-		pg.fontIDs = []int{}
-		pg.imageNos = []int{}
-		pg.content.Reset()
-	}
-	pdf.docAuthor, pdf.docCreator, pdf.docKeywords = "", "", ""
-	pdf.docSubject, pdf.docTitle, pdf.unitName = "", "", ""
-	pdf.pages = []pdfPage{}
-	pdf.fonts = []pdfFont{}
-	pdf.images = []pdfImage{}
-	pdf.columnWidths = []float64{}
-	pdf.content.Reset()
+	pdf.pagePtr, pdf.contentPtr = nil, nil
+	*pdf = NewPDF(pdf.pageSize.name)
 	return pdf
 } //                                                                       Reset
 
