@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 01:27:51 DC52F5                              [one_file_pdf.go]
+// :v: 2018-03-09 01:32:16 FCBCD8                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -136,6 +136,7 @@ import "io/ioutil"     // standard
 import "reflect"       // standard
 import "strconv"       // standard
 import "strings"       // standard
+import "unicode"       // standard   only uses IsSpace()
 import _ "image/png"   // standard
 
 // PDFErrorHandler is the function that handles errors.
@@ -1882,8 +1883,7 @@ func (*PDF) getPointsPerUnit(unitName string) float64 {
 // isWhiteSpace returns true if all the chars. in 's' are white-spaces
 func (*PDF) isWhiteSpace(s string) bool {
 	for _, ch := range s {
-		if ch != ' ' && ch != '\a' && ch != '\b' && ch != '\f' &&
-			ch != '\n' && ch != '\r' && ch != '\t' && ch != '\v' {
+		if !unicode.IsSpace(ch) {
 			return false
 		}
 	}
