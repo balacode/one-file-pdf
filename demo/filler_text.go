@@ -1,10 +1,11 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-08 01:49:48 308F16                                      [demo.go]
+// :v: 2018-03-09 01:24:16 4820B6                                      [demo.go]
 // -----------------------------------------------------------------------------
 
 package main
 
+// CorporateFiller1 is the filler in the first column of "Synergy Ipsum" demo
 const CorporateFiller1 = `
 CORPORATE SYNERGY: WIN-WIN FOR ALL STAKEHOLDERS
 Dramatically mesh low-risk high-yield alignments
@@ -39,6 +40,7 @@ empowered e-business after user friendly intellectual
 capital. Dramatically engage top- line web services
 vis-a-vis cutting-edge deliverables.`
 
+// CorporateFiller2 is the filler in the second column of "Synergy Ipsum" demo
 const CorporateFiller2 = `
 Seamlessly empower fully researched growth strategies and
 interoperable internal or "organic" sources. Dramatically

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-08 00:54:21 64A8CA                              [one_file_pdf.go]
+// :v: 2018-03-09 01:23:06 8279CE                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -80,7 +80,7 @@ package pdf
 //   (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF
 //   (pdf *PDF) DrawText(text string) *PDF
 //   (pdf *PDF) DrawTextAlignedToBox(
-//                 x, y, width, height float64, align, text string,
+//                  x, y, width, height float64, align, text string,
 //              ) *PDF
 //   (pdf *PDF) DrawTextAt(x, y float64, text string) *PDF
 //   (pdf *PDF) DrawTextInBox(x, y, width, height float64, align, text string,
@@ -103,8 +103,8 @@ package pdf
 //   (pdf *PDF) applyFont()
 //   (pdf *PDF) drawTextLine(s string) *PDF
 //   (pdf *PDF) drawTextBox(
-//                 x, y, width, height float64,
-//                 wrapText bool, align, text string,
+//                  x, y, width, height float64,
+//                  wrapText bool, align, text string,
 //              ) *PDF
 //   (pdf *PDF) setCurrentPage(pageNo int) *PDF
 //   (pdf *PDF) textWidthPt1000(text string) float64
@@ -121,7 +121,7 @@ package pdf
 //   (pdf *PDF) writeStream(content []byte) *PDF
 //   (pdf *PDF) writeStreamData(content []byte) *PDF
 //
-// # Private Functions
+// # Private Functions (just attached to PDF, but not using it)
 //   (*PDF) escape(s string) []byte
 //   (*PDF) getPointsPerUnit(unitName string) float64
 //   (*PDF) isWhiteSpace(s string) bool
@@ -721,8 +721,7 @@ func NewPDF(pageSize string) PDF {
 // -----------------------------------------------------------------------------
 // # Read-Only Properties
 
-// CurrentPage returns the number of the current page,
-// 1 being the first page.
+// CurrentPage returns the current page's number, 1 being the first page.
 func (pdf *PDF) CurrentPage() int {
 	return pdf.pageNo + 1
 } //                                                                 CurrentPage
@@ -1089,11 +1088,11 @@ func (pdf *PDF) DrawBox(x, y, width, height float64, fill ...bool) *PDF {
 	y = pdf.pageSize.HeightPt - y*pdf.ptPerUnit - height
 	var mode = pdf.writeInit(fill...)
 	return pdf.write("%.3f %.3f %.3f %.3f re %s\n", x, y, width, height, mode)
-	// re = construct a rectangular path
+	// re: construct a rectangular path
 } //                                                                     DrawBox
 
 // DrawCircle draws a circle of radius r centered on (x, y),
-// by drawing 4 Bezier curves (PDF has no circle primitive)
+// by drawing 4 Bézier curves (PDF has no circle primitive)
 func (pdf *PDF) DrawCircle(x, y, radius float64, fill ...bool) *PDF {
 	if !pdf.warnIfNoPage() {
 		pdf.DrawEllipse(x, y, radius, radius, fill...)
@@ -1103,25 +1102,25 @@ func (pdf *PDF) DrawCircle(x, y, radius float64, fill ...bool) *PDF {
 
 // DrawEllipse draws an ellipse centered on (x, y),
 // with horizontal radius xRadius and vertical radius yRadius
-// by drawing 4 Bezier curves (PDF has no circle primitive)
+// by drawing 4 Bézier curves (PDF has no ellipse primitive)
 func (pdf *PDF) DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF {
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
 	x, y = x*pdf.ptPerUnit, pdf.pageSize.HeightPt-y*pdf.ptPerUnit
-	const ratio = 0.552284749830794   // (4/3)*tan(PI/8)
+	const ratio = 0.552284749830794   // (4/3) * tan(PI/8)
 	var r = xRadius * pdf.ptPerUnit   // horizontal radius
 	var v = yRadius * pdf.ptPerUnit   // vertical radius
 	var m, n = r * ratio, v * ratio   // ratios for control points
 	var mode = pdf.writeInit(fill...) // prepare colors/line width
 	//
-	return pdf.write(" %.3f %.3f m", x-r, y). // start point
+	return pdf.write(" %.3f %.3f m", x-r, y). // x0 y0 m: move to point (x0, y0)
 		//         control-1 control-2 endpoint
 		writeCurve(x-r, y+n, x-m, y+v, x+0, y+v). // top left arc
 		writeCurve(x+m, y+v, x+r, y+n, x+r, y+0). // top right
 		writeCurve(x+r, y-n, x+m, y-v, x+0, y-v). // bottom right
 		writeCurve(x-m, y-v, x-r, y-n, x-r, y+0). // bottom left
-		write(" %s\n", mode)
+		write(" %s\n", mode)                      // b: fill or S: stroke
 } //                                                                 DrawEllipse
 
 // DrawImage draws a grayscale PNG image.
@@ -1214,10 +1213,10 @@ func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 	// draw the image      w      h  x  y
 	return pdf.write("q\n %f 0 0 %f %f %f cm\n/IMG%d Do\nQ\n",
 		width, height, x, y, imgNo)
-	// q  = save graphics state
-	// cm = concatenate matrix to current transform matrix
-	// Do = invoke named XObject
-	// Q  = restore graphics state
+	//  q: save graphics state
+	// cm: concatenate matrix to current transform matrix
+	// Do: invoke named XObject (/IMGn)
+	//  Q: restore graphics state
 } //                                                                   DrawImage
 
 // DrawLine draws a straight line from point (x1, y1) to point (x2, y2).
@@ -1229,7 +1228,7 @@ func (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF {
 	x2, y2 = x2*pdf.ptPerUnit, pdf.pageSize.HeightPt-y2*pdf.ptPerUnit
 	pdf.writeInit(true) // prepare color/line width
 	return pdf.write("%.3f %.3f m %.3f %.3f l S\n", x1, y1, x2, y2)
-	// m = move  S = stroke path
+	// m: move  S: stroke path (for lines)
 } //                                                                    DrawLine
 
 // DrawText draws a text string at the current position (X, Y).
@@ -1318,13 +1317,13 @@ func (pdf *PDF) FillBox(x, y, width, height float64) *PDF {
 } //                                                                     FillBox
 
 // FillCircle fills a circle of radius r centered on (x, y),
-// by drawing 4 Bezier curves (PDF has no circle primitive)
+// by drawing 4 Bézier curves (PDF has no circle primitive)
 func (pdf *PDF) FillCircle(x, y, radius float64) *PDF {
 	return pdf.DrawEllipse(x, y, radius, radius, true)
 } //                                                                  FillCircle
 
 // FillEllipse fills a Ellipse of radius r centered on (x, y),
-// by drawing 4 Bezier curves (PDF has no Ellipse primitive)
+// by drawing 4 Bézier curves (PDF has no ellipse primitive)
 func (pdf *PDF) FillEllipse(x, y, xRadius, yRadius float64) *PDF {
 	return pdf.DrawEllipse(x, y, xRadius, yRadius, true)
 } //                                                                 FillEllipse
@@ -1559,7 +1558,7 @@ func (pdf *PDF) applyFont() {
 	pg.fontID = font.fontID
 	pg.fontSizePt = pdf.fontSizePt
 	pdf.write("BT /F%d %d Tf ET\n", pg.fontID, int(pg.fontSizePt))
-	// BT = begin text   /F0 0 Tf = font index and name   ET = end text
+	// BT: begin text   /FNT0 i0 Tf: set font to FNT0 index i0   ET: end text
 } //                                                                   applyFont
 
 // drawTextLine writes a line of text at the current coordinates to the
@@ -1574,14 +1573,14 @@ func (pdf *PDF) drawTextLine(s string) *PDF {
 	if pdf.pagePtr.horizontalScaling != pdf.horizontalScaling {
 		pdf.pagePtr.horizontalScaling = pdf.horizontalScaling
 		pdf.write("BT %d Tz ET\n", pdf.pagePtr.horizontalScaling)
-		// BT = begin text   n Tz = horizontal text scaling   ET = end text
+		// BT: begin text   n0 Tz: set horiz. text scaling to n0%   ET: end text
 	}
 	pdf.writeInit(true) // fill/nonStroke
 	var pg = pdf.pagePtr
 	if pg.x < 0 || pg.y < 0 {
 		pdf.SetXY(0, 0)
 	}
-	// BT = begin text  Td = move text position  Tj = show text  ET = end text
+	// BT: begin text   Td: move text position   Tj: show text   ET: end text
 	pdf.write("BT %d %d Td (%s) Tj ET\n", int(pg.x), int(pg.y), pdf.escape(s))
 	pg.x += pdf.textWidthPt1000(s)
 	return pdf
@@ -1716,7 +1715,7 @@ func (pdf *PDF) write(format string, args ...interface{}) *PDF {
 	return pdf
 } //                                                                       write
 
-// writeCurve writes a Bezier curve using the 'c' PDF primitive.
+// writeCurve writes a Bézier curve using the 'c' PDF primitive.
 // The starting point is the current (x, y) position.
 // (xc, yc) and (xd, yd) are the two control points, (xe, ye) the end point.
 func (pdf *PDF) writeCurve(xc, yc, xd, yd, xe, ye float64) *PDF {
@@ -1842,7 +1841,7 @@ func (pdf *PDF) writeStreamData(ar []byte) *PDF {
 } //                                                             writeStreamData
 
 // -----------------------------------------------------------------------------
-// # Private Functions
+// # Private Functions (just attached to PDF, but not using it)
 
 // escape escapes special characters '(', '(' and '\' in strings
 // in order to avoid them interfering with PDF commands.

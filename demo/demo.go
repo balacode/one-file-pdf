@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-08 01:47:29 B03D87                                      [demo.go]
+// :v: 2018-03-09 01:23:06 F05AA5                                      [demo.go]
 // -----------------------------------------------------------------------------
 
 package main
@@ -66,7 +66,7 @@ func corporateIpsum() {
 	fmt.Println("Generating sample PDF:", filename, "...")
 	var pdf = pdf.NewPDF("A4") // create a new PDF using 'A4' page size
 	pdf.SetUnits("cm")
-	pdf.AddPage()              // add a new page
+	pdf.AddPage() // add a new page
 	//
 	// draw the heading
 	pdf.SetColor("#002FA7 InternationalKleinBlue").
