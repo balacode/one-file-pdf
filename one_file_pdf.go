@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 02:35:36 63803B                              [one_file_pdf.go]
+// :v: 2018-03-09 02:40:34 B31512                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -823,16 +823,15 @@ func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 	if len(s) >= 7 && s[0] == '#' {
 		var hex [6]uint8
 		for i, ch := range s[1:7] {
-			if ch >= '0' && ch <= '9' {
+			switch {
+			case ch >= '0' && ch <= '9':
 				hex[i] = uint8(ch - '0')
-				continue
-			}
-			if ch >= 'A' && ch <= 'F' {
+			case ch >= 'A' && ch <= 'F':
 				hex[i] = uint8(ch - 'A' + 10)
-				continue
+			default:
+				return pdf.SetColorRGB(0, 0, 0).
+					logError("Invalid color code '" + s + "'; setting to black")
 			}
-			pdf.logError("Invalid color code '" + s + "'. Setting to black.")
-			return pdf.SetColorRGB(0, 0, 0)
 		}
 		return pdf.SetColorRGB(
 			hex[0]*16+hex[1], hex[2]*16+hex[3], hex[4]*16+hex[5])
