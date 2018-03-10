@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-10 12:04:18 618565                              [one_file_pdf.go]
+// :v: 2018-03-10 12:20:57 CCCAA3                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -956,7 +956,7 @@ func (pdf *PDF) AddPage() *PDF {
 		x: -1, y: -1,
 		strokeColor: COLOR, nonStrokeColor: COLOR, horizontalScaling: 100,
 	})
-	var pageNo = len(pdf.pages)
+	var pageNo = len(pdf.pages) - 1
 	pdf.setCurrentPage(pageNo)
 	pdf.pageNo = pageNo
 	return pdf.SetXY(0, 0)
