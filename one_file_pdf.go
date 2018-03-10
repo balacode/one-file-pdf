@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-10 11:37:32 8C0F63                              [one_file_pdf.go]
+// :v: 2018-03-10 11:59:53 78BE25                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -15,16 +15,16 @@ package pdf
 //   pdfFont struct
 //   pdfImage struct
 //   pdfPage struct
-//   pdfPageSize struct
+//   pdfPaperSize struct
 //
 // # Internal Constants
 //   pdfFontNames = []string
 //   pdfFontWidths = [][]int
 //   pdfPagesIndex = 3
-//   pdfStandardPageSizes = []pdfPageSize
+//   pdfStandardPaperSizes = []pdfPaperSize
 //
 // # Constructor
-//   NewPDF(pageSize string) PDF
+//   NewPDF(paperSize string) PDF
 //
 // # Read-Only Properties
 //   (pdf *PDF) CurrentPage() int
@@ -123,7 +123,7 @@ package pdf
 //   (*PDF) isWhiteSpace(s string) bool
 //   (*PDF) splitLines(s string) []string
 //   (*PDF) toUpperLettersDigits(s, extras string) string
-//   (pdf *PDF) getPageSize(pageSize string) pdfPageSize
+//   (pdf *PDF) getPaperSize(name string) pdfPaperSize
 //   (pdf *PDF) getPointsPerUnit(unitName string) float64
 //   (pdf *PDF) logError(a ...interface{}) *PDF
 
@@ -149,7 +149,7 @@ type PDF struct {
 	docKeywords       string        // 'keywords' metadata entry
 	docSubject        string        // 'subject' metadata entry
 	docTitle          string        // 'title' metadata entry
-	pageSize          pdfPageSize   // page size used in this PDF
+	pageSize          pdfPaperSize  // paper size used in this PDF
 	pageNo            int           // current page number
 	pagePtr           *pdfPage      // pointer to the current page
 	pages             []pdfPage     // all the pages added to this PDF
@@ -352,7 +352,7 @@ type pdfImage struct {
 
 // pdfPage holds details for each page
 type pdfPage struct {
-	pageSize          pdfPageSize
+	pageSize          pdfPaperSize
 	content           bytes.Buffer
 	fontIDs           []int
 	imageNos          []int
@@ -366,12 +366,12 @@ type pdfPage struct {
 	horizontalScaling uint16
 } //                                                                     pdfPage
 
-// pdfPageSize represents a page size name and its dimensions in points
-type pdfPageSize struct {
+// pdfPaperSize represents a page size name and its dimensions in points
+type pdfPaperSize struct {
 	name     string  // paper size: e.g. 'Letter', 'A4', etc.
 	widthPt  float64 // width in points
 	heightPt float64 // height in points
-} //                                                                 pdfPageSize
+} //                                                                pdfPaperSize
 
 // -----------------------------------------------------------------------------
 // # Internal Constants
@@ -657,9 +657,9 @@ var pdfFontWidths = [][]int{
 // pdfPagesIndex is the starting page object index (after Catalog and Pages)
 const pdfPagesIndex = 3
 
-// pdfStandardPageSizes is an array of standard page sizes,
+// pdfStandardPaperSizes is an array of standard page sizes,
 // specifying the size name, width and height in points.
-var pdfStandardPageSizes = []pdfPageSize{
+var pdfStandardPaperSizes = []pdfPaperSize{
 	{"A3", 841.89, 1190.55},
 	{"A3-L", 1190.55, 841.89}, // A3-Landscape, etc.
 	{"A4", 595.28, 841.89},
@@ -670,24 +670,24 @@ var pdfStandardPageSizes = []pdfPageSize{
 	{"LEGAL-L", 1008, 612},
 	{"LETTER", 612, 792},
 	{"LETTER-L", 792, 612},
-} //                                                        pdfStandardPageSizes
+} //                                                       pdfStandardPaperSizes
 
 // -----------------------------------------------------------------------------
 // # Constructor
 
 // NewPDF creates and initializes a new PDF object.
-func NewPDF(pageSize string) PDF {
+func NewPDF(paperSize string) PDF {
 	var pdf PDF
 	pdf = PDF{
 		pageNo:            -1,
-		pageSize:          pdf.getPageSize(pageSize),
+		pageSize:          pdf.getPaperSize(paperSize),
 		horizontalScaling: 100,
 		compressStreams:   true,
 		errorLogger:       fmt.Println,
 	}
 	if pdf.pageSize.name == "" {
-		pdf.logError("Unknown page size '" + pageSize + "'; setting to 'A4'")
-		pdf.pageSize = pdf.getPageSize("A4")
+		pdf.logError("Unknown page size '" + paperSize + "'; setting to 'A4'")
+		pdf.pageSize = pdf.getPaperSize("A4")
 	}
 	pdf.SetUnits("point") // set default units: or ptPerUnit, x & y will be 0
 	return pdf
@@ -1856,18 +1856,18 @@ func (*PDF) toUpperLettersDigits(s, extras string) string {
 	return buf.String()
 } //                                                        toUpperLettersDigits
 
-// getPageSize returns a pdfPageSize struct based on
+// getPaperSize returns a pdfPaperSize struct based on
 // the specified page size string. If the page size is
 // not found, returns a zero-initialized structure.
-func (pdf *PDF) getPageSize(pageSize string) pdfPageSize {
-	pageSize = pdf.toUpperLettersDigits(pageSize, "")
-	for _, iter := range pdfStandardPageSizes {
-		if iter.name == pageSize {
+func (pdf *PDF) getPaperSize(name string) pdfPaperSize {
+	name = pdf.toUpperLettersDigits(name, "")
+	for _, iter := range pdfStandardPaperSizes {
+		if iter.name == name {
 			return iter
 		}
 	}
-	return pdfPageSize{}
-} //                                                                 getPageSize
+	return pdfPaperSize{}
+} //                                                                getPaperSize
 
 // getPointsPerUnit returns number of points per named measurement unit.
 // called by: SetUnits(), ToPoints()
