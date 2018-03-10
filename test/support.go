@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-11 00:26:09 9D30D4                              [test/support.go]
+// :v: 2018-03-11 00:38:55 90E51C                              [test/support.go]
 // -----------------------------------------------------------------------------
 
 // Contains slightly-altered testing functions from Zircon-Go lib:
@@ -17,6 +17,11 @@ import "testing" // standard
 import "time"    // standard
 
 const showSourceFileNames = false
+
+// does nothing, just allows this package to build properly
+// this package is only used for testing
+func main() {
+}
 
 // CallerList returns a human-friendly list of strings showing the
 // call stack with each calling method or function's name and line number.
