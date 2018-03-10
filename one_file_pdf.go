@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-10 11:59:53 78BE25                              [one_file_pdf.go]
+// :v: 2018-03-10 12:04:18 618565                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -352,7 +352,6 @@ type pdfImage struct {
 
 // pdfPage holds details for each page
 type pdfPage struct {
-	pageSize          pdfPaperSize
 	content           bytes.Buffer
 	fontIDs           []int
 	imageNos          []int
@@ -703,18 +702,12 @@ func (pdf *PDF) CurrentPage() int {
 
 // PageHeight returns the height of the current page in selected units.
 func (pdf *PDF) PageHeight() float64 {
-	if pdf.pageNo < 0 || pdf.pageNo > len(pdf.pages)-1 || pdf.pagePtr == nil {
-		return pdf.ToUnits(pdf.pageSize.heightPt)
-	}
-	return pdf.ToUnits(pdf.pagePtr.pageSize.heightPt)
+	return pdf.ToUnits(pdf.pageSize.heightPt)
 } //                                                                  PageHeight
 
 // PageWidth returns the width of the current page in selected units.
 func (pdf *PDF) PageWidth() float64 {
-	if pdf.pageNo < 0 || pdf.pageNo > len(pdf.pages)-1 || pdf.pagePtr == nil {
-		return pdf.ToUnits(pdf.pageSize.widthPt)
-	}
-	return pdf.ToUnits(pdf.pagePtr.pageSize.widthPt)
+	return pdf.ToUnits(pdf.pageSize.widthPt)
 } //                                                                   PageWidth
 
 // -----------------------------------------------------------------------------
@@ -958,15 +951,12 @@ func (pdf *PDF) SetY(y float64) *PDF {
 
 // AddPage appends a new blank page to the document and makes it selected.
 func (pdf *PDF) AddPage() *PDF {
-	var pageNo = len(pdf.pages)
+	var COLOR = color.RGBA{1, 0, 1, 0x01} // unlikely default color
 	pdf.pages = append(pdf.pages, pdfPage{
-		pageSize:          pdf.pageSize,
-		x:                 -1, // must default to -1
-		y:                 -1,
-		strokeColor:       color.RGBA{1, 0, 1, 0x01}, // default: unlikely value
-		nonStrokeColor:    color.RGBA{1, 0, 1, 0x01},
-		horizontalScaling: 100,
+		x: -1, y: -1,
+		strokeColor: COLOR, nonStrokeColor: COLOR, horizontalScaling: 100,
 	})
+	var pageNo = len(pdf.pages)
 	pdf.setCurrentPage(pageNo)
 	pdf.pageNo = pageNo
 	return pdf.SetXY(0, 0)
