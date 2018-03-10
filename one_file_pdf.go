@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-10 00:28:29 F45FC2                              [one_file_pdf.go]
+// :v: 2018-03-10 11:37:32 8C0F63                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -332,7 +332,7 @@ var PDFColorNames = map[string]color.RGBA{
 // -----------------------------------------------------------------------------
 // # Internal Structures
 
-// pdfFont represents a font name and its appearance.
+// pdfFont represents a font name and its appearance
 type pdfFont struct {
 	fontID    int
 	fontName  string
@@ -341,7 +341,7 @@ type pdfFont struct {
 	isItalic  bool
 } //                                                                     pdfFont
 
-// pdfImage represents an image.
+// pdfImage represents an image
 type pdfImage struct {
 	name      string
 	width     int
@@ -350,7 +350,7 @@ type pdfImage struct {
 	grayscale bool
 } //                                                                    pdfImage
 
-// pdfPage holds details for each page.
+// pdfPage holds details for each page
 type pdfPage struct {
 	pageSize          pdfPageSize
 	content           bytes.Buffer
@@ -376,8 +376,7 @@ type pdfPageSize struct {
 // -----------------------------------------------------------------------------
 // # Internal Constants
 
-// pdfFontNames lists the names of built-in font names
-// these fonts must be available on all PDF implementations
+// pdfFontNames contains font names available on all PDF implementations
 var pdfFontNames = []string{
 	"Courier",               // fixed-width
 	"Courier-Bold",          // fixed-width
@@ -839,20 +838,17 @@ func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 		logError("Color name '" + s + "' not known; setting to black")
 } //                                                                    SetColor
 
-// SetColorRGB sets the current color using separate
-// red, green and blue values. Each component value
-// can range from 0 to 255. The current color is used
-// for subsequent text and line drawing and fills.
+// SetColorRGB sets the current color using red, green and blue values.
+// The current color is used for subsequent text/line drawing and fills.
 func (pdf *PDF) SetColorRGB(r, g, b uint8) *PDF {
 	pdf.color = color.RGBA{r, g, b, 0xFF}
 	return pdf
 } //                                                                 SetColorRGB
 
-// SetCompression sets the compression mode used to generate
-// the PDF. If set to true, all PDF content will be
-// compressed when the PDF is generated. If false, most PDF
-// content (excluding images) will be in plain text, which
-// is useful for debugging or to study PDF commands.
+// SetCompression sets the compression mode used to generate the PDF.
+// If set to true, all PDF steams will be compressed when the PDF is
+// generated. If false, most content (excluding images) will be in
+// plain text, which is useful for debugging or to study PDF commands.
 func (pdf *PDF) SetCompression(compress bool) *PDF {
 	pdf.compressStreams = compress
 	return pdf
