@@ -7,10 +7,10 @@
 The main idea behind this project was:  
 *"How small can I make a PDF generator for it to still be useful for 80% of common PDF generation needs?"*
 
-The result is a single .go file with less than 1999 lines of code.
+The result is a single .go file with less than 1999 lines of code, about 400 of which are color and glyph-size constants, and ~350 are comments.
 
 - All the basics for generating PDF documents, enough for generating mundane business reports.
-- It's easier to learn about the internals of the PDF format with a smaller library.
+- It's easier to learn about the internals of the PDF format with a small, concise library.
 - The current version of the file is indicated in the header (the timestamp).
 
 ### To Install:  
@@ -21,22 +21,21 @@ The result is a single .go file with less than 1999 lines of code.
 
 ### Naming Convention:  
 All types in are prefixed with PDF for public, and 'pdf' for private types.
-The only type you really need to use is PDF, while PDFColorNames are left public for reference.
+The only type you need to use is PDF, while PDFColorNames are left public for reference.
 
-### Supported Features (the fundamentals):  
-- You can use all built-in PDF fonts: Courier, Helvetica, Symbol, Times, ZapfDingbats, and their variants
+### Supported Features:  
+- Use all built-in PDF fonts: Courier, Helvetica, Symbol, Times, ZapfDingbats, and their variants
 - Recognises 144 web colo(u)r names, or any RGB value
-- Stream compression can be turned on or off (normal PDF files compress streams to reduce file size, but turning compression off helps in debugging or learning about PDF commands)
-- Properties to set metadata: author, creator, keywords, subject and title
-- Set the measurement units you want: cm, inches, points, etc.
+- Stream compression can be turned on or off (normal PDF files compress streams to reduce file size, but turning it off helps in debugging or learning about PDF commands)
+- Metadata properties: author, creator, keywords, subject and title
+- Set the measurement units you want: mm, cm, inches, twips or points
 - Draw lines with different thickness
-- Filled or outline rectangles
+- Filled or outline rectangles, circles and ellipses
 - Grayscale PNG images
-- Filled and outline circles and ellipses **< NEW**
-- Set columns for outputting text (like arbitrary tab stops on the page)
-- Built-in grid that can be enabled to assist measurement and positioning
+- Set columns for text (like tab stops on the page)
+- Built-in grid option to help measurement and positioning
 
-### Not Supported (everything else):  
+### Not Supported:  
 - Unicode (requires font embedding)
 - Font embedding
 - PDF encryption
@@ -96,11 +95,9 @@ func main() {
 
 ### Samples:
 
-#### Hello World
-!["Hello World!" sample image](demo/samples/hello.png)
+!["Hello World!" sample image](demo/samples/hello.png)  
 
-#### "Synergy Ipsum"
-!["Synergy Ipsum" sample image](demo/samples/corporate.png)
+!["Synergy Ipsum" sample image](demo/samples/corporate.png)  
 
 ### Changelog (excluding internal changes):
 
