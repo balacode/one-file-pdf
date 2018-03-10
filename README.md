@@ -116,5 +116,3 @@ func main() {
 - SetColumnWidths() is no longer limited to 100 columns
 - Font names and color names can be specified with spaces, underscores or '-' delimiting words
 - Removed module-global PDFErrorHandler, created SetErrorLogger() to set the handler for each PDF instance
-
-![API Warning](doc/image/alter_api.png) **I have altered the API**
