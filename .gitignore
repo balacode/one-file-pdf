@@ -1,24 +1,23 @@
-# Binaries for programs and plugins
-*.dll
-*.dylib
-*.exe
-*.so
+# [.gitignore]
 
-# Test binary, build with `go test -c`
+# binary files
+*.exe
+demo/demo
+
+# test binary, build with `go test -c`
 *.test
 
-# Output of the go coverage tool, specifically when used with LiteIDE
+# output of the go coverage tool
 *.out
 
-# Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
-.glide/
-
-# Drafts, Etc.
+# drafts, etc.
 *.repl
 *`*
 __*
 
-# Generated files
-
-# ignore the generated file, the reference sample is in demo/sample/hello.pdf
+# ignore generated PDF files
+# (reference samples are in demo/sample)
 demo/hello.pdf 
+demo/corporate.pdf 
+
+#end
