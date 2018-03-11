@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-11 23:34:18 E1E7A7                              [one_file_pdf.go]
+// :v: 2018-03-11 23:39:17 A51C86                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1559,13 +1559,8 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}) (img pdfImage, idx int) {
 				))
 			}
 		}
-		img = pdfImage{
-			name:      name,
-			width:     w,
-			height:    h,
-			data:      data,
-			grayscale: true, //TODO: determine actual grayscale mode
-		}
+		img = pdfImage{name: name, width: w, height: h, data: data,
+			grayscale: true} //TODO: determine actual grayscale mode
 		idx = len(pdf.images)
 		pdf.images = append(pdf.images, img)
 	}
