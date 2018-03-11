@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-11 19:52:52 B6BCCE                              [one_file_pdf.go]
+// :v: 2018-03-11 19:58:13 580D2D                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -350,12 +350,11 @@ type pdfImage struct {
 	grayscale bool
 } //                                                                    pdfImage
 
-// pdfPage holds details for each page
+// pdfPage holds references, state and the stream buffer for each page
 type pdfPage struct {
-	content           bytes.Buffer
-	fontIDs           []int
+	fontIDs           []int // references to fonts and images
 	imageNos          []int
-	x                 float64
+	x                 float64 // current drawing state
 	y                 float64
 	lineWidth         float64
 	fontSizePt        float64
@@ -363,6 +362,7 @@ type pdfPage struct {
 	strokeColor       color.RGBA
 	nonStrokeColor    color.RGBA
 	horizontalScaling uint16
+	content           bytes.Buffer // write..() calls send output here
 } //                                                                     pdfPage
 
 // pdfPaperSize represents a page size name and its dimensions in points
@@ -676,7 +676,9 @@ var pdfStandardPaperSizes = map[string][2]int{
 // -----------------------------------------------------------------------------
 // # Constructor
 
-// NewPDF creates and initializes a new PDF object.
+// NewPDF creates and initializes a new PDF object. Specify paperSize as:
+// A, B, C series (e.g. "A4") or "LEGAL", "TABLOID", "LETTER", or "LEDGER".
+// To specify a landscape orientation, add "-L" suffix e.g. "A4-L".
 func NewPDF(paperSize string) PDF {
 	var pdf = PDF{pageNo: -1, horizontalScaling: 100, compressStreams: true,
 		errorLogger: fmt.Println}
