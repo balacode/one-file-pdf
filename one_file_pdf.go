@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-11 23:39:17 A51C86                              [one_file_pdf.go]
+// :v: 2018-03-11 23:42:46 C4EC73                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1677,13 +1677,11 @@ func (pdf *PDF) writeMode(fill ...bool) (mode string) {
 func (pdf *PDF) writeObj(objType string) *PDF {
 	var n = pdf.nextObj()
 	if objType == "" {
-		pdf.write("%d 0 obj<<", n)
+		return pdf.write("%d 0 obj<<", n)
 	} else if objType[0] == '/' {
-		pdf.write("%d 0 obj<</Type%s", n, objType)
-	} else {
-		pdf.setError("objType should begin with '/' or be a blank string")
+		return pdf.write("%d 0 obj<</Type%s", n, objType)
 	}
-	return pdf
+	return pdf.setError("objType should begin with '/' or be a blank string")
 } //                                                                    writeObj
 
 // writePages writes all PDF pages
