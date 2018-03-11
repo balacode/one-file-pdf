@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-11 20:06:31 ED2D14                              [one_file_pdf.go]
+// :v: 2018-03-11 20:09:37 FC89BA                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1181,15 +1181,15 @@ func (pdf *PDF) DrawUnitGrid() *PDF {
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
-	var pgWidth, pgHeight = pdf.PageWidth(), pdf.PageHeight()
+	var pw, ph = pdf.PageWidth(), pdf.PageHeight()
 	pdf.SetLineWidth(0.1).SetFont("Helvetica", 8)
-	for i, x := 0, 0.0; x < pgWidth; x++ { //                   vertical lines |
-		pdf.SetColorRGB(200, 200, 200).DrawLine(x, 0, x, pgHeight).
+	for i, x := 0, 0.0; x < pw; x++ { //                        vertical lines |
+		pdf.SetColorRGB(200, 200, 200).DrawLine(x, 0, x, ph).
 			SetColor("Indigo").SetXY(x+0.1, 0.3).DrawText(strconv.Itoa(i))
 		i++
 	}
-	for i, y := 0, 0.0; y < pgHeight; y++ { //                horizontal lines -
-		pdf.SetColorRGB(200, 200, 200).DrawLine(0, y, pgWidth, y).
+	for i, y := 0, 0.0; y < ph; y++ { //                      horizontal lines -
+		pdf.SetColorRGB(200, 200, 200).DrawLine(0, y, pw, y).
 			SetColor("Indigo").SetXY(0.1, y+0.3).DrawText(strconv.Itoa(i))
 		i++
 	}
