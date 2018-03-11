@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-11 20:29:47 0A20A7                              [one_file_pdf.go]
+// :v: 2018-03-11 20:34:38 9DB144                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -113,7 +113,7 @@ package pdf
 //   (pdf *PDF) writeCurve(x1, y1, x2, y2, x3, y3 float64) *PDF
 //   (pdf *PDF) writeEndobj() *PDF
 //   (pdf *PDF) writeMode(fill ...bool) (mode string)
-//   (pdf *PDF) writeObj(objectType string) *PDF
+//   (pdf *PDF) writeObj(objType string) *PDF
 //   (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF
 //   (pdf *PDF) writeStream(content []byte) *PDF
 //   (pdf *PDF) writeStreamData(content []byte) *PDF
@@ -1695,15 +1695,15 @@ func (pdf *PDF) writeMode(fill ...bool) (mode string) {
 } //                                                                   writeMode
 
 // writeObj outputs an object header
-func (pdf *PDF) writeObj(objectType string) *PDF {
+func (pdf *PDF) writeObj(objType string) *PDF {
 	pdf.setCurrentPage(-1)
-	var objNo = pdf.nextObj()
-	if objectType == "" {
-		pdf.write("%d 0 obj<<", objNo)
-	} else if objectType[0] == '/' {
-		pdf.write("%d 0 obj<</Type%s", objNo, objectType)
+	var n = pdf.nextObj()
+	if objType == "" {
+		pdf.write("%d 0 obj<<", n)
+	} else if objType[0] == '/' {
+		pdf.write("%d 0 obj<</Type%s", n, objType)
 	} else {
-		pdf.setError("objectType should begin with '/' or be a blank string")
+		pdf.setError("objType should begin with '/' or be a blank string")
 	}
 	return pdf
 } //                                                                    writeObj
