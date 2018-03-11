@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-11 19:58:13 580D2D                              [one_file_pdf.go]
+// :v: 2018-03-11 19:59:17 020ECE                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -125,7 +125,7 @@ package pdf
 //   (*PDF) toUpperLettersDigits(s, extras string) string
 //   (pdf *PDF) getPaperSize(name string) pdfPaperSize
 //   (pdf *PDF) getPointsPerUnit(unitName string) float64
-//   (pdf *PDF) logError(a ...interface{}) *PDF
+//   (pdf *PDF) setError(a ...interface{}) *PDF
 
 import "bytes"         // standard
 import "compress/zlib" // standard
@@ -684,7 +684,7 @@ func NewPDF(paperSize string) PDF {
 		errorLogger: fmt.Println}
 	var size, err = pdf.getPaperSize(paperSize)
 	if err != nil {
-		pdf.logError(err)
+		pdf.setError(err)
 		pdf.pageSize, _ = pdf.getPaperSize("A4")
 	}
 	pdf.pageSize = size
@@ -815,7 +815,7 @@ func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 				hex[i] = uint8(ch - 'A' + 10)
 			default:
 				return pdf.SetColorRGB(0, 0, 0).
-					logError("Invalid color code '" + s + "'; setting to black")
+					setError("Invalid color code '" + s + "'; setting to black")
 			}
 		}
 		return pdf.SetColorRGB(
@@ -827,7 +827,7 @@ func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 		return pdf.SetColorRGB(color.R, color.G, color.B)
 	}
 	return pdf.SetColorRGB(0, 0, 0).
-		logError("Color name '" + s + "' not known; setting to black")
+		setError("Color name '" + s + "' not known; setting to black")
 } //                                                                    SetColor
 
 // SetColorRGB sets the current color using red, green and blue values.
@@ -1241,7 +1241,7 @@ func (pdf *PDF) Reset() *PDF {
 func (pdf *PDF) SaveFile(filename string) error {
 	var err = ioutil.WriteFile(filename, pdf.Bytes(), 0644)
 	if err != nil {
-		pdf.logError("Failed writing to file "+filename+":", err)
+		pdf.setError("Failed writing to file "+filename+":", err)
 		return err
 	}
 	return nil
@@ -1250,7 +1250,7 @@ func (pdf *PDF) SaveFile(filename string) error {
 // SetColumnWidths creates columns along the X-axis.
 func (pdf *PDF) SetColumnWidths(widths ...float64) *PDF {
 	if len(widths) < 1 {
-		return pdf.logError("Argument not specified: widths")
+		return pdf.setError("Argument not specified: widths")
 	}
 	pdf.columnWidths = widths
 	return pdf
@@ -1290,7 +1290,7 @@ func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
 	}
 	var ppu = pdf.getPointsPerUnit(unit)
 	if int(ppu*100) == 0 && unit != "" {
-		pdf.logError("Unknown unit name: '" + unit + "'")
+		pdf.setError("Unknown unit name: '" + unit + "'")
 	}
 	var n, _ = strconv.ParseFloat(num, 64)
 	if unit == "" {
@@ -1411,7 +1411,7 @@ func (pdf *PDF) applyFont() {
 	}
 	// if there is no selected font or it's invalid, use Helvetica
 	if !valid {
-		pdf.logError("Invalid font name: '" + pdf.fontName + "'")
+		pdf.setError("Invalid font name: '" + pdf.fontName + "'")
 		font = pdfFont{fontName: "Helvetica", isBuiltIn: true}
 	}
 	// has the font been added to the global list? If not, add it:
@@ -1535,7 +1535,7 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}) (img pdfImage, idx int) {
 	case string:
 		var data, err = ioutil.ReadFile(val)
 		if err != nil {
-			pdf.logError("File "+val+":", err)
+			pdf.setError("File "+val+":", err)
 			return pdfImage{}, -1
 		}
 		name = val
@@ -1548,7 +1548,7 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}) (img pdfImage, idx int) {
 		name = fmt.Sprintf("%x", val[:n])
 		buf = bytes.NewBuffer(val)
 	default:
-		pdf.logError("Invalid type in fileNameOrBytes:",
+		pdf.setError("Invalid type in fileNameOrBytes:",
 			reflect.TypeOf(fileNameOrBytes), "value:", fileNameOrBytes)
 		return pdfImage{}, -1
 	}
@@ -1561,7 +1561,7 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}) (img pdfImage, idx int) {
 	if idx == -1 {
 		var decoded, _, err = image.Decode(buf)
 		if err != nil {
-			pdf.logError("Image not decoded:", err)
+			pdf.setError("Image not decoded:", err)
 			return pdfImage{}, -1
 		}
 		var bounds = decoded.Bounds()
@@ -1595,7 +1595,7 @@ func (pdf *PDF) setCurrentPage(pageNo int) *PDF {
 		pdf.ppage = nil
 		pdf.pbuf = &pdf.content
 	} else if pageNo > len(pdf.pages)-1 {
-		return pdf.logError("Page number out of range:", pageNo)
+		return pdf.setError("Page number out of range:", pageNo)
 	} else {
 		pdf.ppage = &pdf.pages[pageNo]
 		pdf.pbuf = &pdf.ppage.content
@@ -1613,7 +1613,7 @@ func (pdf *PDF) textWidthPt1000(s string) float64 {
 	var w = 0.0
 	for i, ch := range s {
 		if ch < 0 || ch > 255 {
-			pdf.logError("Rune out of range at", i, "('"+string(ch)+"')")
+			pdf.setError("Rune out of range at", i, "('"+string(ch)+"')")
 			break
 		}
 		w += float64(pdfFontWidths[ch][0])
@@ -1628,7 +1628,7 @@ func (pdf *PDF) textWidthPt1000(s string) float64 {
 //            SetX(), SetXY(), SetY(), TextWidth(), X(), Y()
 func (pdf *PDF) warnIfNoPage() bool {
 	if pdf.ppage == nil || pdf.pageNo < 0 || pdf.pageNo > len(pdf.pages)-1 {
-		pdf.logError("No current page")
+		pdf.setError("No current page")
 		return true
 	}
 	return false
@@ -1654,7 +1654,7 @@ func (pdf *PDF) write(format string, args ...interface{}) *PDF {
 	if pdf.pageNo < 0 {
 		buf = pdf.pbuf
 	} else if pdf.pageNo > len(pdf.pages)-1 {
-		return pdf.logError("Invalid page index:", pdf.pageNo)
+		return pdf.setError("Invalid page index:", pdf.pageNo)
 	} else {
 		buf = &pdf.ppage.content
 	}
@@ -1708,7 +1708,7 @@ func (pdf *PDF) writeObj(objectType string) *PDF {
 	} else if objectType[0] == '/' {
 		pdf.write("%d 0 obj<</Type%s", objNo, objectType)
 	} else {
-		pdf.logError("objectType should begin with '/' or be a blank string")
+		pdf.setError("objectType should begin with '/' or be a blank string")
 	}
 	return pdf
 } //                                                                    writeObj
@@ -1733,7 +1733,7 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
 	pdf.writeEndobj()
 	for i, pg := range pdf.pages { //                            write each page
 		if pg.content.Len() == 0 {
-			pdf.logError("Warning: empty page", i+1)
+			pdf.setError("Warning: empty page", i+1)
 			continue
 		}
 		pdf.writeObj("/Page").
@@ -1778,7 +1778,7 @@ func (pdf *PDF) writeStreamData(ar []byte) *PDF {
 		var wr = zlib.NewWriter(&buf)
 		var _, err = wr.Write([]byte(ar))
 		if err != nil {
-			return pdf.logError("Failed compressing:", err)
+			return pdf.setError("Failed compressing:", err)
 		}
 		wr.Close() // don't defer, close before reading Bytes()
 		ar = buf.Bytes()
@@ -1857,7 +1857,7 @@ func (pdf *PDF) getPaperSize(name string) (pdfPaperSize, error) {
 	var wh, found = pdfStandardPaperSizes[s]
 	if !found {
 		s = "Unknown paper size '" + name + "'"
-		pdf.logError(s)
+		pdf.setError(s)
 		return pdfPaperSize{}, fmt.Errorf(s)
 	}
 	// convert mm to points: div by 25.4mm/inch; mul by 72 points/inch
@@ -1886,12 +1886,12 @@ func (pdf *PDF) getPointsPerUnit(unitName string) float64 {
 	return 0
 } //                                                            getPointsPerUnit
 
-// logError calls errorLogger (set to fmt.Println by default) to log an error
-func (pdf *PDF) logError(a ...interface{}) *PDF {
+// setError calls errorLogger (set to fmt.Println by default) to log an error
+func (pdf *PDF) setError(a ...interface{}) *PDF {
 	if pdf.errorLogger != nil {
 		pdf.errorLogger(a...)
 	}
 	return pdf
-} //                                                                    logError
+} //                                                                    setError
 
 //end
