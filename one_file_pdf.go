@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-11 20:09:37 FC89BA                              [one_file_pdf.go]
+// :v: 2018-03-11 20:14:24 B91CED                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1489,36 +1489,31 @@ func (pdf *PDF) drawTextBox(x, y, width, height float64,
 	} else {
 		lines = []string{text}
 	}
+	align = strings.ToUpper(align)
 	var lineHeight = pdf.FontSize()
 	var allLinesHeight = lineHeight * float64(len(lines))
 	//
+	// calculate aligned y-axis position of text (top, bottom, center)
+	y, height = y*pdf.ptPerUnit+pdf.fontSizePt, height*pdf.ptPerUnit
+	if strings.Contains(align, "B") { // bottom
+		y += height - allLinesHeight - 4 //                           4pt margin
+	} else if !strings.Contains(align, "T") {
+		y += height/2 - allLinesHeight/2 - pdf.fontSizePt*0.15 //         center
+	}
+	y = pdf.paperSize.heightPt - y
+	//
 	// calculate x-axis position of text (left, right, center)
 	x, width = x*pdf.ptPerUnit, width*pdf.ptPerUnit
-	var alignX = func(s string) float64 {
-		for _, ch := range align {
-			if ch == 'l' || ch == 'L' {
-				return pdf.fontSizePt / 6 // add margin
-			} else if ch == 'r' || ch == 'R' {
-				return width - pdf.textWidthPt1000(s) - pdf.fontSizePt/6
-			}
-		}
-		return width/2 - pdf.textWidthPt1000(s)/2 // center
-	}
-	// calculate aligned y-axis position of text (top, bottom, center)
-	y, height = y*pdf.ptPerUnit, height*pdf.ptPerUnit
-	y += pdf.fontSizePt + (func() float64 {
-		for _, ch := range align {
-			if ch == 't' || ch == 'T' {
-				return 0 // top
-			} else if ch == 'b' || ch == 'B' {
-				return height - allLinesHeight - 4 // bottom
-			}
-		}
-		return height/2 - allLinesHeight/2 - pdf.fontSizePt*0.15 // center
-	})() // IIFE
-	y = pdf.paperSize.heightPt - y
 	for _, line := range lines {
-		pdf.ppage.x, pdf.ppage.y = x+alignX(line), y
+		var off = 0.0 //                                x-offset to align in box
+		if strings.Contains(align, "L") {
+			off = pdf.fontSizePt / 6 //                              left margin
+		} else if strings.Contains(align, "R") {
+			off = width - pdf.textWidthPt1000(line) - pdf.fontSizePt/6
+		} else {
+			off = width/2 - pdf.textWidthPt1000(line)/2 //                center
+		}
+		pdf.ppage.x, pdf.ppage.y = x+off, y
 		pdf.drawTextLine(line)
 		y -= lineHeight
 	}
