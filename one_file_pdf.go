@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-11 20:37:44 6B069A                              [one_file_pdf.go]
+// :v: 2018-03-11 23:18:24 A81DD2                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -807,12 +807,12 @@ func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 	var s = pdf.toUpperLettersDigits(nameOrHTMLColor, "#")
 	if len(s) >= 7 && s[0] == '#' {
 		var hex [6]uint8
-		for i, ch := range s[1:7] {
+		for i, r := range s[1:7] {
 			switch {
-			case ch >= '0' && ch <= '9':
-				hex[i] = uint8(ch - '0')
-			case ch >= 'A' && ch <= 'F':
-				hex[i] = uint8(ch - 'A' + 10)
+			case r >= '0' && r <= '9':
+				hex[i] = uint8(r - '0')
+			case r >= 'A' && r <= 'F':
+				hex[i] = uint8(r - 'A' + 10)
 			default:
 				return pdf.SetColorRGB(0, 0, 0).
 					setError("Invalid color code '" + s + "'; setting to black")
@@ -1280,12 +1280,12 @@ func (pdf *PDF) TextWidth(s string) float64 {
 // Recognised units: mm cm " in inch inches tw twip twips pt point points
 func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
 	var num, unit string //                              extract number and unit
-	for _, ch := range pdf.toUpperLettersDigits(numberAndUnit, `-."`) {
+	for _, r := range pdf.toUpperLettersDigits(numberAndUnit, `-."`) {
 		switch {
-		case ch == '-', ch == '.', unicode.IsDigit(ch):
-			num += string(ch)
-		case ch == '"', unicode.IsLetter(ch):
-			unit += string(ch)
+		case r == '-', r == '.', unicode.IsDigit(r):
+			num += string(r)
+		case r == '"', unicode.IsLetter(r):
+			unit += string(r)
 		}
 	}
 	var ppu = pdf.getPointsPerUnit(unit)
@@ -1606,12 +1606,12 @@ func (pdf *PDF) textWidthPt1000(s string) float64 {
 		return 0
 	}
 	var w = 0.0
-	for i, ch := range s {
-		if ch < 0 || ch > 255 {
-			pdf.setError("Rune out of range at", i, "('"+string(ch)+"')")
+	for i, r := range s {
+		if r < 0 || r > 255 {
+			pdf.setError("Rune out of range at", i, "('"+string(r)+"')")
 			break
 		}
-		w += float64(pdfFontWidths[ch][0])
+		w += float64(pdfFontWidths[r][0])
 		// TODO: [0] is not considering the current font!
 	}
 	return w * pdf.fontSizePt / 1000 * float64(pdf.horizontalScaling) / 100
@@ -1791,19 +1791,19 @@ func (*PDF) escape(s string) []byte {
 		return []byte(s)
 	}
 	var wr = bytes.NewBuffer(make([]byte, 0, len(s)))
-	for _, ch := range s {
-		if ch == '(' || ch == ')' || ch == '\\' {
+	for _, r := range s {
+		if r == '(' || r == ')' || r == '\\' {
 			wr.WriteRune('\\')
 		}
-		wr.WriteRune(ch)
+		wr.WriteRune(r)
 	}
 	return wr.Bytes()
 } //                                                                      escape
 
 // isWhiteSpace returns true if all the chars. in 's' are white-spaces
 func (*PDF) isWhiteSpace(s string) bool {
-	for _, ch := range s {
-		if !unicode.IsSpace(ch) {
+	for _, r := range s {
+		if !unicode.IsSpace(r) {
 			return false
 		}
 	}
@@ -1828,10 +1828,10 @@ func (*PDF) splitLines(s string) []string {
 // toUpperLettersDigits returns letters and digits from s, in upper case
 func (*PDF) toUpperLettersDigits(s, extras string) string {
 	var buf = bytes.NewBuffer(make([]byte, 0, len(s)))
-	for _, ch := range strings.ToUpper(s) {
-		if unicode.IsLetter(ch) || unicode.IsDigit(ch) ||
-			strings.ContainsRune(extras, ch) {
-			buf.WriteRune(ch)
+	for _, r := range strings.ToUpper(s) {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) ||
+			strings.ContainsRune(extras, r) {
+			buf.WriteRune(r)
 		}
 	}
 	return buf.String()
