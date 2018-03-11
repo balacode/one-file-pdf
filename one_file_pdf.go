@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-11 23:42:46 C4EC73                              [one_file_pdf.go]
+// :v: 2018-03-12 00:00:44 2F1610                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -174,7 +174,7 @@ type PDF struct {
 // # Constants
 
 // PDFColorNames maps web (X11) color names to values.
-// (from https://en.wikipedia.org/wiki/X11_color_names)
+// From https://en.wikipedia.org/wiki/X11_color_names
 var PDFColorNames = map[string]color.RGBA{
 	"ALICEBLUE":            {R: 240, G: 248, B: 255}, // #F0F8FF
 	"ANTIQUEWHITE":         {R: 250, G: 235, B: 215}, // #FAEBD7
@@ -946,8 +946,8 @@ func (pdf *PDF) SetY(y float64) *PDF {
 func (pdf *PDF) AddPage() *PDF {
 	var COLOR = color.RGBA{1, 0, 1, 0x01} // unlikely default color
 	pdf.pages = append(pdf.pages, pdfPage{
-		x: -1, y: -1,
-		strokeColor: COLOR, nonStrokeColor: COLOR, horizontalScaling: 100,
+		x: -1, y: -1, strokeColor: COLOR, nonStrokeColor: COLOR,
+		horizontalScaling: 100,
 	})
 	var pageNo = len(pdf.pages) - 1
 	pdf.setCurrentPage(pageNo)
@@ -1131,12 +1131,11 @@ func (pdf *PDF) DrawText(s string) *PDF {
 		x += pdf.columnWidths[i]
 	}
 	pdf.SetX(x).drawTextLine(s)
-	if pdf.columnNo >= len(pdf.columnWidths)-1 {
-		pdf.NextLine()
-	} else {
+	if pdf.columnNo < len(pdf.columnWidths)-1 {
 		pdf.columnNo++
+		return pdf
 	}
-	return pdf
+	return pdf.NextLine()
 } //                                                                    DrawText
 
 // DrawTextAlignedToBox draws 'text' within a rectangle specified
@@ -1210,16 +1209,15 @@ func (pdf *PDF) FillEllipse(x, y, xRadius, yRadius float64) *PDF {
 // I.e. the Y increases by the height of the font and
 // the X-coordinate is reset to zero.
 func (pdf *PDF) NextLine() *PDF {
-	var y = pdf.Y() + pdf.FontSize()*pdf.ptPerUnit
+	var x, y = 0.0, pdf.Y() + pdf.FontSize()*pdf.ptPerUnit
+	if len(pdf.columnWidths) > 0 {
+		x = pdf.columnWidths[0]
+	}
 	if y > pdf.paperSize.heightPt*pdf.ptPerUnit {
 		pdf.AddPage()
 		y = 0
 	}
 	pdf.columnNo = 0
-	var x = 0.0
-	if len(pdf.columnWidths) > 0 {
-		x = pdf.columnWidths[0]
-	}
 	return pdf.SetXY(x, y)
 } //                                                                    NextLine
 
@@ -1315,10 +1313,9 @@ func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
 				if w <= width {
 					return n
 				}
+				n -= 1
 				if step == 1 {
 					n /= 2
-				} else {
-					n -= 1
 				}
 			case 2: // increase n until n chars won't fit in width
 				if w > width {
