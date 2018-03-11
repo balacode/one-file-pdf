@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-10 14:53:25 093604                              [one_file_pdf.go]
+// :v: 2018-03-11 19:52:52 B6BCCE                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -151,7 +151,7 @@ type PDF struct {
 	docTitle          string        // 'title' metadata entry
 	pageSize          pdfPaperSize  // paper size used in this PDF
 	pageNo            int           // current page number
-	pagePtr           *pdfPage      // pointer to the current page
+	ppage             *pdfPage      // pointer to the current page
 	pages             []pdfPage     // all the pages added to this PDF
 	fonts             []pdfFont     // all the fonts used in this PDF
 	images            []pdfImage    // all the images used in this PDF
@@ -166,7 +166,7 @@ type PDF struct {
 	horizontalScaling uint16        // horizontal scaling factor (in %)
 	compressStreams   bool          // enable stream compression?
 	content           bytes.Buffer  // content buffer where PDF is written
-	contentPtr        *bytes.Buffer // pointer to PDF/current page's buffer
+	pbuf              *bytes.Buffer // pointer to PDF/current page's buffer
 	objOffsets        []int         // used by Bytes() and write..()
 	objNo             int           // used by Bytes() and write..()
 	//
@@ -780,7 +780,7 @@ func (pdf *PDF) X() float64 {
 	if pdf.warnIfNoPage() {
 		return 0
 	}
-	return pdf.ToUnits(pdf.pagePtr.x)
+	return pdf.ToUnits(pdf.ppage.x)
 } //                                                                           X
 
 // Y returns the Y-coordinate of the current drawing position.
@@ -788,7 +788,7 @@ func (pdf *PDF) Y() float64 {
 	if pdf.warnIfNoPage() {
 		return 0
 	}
-	return pdf.ToUnits(pdf.pageSize.heightPt - pdf.pagePtr.y)
+	return pdf.ToUnits(pdf.pageSize.heightPt - pdf.ppage.y)
 } //                                                                           Y
 
 // -----------------------------------------------------------------------------
@@ -922,7 +922,7 @@ func (pdf *PDF) SetUnits(unitName string) *PDF {
 // SetX changes the X-coordinate of the current drawing position.
 func (pdf *PDF) SetX(x float64) *PDF {
 	if !pdf.warnIfNoPage() {
-		pdf.pagePtr.x = x * pdf.ptPerUnit
+		pdf.ppage.x = x * pdf.ptPerUnit
 	}
 	return pdf
 } //                                                                        SetX
@@ -938,7 +938,7 @@ func (pdf *PDF) SetXY(x, y float64) *PDF {
 // SetY changes the Y-coordinate of the current drawing position.
 func (pdf *PDF) SetY(y float64) *PDF {
 	if !pdf.warnIfNoPage() {
-		pdf.pagePtr.y = pdf.pageSize.heightPt - y*pdf.ptPerUnit
+		pdf.ppage.y = pdf.pageSize.heightPt - y*pdf.ptPerUnit
 	}
 	return pdf
 } //                                                                        SetY
@@ -1086,7 +1086,7 @@ func (pdf *PDF) DrawImage(
 		return pdf
 	}
 	// add the image to the current page, if not already referenced
-	var pg = pdf.pagePtr
+	var pg = pdf.ppage
 	var img, idx = pdf.loadImage(fileNameOrBytes)
 	var found bool
 	for _, iter := range pg.imageNos {
@@ -1230,7 +1230,7 @@ func (pdf *PDF) NextLine() *PDF {
 
 // Reset releases all resources and resets all variables, except page size.
 func (pdf *PDF) Reset() *PDF {
-	pdf.pagePtr, pdf.contentPtr = nil, nil
+	pdf.ppage, pdf.pbuf = nil, nil
 	*pdf = NewPDF(pdf.pageSize.name)
 	return pdf
 } //                                                                       Reset
@@ -1423,7 +1423,7 @@ func (pdf *PDF) applyFont() {
 		font.fontID = 1 + len(pdf.fonts)
 		pdf.fonts = append(pdf.fonts, font)
 	}
-	var pg = pdf.pagePtr
+	var pg = pdf.ppage
 	if pg.fontID == font.fontID &&
 		int(pg.fontSizePt*100) == int(pdf.fontSizePt)*100 {
 		return
@@ -1455,13 +1455,13 @@ func (pdf *PDF) drawTextLine(s string) *PDF {
 	}
 	// draw the text
 	pdf.applyFont()
-	if pdf.pagePtr.horizontalScaling != pdf.horizontalScaling {
-		pdf.pagePtr.horizontalScaling = pdf.horizontalScaling
-		pdf.write("BT %d Tz ET\n", pdf.pagePtr.horizontalScaling)
+	if pdf.ppage.horizontalScaling != pdf.horizontalScaling {
+		pdf.ppage.horizontalScaling = pdf.horizontalScaling
+		pdf.write("BT %d Tz ET\n", pdf.ppage.horizontalScaling)
 		// BT: begin text   n0 Tz: set horiz. text scaling to n0%   ET: end text
 	}
 	pdf.writeMode(true) // fill/nonStroke
-	var pg = pdf.pagePtr
+	var pg = pdf.ppage
 	if pg.x < 0 || pg.y < 0 {
 		pdf.SetXY(0, 0)
 	}
@@ -1516,7 +1516,7 @@ func (pdf *PDF) drawTextBox(x, y, width, height float64,
 	})() // IIFE
 	y = pdf.pageSize.heightPt - y
 	for _, line := range lines {
-		pdf.pagePtr.x, pdf.pagePtr.y = x+alignX(line), y
+		pdf.ppage.x, pdf.ppage.y = x+alignX(line), y
 		pdf.drawTextLine(line)
 		y -= lineHeight
 	}
@@ -1590,13 +1590,13 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}) (img pdfImage, idx int) {
 // called by: AddPage(), Bytes()
 func (pdf *PDF) setCurrentPage(pageNo int) *PDF {
 	if pageNo < 0 {
-		pdf.pagePtr = nil
-		pdf.contentPtr = &pdf.content
+		pdf.ppage = nil
+		pdf.pbuf = &pdf.content
 	} else if pageNo > len(pdf.pages)-1 {
 		return pdf.logError("Page number out of range:", pageNo)
 	} else {
-		pdf.pagePtr = &pdf.pages[pageNo]
-		pdf.contentPtr = &pdf.pagePtr.content
+		pdf.ppage = &pdf.pages[pageNo]
+		pdf.pbuf = &pdf.ppage.content
 	}
 	pdf.pageNo = pageNo
 	return pdf
@@ -1625,7 +1625,7 @@ func (pdf *PDF) textWidthPt1000(s string) float64 {
 // called by: DrawBox(), DrawLine(), DrawText(), FillBox(),
 //            SetX(), SetXY(), SetY(), TextWidth(), X(), Y()
 func (pdf *PDF) warnIfNoPage() bool {
-	if pdf.pagePtr == nil || pdf.pageNo < 0 || pdf.pageNo > len(pdf.pages)-1 {
+	if pdf.ppage == nil || pdf.pageNo < 0 || pdf.pageNo > len(pdf.pages)-1 {
 		pdf.logError("No current page")
 		return true
 	}
@@ -1650,11 +1650,11 @@ func (pdf *PDF) nextObj() int {
 func (pdf *PDF) write(format string, args ...interface{}) *PDF {
 	var buf *bytes.Buffer
 	if pdf.pageNo < 0 {
-		buf = pdf.contentPtr
+		buf = pdf.pbuf
 	} else if pdf.pageNo > len(pdf.pages)-1 {
 		return pdf.logError("Invalid page index:", pdf.pageNo)
 	} else {
-		buf = &pdf.pagePtr.content
+		buf = &pdf.ppage.content
 	}
 	buf.Write([]byte(fmt.Sprintf(format, args...)))
 	return pdf
@@ -1679,18 +1679,18 @@ func (pdf *PDF) writeMode(fill ...bool) (mode string) {
 	mode = "S" // S: stroke path (for lines)
 	if len(fill) > 0 && fill[0] {
 		mode = "b" // b: fill / text
-		if p := &pdf.pagePtr.nonStrokeColor; *p != pdf.color {
+		if p := &pdf.ppage.nonStrokeColor; *p != pdf.color {
 			*p = pdf.color
 			pdf.write(" %.3f %.3f %.3f rg\n", // rg: set non-stroking/text color
 				float64(p.R)/255, float64(p.G)/255, float64(p.B)/255)
 		}
 	}
-	if p := &pdf.pagePtr.strokeColor; *p != pdf.color {
+	if p := &pdf.ppage.strokeColor; *p != pdf.color {
 		*p = pdf.color
 		pdf.write("%.3f %.3f %.3f RG\n", // RG: set stroke (line) color
 			float64(p.R)/255, float64(p.G)/255, float64(p.B)/255)
 	}
-	if p := &pdf.pagePtr.lineWidth; int(*p*100) != int(pdf.lineWidth*100) {
+	if p := &pdf.ppage.lineWidth; int(*p*100) != int(pdf.lineWidth*100) {
 		*p = pdf.lineWidth
 		pdf.write("%.3f w\n", float64(*p)) // n0 w: set line width to n0
 	}
