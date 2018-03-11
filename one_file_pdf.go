@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-11 23:18:24 A81DD2                              [one_file_pdf.go]
+// :v: 2018-03-11 23:34:18 E1E7A7                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -26,106 +26,100 @@ package pdf
 // # Constructor
 //   NewPDF(paperSize string) PDF
 //
-// # Read-Only Properties
-//   (pdf *PDF) CurrentPage() int
-//   (pdf *PDF) PageHeight() float64
-//   (pdf *PDF) PageWidth() float64
+// # Read-Only Properties (pdf *PDF)
+//   CurrentPage() int
+//   PageHeight() float64
+//   PageWidth() float64
 //
-// # Property Getters
-//   (pdf *PDF) Color() color.RGBA
-//   (pdf *PDF) Compression() bool
-//   (pdf *PDF) DocAuthor() string
-//   (pdf *PDF) DocCreator() string
-//   (pdf *PDF) DocKeywords() string
-//   (pdf *PDF) DocSubject() string
-//   (pdf *PDF) DocTitle() string
-//   (pdf *PDF) FontName() string
-//   (pdf *PDF) FontSize() float64
-//   (pdf *PDF) HorizontalScaling() uint16
-//   (pdf *PDF) LineWidth() float64
-//   (pdf *PDF) Units() string
-//   (pdf *PDF) X() float64
-//   (pdf *PDF) Y() float64
+// # Property Getters (pdf *PDF)
+//   Color() color.RGBA             FontName() string
+//   Compression() bool             FontSize() float64
+//   DocAuthor() string             HorizontalScaling() uint16
+//   DocCreator() string            LineWidth() float64
+//   DocKeywords() string           Units() string
+//   DocSubject() string            X() float64
+//   DocTitle() string              Y() float64
 //
-// # Property Setters
-//   (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF
-//   (pdf *PDF) SetColorRGB(red, green, blue int) *PDF
-//   (pdf *PDF) SetCompression(compress bool) *PDF
-//   (pdf *PDF) SetDocAuthor(s string) *PDF
-//   (pdf *PDF) SetDocCreator(s string) *PDF
-//   (pdf *PDF) SetDocKeywords(s string) *PDF
-//   (pdf *PDF) SetDocSubject(s string) *PDF
-//   (pdf *PDF) SetDocTitle(s string) *PDF
-//   (pdf *PDF) SetFont(name string, points float64) *PDF
-//   (pdf *PDF) SetFontName(name string) *PDF
-//   (pdf *PDF) SetFontSize(points float64) *PDF
-//   (pdf *PDF) SetHorizontalScaling(percent uint16) *PDF
-//   (pdf *PDF) SetLineWidth(points float64) *PDF
-//   (pdf *PDF) SetUnits(unitName string) *PDF
-//   (pdf *PDF) SetX(x float64) *PDF
-//   (pdf *PDF) SetXY(x, y float64) *PDF
-//   (pdf *PDF) SetY(y float64) *PDF
+// # Property Setters (pdf *PDF)
+//   SetColor(nameOrHTMLColor string) *PDF
+//   SetColorRGB(red, green, blue int) *PDF
+//   SetCompression(compress bool) *PDF
+//   SetDocAuthor(s string) *PDF
+//   SetDocCreator(s string) *PDF
+//   SetDocKeywords(s string) *PDF
+//   SetDocSubject(s string) *PDF
+//   SetDocTitle(s string) *PDF
+//   SetFont(name string, points float64) *PDF
+//   SetFontName(name string) *PDF
+//   SetFontSize(points float64) *PDF
+//   SetHorizontalScaling(percent uint16) *PDF
+//   SetLineWidth(points float64) *PDF
+//   SetUnits(unitName string) *PDF
+//   SetX(x float64) *PDF
+//   SetXY(x, y float64) *PDF
+//   SetY(y float64) *PDF
 //
-// # Methods
-//   (pdf *PDF) AddPage() *PDF
-//   (pdf *PDF) Bytes() []byte
-//   (pdf *PDF) DrawBox(x, y, width, height float64, fill ...bool) *PDF
-//   (pdf *PDF) DrawCircle(x, y, radius float64, fill ...bool) *PDF
-//   (pdf *PDF) DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF
-//   (pdf *PDF) DrawImage(
-//                  x, y, height float64, fileNameOrBytes interface{}) *PDF
-//   (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF
-//   (pdf *PDF) DrawText(s string) *PDF
-//   (pdf *PDF) DrawTextAlignedToBox(
-//                  x, y, width, height float64, align, text string) *PDF
-//   (pdf *PDF) DrawTextAt(x, y float64, text string) *PDF
-//   (pdf *PDF) DrawTextInBox(
-//                  x, y, width, height float64, align, text string ) *PDF
-//   (pdf *PDF) DrawUnitGrid() *PDF
-//   (pdf *PDF) FillBox(x, y, width, height float64) *PDF
-//   (pdf *PDF) FillCircle(x, y, radius float64) *PDF
-//   (pdf *PDF) FillEllipse(x, y, xRadius, yRadius float64) *PDF
-//   (pdf *PDF) NextLine() *PDF
-//   (pdf *PDF) Reset() *PDF
-//   (pdf *PDF) SaveFile(filename string) error
-//   (pdf *PDF) SetColumnWidths(widths ...float64) *PDF
-//   (pdf *PDF) SetErrorLogger(fn func(a ...interface{}) (int, error)) *PDF
+// # Methods (pdf *PDF)
+//   AddPage() *PDF
+//   Bytes() []byte
+//   DrawBox(x, y, width, height float64, fill ...bool) *PDF
+//   DrawCircle(x, y, radius float64, fill ...bool) *PDF
+//   DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF
+//   DrawImage(
+//       x, y, height float64, fileNameOrBytes interface{}) *PDF
+//   DrawLine(x1, y1, x2, y2 float64) *PDF
+//   DrawText(s string) *PDF
+//   DrawTextAlignedToBox(
+//       x, y, width, height float64, align, text string) *PDF
+//   DrawTextAt(x, y float64, text string) *PDF
+//   DrawTextInBox(
+//       x, y, width, height float64, align, text string ) *PDF
+//   DrawUnitGrid() *PDF
+//   FillBox(x, y, width, height float64) *PDF
+//   FillCircle(x, y, radius float64) *PDF
+//   FillEllipse(x, y, xRadius, yRadius float64) *PDF
+//   NextLine() *PDF
+//   Reset() *PDF
+//   SaveFile(filename string) error
+//   SetColumnWidths(widths ...float64) *PDF
+//   SetErrorLogger(fn func(a ...interface{}) (int, error)) *PDF
 //
-// # Metrics Methods
-//   (pdf *PDF) TextWidth(s string) float64
-//   (pdf *PDF) ToPoints(numberAndUnit string) float64
-//   (pdf *PDF) ToUnits(points float64) float64
-//   (pdf *PDF) WrapTextLines(width float64, text string) (ret []string)
+// # Metrics Methods (pdf *PDF)
+//   TextWidth(s string) float64
+//   ToPoints(numberAndUnit string) float64
+//   ToUnits(points float64) float64
+//   WrapTextLines(width float64, text string) (ret []string)
 //
-// # Private Methods
-//   (pdf *PDF) applyFont()
-//   (pdf *PDF) drawTextLine(s string) *PDF
-//   (pdf *PDF) drawTextBox(x, y, width, height float64,
-//                  wrapText bool, align, text string) *PDF
-//   (pdf *PDF) loadImage(fileNameOrBytes interface{}) (img pdfImage, idx int)
-//   (pdf *PDF) setCurrentPage(pageNo int) *PDF
-//   (pdf *PDF) textWidthPt1000(s string) float64
-//   (pdf *PDF) warnIfNoPage() bool
+// # Private Methods (pdf *PDF)
+//   applyFont() {
+//   drawTextLine(s string) *PDF
+//   drawTextBox(x, y, width, height float64,
+//       wrapText bool, align, text string) *PDF
+//   loadImage(fileNameOrBytes interface{}) (img pdfImage, idx int)
+//   setCurrentPage(pageNo int) *PDF
+//   textWidthPt1000(s string) float64
+//   warnIfNoPage() bool
 //
-// # Private Generation Methods
-//   (pdf *PDF) nextObj() int
-//   (pdf *PDF) write(format string, args ...interface{}) *PDF
-//   (pdf *PDF) writeCurve(x1, y1, x2, y2, x3, y3 float64) *PDF
-//   (pdf *PDF) writeEndobj() *PDF
-//   (pdf *PDF) writeMode(fill ...bool) (mode string)
-//   (pdf *PDF) writeObj(objType string) *PDF
-//   (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF
-//   (pdf *PDF) writeStream(content []byte) *PDF
-//   (pdf *PDF) writeStreamData(content []byte) *PDF
+// # Private Generation Methods (pdf *PDF)
+//   nextObj() int
+//   write(format string, args ...interface{}) *PDF
+//   writeCurve(x1, y1, x2, y2, x3, y3 float64) *PDF
+//   writeEndobj() *PDF
+//   writeMode(fill ...bool) (mode string)
+//   writeObj(objType string) *PDF
+//   writePages(fontsIndex, imagesIndex int) *PDF
+//   writeStream(content []byte) *PDF
+//   writeStreamData(content []byte) *PDF
 //
-// # Private Functions (just attached to PDF, but not using it)
-//   (*PDF) escape(s string) []byte
-//   (*PDF) isWhiteSpace(s string) bool
-//   (*PDF) splitLines(s string) []string
-//   (*PDF) toUpperLettersDigits(s, extras string) string
-//   (pdf *PDF) getPaperSize(name string) pdfPaperSize
-//   (pdf *PDF) getPointsPerUnit(unitName string) float64
-//   (pdf *PDF) setError(a ...interface{}) *PDF
+// # Private Functions (*PDF) - just attached to PDF, but not using its data
+//   escape(s string) []byte
+//   isWhiteSpace(s string) bool
+//   splitLines(s string) []string
+//   toUpperLettersDigits(s, extras string) string
+//   (pdf *PDF):
+//   getPaperSize(name string) pdfPaperSize
+//   getPointsPerUnit(unitName string) float64
+//   setError(a ...interface{}) *PDF
 
 import "bytes"         // standard
 import "compress/zlib" // standard
@@ -692,7 +686,7 @@ func NewPDF(paperSize string) PDF {
 } //                                                                      NewPDF
 
 // -----------------------------------------------------------------------------
-// # Read-Only Properties
+// # Read-Only Properties (pdf *PDF)
 
 // CurrentPage returns the current page's number, 1 being the first page.
 func (pdf *PDF) CurrentPage() int {
@@ -710,7 +704,7 @@ func (pdf *PDF) PageWidth() float64 {
 } //                                                                   PageWidth
 
 // -----------------------------------------------------------------------------
-// # Property Getters
+// # Property Getters (pdf *PDF)
 
 // Color returns the current color, which is used for text, lines and fills.
 func (pdf *PDF) Color() color.RGBA {
@@ -794,7 +788,7 @@ func (pdf *PDF) Y() float64 {
 } //                                                                           Y
 
 // -----------------------------------------------------------------------------
-// # Property Setters
+// # Property Setters (pdf *PDF)
 
 // SetColor sets the current color using a web/X11 color name
 // (e.g. "HoneyDew") or HTML color value such as "#191970"
@@ -946,7 +940,7 @@ func (pdf *PDF) SetY(y float64) *PDF {
 } //                                                                        SetY
 
 // -----------------------------------------------------------------------------
-// # Methods
+// # Methods (pdf *PDF)
 
 // AddPage appends a new blank page to the document and makes it selected.
 func (pdf *PDF) AddPage() *PDF {
@@ -965,7 +959,6 @@ func (pdf *PDF) AddPage() *PDF {
 // auxiliary objects and returns it in an array of bytes,
 // identical to the content of a PDF file. This method is where
 // you'll find the core structure of a PDF document.
-// Called by: SaveFile()
 func (pdf *PDF) Bytes() []byte {
 	//
 	// free any existing generated content and write PDF header
@@ -1265,7 +1258,7 @@ func (pdf *PDF) SetErrorLogger(fn func(a ...interface{}) (int, error)) *PDF {
 } //                                                              SetErrorLogger
 
 // -----------------------------------------------------------------------------
-// # Metrics Methods
+// # Metrics Methods (pdf *PDF)
 
 // TextWidth returns the width of the text in current units.
 func (pdf *PDF) TextWidth(s string) float64 {
@@ -1368,7 +1361,7 @@ func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
 } //                                                               WrapTextLines
 
 // -----------------------------------------------------------------------------
-// # Private Methods
+// # Private Methods (pdf *PDF)
 
 // applyFont writes a font change command, provided the font has
 // been changed since the last operation that uses fonts.
@@ -1385,8 +1378,6 @@ func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
 //   standard (built-in) font like Helvetica or a TrueType font.
 // - Fills the document-wide list of fonts (pdf.fonts).
 // - Adds items to the list of font ID's used on the current page.
-//
-// called by drawTextLine()
 func (pdf *PDF) applyFont() {
 	var font pdfFont
 	var name = pdf.toUpperLettersDigits(pdf.fontName, "")
@@ -1449,8 +1440,7 @@ func (pdf *PDF) applyFont() {
 } //                                                                   applyFont
 
 // drawTextLine writes a line of text at the current coordinates to the
-// current page's content stream, using a sequence of raw PDF commands.
-// called by: DrawText(), drawTextBox()
+// current page's content stream, using a sequence of raw PDF commands
 func (pdf *PDF) drawTextLine(s string) *PDF {
 	if s == "" {
 		return pdf
@@ -1475,8 +1465,7 @@ func (pdf *PDF) drawTextLine(s string) *PDF {
 
 // drawTextBox draws a line of text, or a word-wrapped block of text.
 // align: specify up to 2 flags: L R T B to align left, right, top or bottom
-//        the default (blank) is C center, both vertically and horizontally
-// called by: DrawTextAlignedToBox(), DrawTextInBox()
+// the default (blank) is C center, both vertically and horizontally
 func (pdf *PDF) drawTextBox(x, y, width, height float64,
 	wrapText bool, align, text string,
 ) *PDF {
@@ -1584,7 +1573,6 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}) (img pdfImage, idx int) {
 } //                                                                   loadImage
 
 // setCurrentPage selects the currently-active page
-// called by: AddPage(), Bytes()
 func (pdf *PDF) setCurrentPage(pageNo int) *PDF {
 	if pageNo < 0 {
 		pdf.ppage = nil
@@ -1600,7 +1588,6 @@ func (pdf *PDF) setCurrentPage(pageNo int) *PDF {
 } //                                                              setCurrentPage
 
 // textWidthPt1000 returns the width of text in thousandths of a point
-// called by: drawTextLine(), drawTextBox(), TextWidth()
 func (pdf *PDF) textWidthPt1000(s string) float64 {
 	if pdf.warnIfNoPage() || s == "" {
 		return 0
@@ -1619,8 +1606,6 @@ func (pdf *PDF) textWidthPt1000(s string) float64 {
 
 // warnIfNoPage outputs a warning and returns true if there is no active
 // page. This can only happen when the user didn't call AddPage().
-// called by: DrawBox(), DrawLine(), DrawText(), FillBox(),
-//            SetX(), SetXY(), SetY(), TextWidth(), X(), Y()
 func (pdf *PDF) warnIfNoPage() bool {
 	if pdf.ppage == nil || pdf.pageNo < 0 || pdf.pageNo > len(pdf.pages)-1 {
 		pdf.setError("No current page")
@@ -1630,7 +1615,7 @@ func (pdf *PDF) warnIfNoPage() bool {
 } //                                                                warnIfNoPage
 
 // -----------------------------------------------------------------------------
-// # Private Generation Methods
+// # Private Generation Methods (pdf *PDF)
 
 // nextObj increases the object serial no. and stores its offset in array
 func (pdf *PDF) nextObj() int {
@@ -1642,8 +1627,7 @@ func (pdf *PDF) nextObj() int {
 } //                                                                     nextObj
 
 // write writes formatted strings (like fmt.Sprintf) to the current page's
-// content stream or to the final generated PDF, if there is no active page.
-// called by: almost all Draw..() and write..() methods
+// content stream or to the final generated PDF, if there is no active page
 func (pdf *PDF) write(format string, args ...interface{}) *PDF {
 	var buf *bytes.Buffer
 	if pdf.pageNo < 0 {
@@ -1671,7 +1655,7 @@ func (pdf *PDF) writeEndobj() *PDF {
 } //                                                                 writeEndobj
 
 // writeMode sets the stroking or non-stroking color and line width.
-// 'fill' arg specifies non-stroking (true) or stroking mode (none/false).
+// 'fill' arg specifies non-stroking (true) or stroking mode (none/false)
 func (pdf *PDF) writeMode(fill ...bool) (mode string) {
 	mode = "S" // S: stroke path (for lines)
 	if len(fill) > 0 && fill[0] {
@@ -1783,8 +1767,7 @@ func (pdf *PDF) writeStreamData(ar []byte) *PDF {
 // # Private Functions (just attached to PDF, but not using it)
 
 // escape escapes special characters '(', '(' and '\' in strings
-// in order to avoid them interfering with PDF commands.
-// called by: Bytes(), drawTextLine()
+// in order to avoid them interfering with PDF commands
 func (*PDF) escape(s string) []byte {
 	var has = strings.Contains
 	if !has(s, "(") && !has(s, ")") && !has(s, "\\") {
@@ -1837,8 +1820,8 @@ func (*PDF) toUpperLettersDigits(s, extras string) string {
 	return buf.String()
 } //                                                        toUpperLettersDigits
 
-// getPaperSize returns a pdfPaperSize based on the specified paper name.
-// If the paper size is not found, returns a zero-initialized structure.
+// getPaperSize returns a pdfPaperSize based on the specified paper name
+// if the paper size is not found, returns a zero-initialized structure
 func (pdf *PDF) getPaperSize(name string) (pdfPaperSize, error) {
 	name = pdf.toUpperLettersDigits(name, "-")
 	var landscape = strings.HasSuffix(name, "-L")
@@ -1860,8 +1843,7 @@ func (pdf *PDF) getPaperSize(name string) (pdfPaperSize, error) {
 	return pdfPaperSize{name, w, h}, nil
 } //                                                                getPaperSize
 
-// getPointsPerUnit returns number of points per named measurement unit.
-// called by: SetUnits(), ToPoints()
+// getPointsPerUnit returns number of points per named measurement unit
 func (pdf *PDF) getPointsPerUnit(unitName string) float64 {
 	switch pdf.toUpperLettersDigits(unitName, `"`) {
 	case "MM":
