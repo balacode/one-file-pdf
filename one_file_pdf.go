@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-11 20:34:38 9DB144                              [one_file_pdf.go]
+// :v: 2018-03-11 20:37:44 6B069A                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1696,7 +1696,6 @@ func (pdf *PDF) writeMode(fill ...bool) (mode string) {
 
 // writeObj outputs an object header
 func (pdf *PDF) writeObj(objType string) *PDF {
-	pdf.setCurrentPage(-1)
 	var n = pdf.nextObj()
 	if objType == "" {
 		pdf.write("%d 0 obj<<", n)
@@ -1760,13 +1759,11 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
 
 // writeStream outputs a stream object to the document's main buffer
 func (pdf *PDF) writeStream(content []byte) *PDF {
-	return pdf.setCurrentPage(-1).
-		write("%d 0 obj <<", pdf.nextObj()).writeStreamData(content)
+	return pdf.write("%d 0 obj <<", pdf.nextObj()).writeStreamData(content)
 } //                                                                 writeStream
 
 // writeStreamData writes a stream or image stream
 func (pdf *PDF) writeStreamData(ar []byte) *PDF {
-	pdf.setCurrentPage(-1)
 	var s string // filter
 	if pdf.compressStreams {
 		var buf bytes.Buffer
