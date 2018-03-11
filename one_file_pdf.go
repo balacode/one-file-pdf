@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-11 19:59:17 020ECE                              [one_file_pdf.go]
+// :v: 2018-03-11 20:06:31 ED2D14                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -149,7 +149,7 @@ type PDF struct {
 	docKeywords       string        // 'keywords' metadata entry
 	docSubject        string        // 'subject' metadata entry
 	docTitle          string        // 'title' metadata entry
-	pageSize          pdfPaperSize  // paper size used in this PDF
+	paperSize         pdfPaperSize  // paper size used in this PDF
 	pageNo            int           // current page number
 	ppage             *pdfPage      // pointer to the current page
 	pages             []pdfPage     // all the pages added to this PDF
@@ -685,9 +685,9 @@ func NewPDF(paperSize string) PDF {
 	var size, err = pdf.getPaperSize(paperSize)
 	if err != nil {
 		pdf.setError(err)
-		pdf.pageSize, _ = pdf.getPaperSize("A4")
+		pdf.paperSize, _ = pdf.getPaperSize("A4")
 	}
-	pdf.pageSize = size
+	pdf.paperSize = size
 	return *pdf.SetUnits("point") // set default: or ptPerUnit, x & y will be 0
 } //                                                                      NewPDF
 
@@ -701,12 +701,12 @@ func (pdf *PDF) CurrentPage() int {
 
 // PageHeight returns the height of the current page in selected units.
 func (pdf *PDF) PageHeight() float64 {
-	return pdf.ToUnits(pdf.pageSize.heightPt)
+	return pdf.ToUnits(pdf.paperSize.heightPt)
 } //                                                                  PageHeight
 
 // PageWidth returns the width of the current page in selected units.
 func (pdf *PDF) PageWidth() float64 {
-	return pdf.ToUnits(pdf.pageSize.widthPt)
+	return pdf.ToUnits(pdf.paperSize.widthPt)
 } //                                                                   PageWidth
 
 // -----------------------------------------------------------------------------
@@ -790,7 +790,7 @@ func (pdf *PDF) Y() float64 {
 	if pdf.warnIfNoPage() {
 		return 0
 	}
-	return pdf.ToUnits(pdf.pageSize.heightPt - pdf.ppage.y)
+	return pdf.ToUnits(pdf.paperSize.heightPt - pdf.ppage.y)
 } //                                                                           Y
 
 // -----------------------------------------------------------------------------
@@ -940,7 +940,7 @@ func (pdf *PDF) SetXY(x, y float64) *PDF {
 // SetY changes the Y-coordinate of the current drawing position.
 func (pdf *PDF) SetY(y float64) *PDF {
 	if !pdf.warnIfNoPage() {
-		pdf.ppage.y = pdf.pageSize.heightPt - y*pdf.ptPerUnit
+		pdf.ppage.y = pdf.paperSize.heightPt - y*pdf.ptPerUnit
 	}
 	return pdf
 } //                                                                        SetY
@@ -1041,7 +1041,7 @@ func (pdf *PDF) DrawBox(x, y, width, height float64, fill ...bool) *PDF {
 	}
 	width, height = width*pdf.ptPerUnit, height*pdf.ptPerUnit
 	x *= pdf.ptPerUnit
-	y = pdf.pageSize.heightPt - y*pdf.ptPerUnit - height
+	y = pdf.paperSize.heightPt - y*pdf.ptPerUnit - height
 	var mode = pdf.writeMode(fill...)
 	return pdf.write("%.3f %.3f %.3f %.3f re %s\n", x, y, width, height, mode)
 	// re: construct a rectangular path
@@ -1060,7 +1060,7 @@ func (pdf *PDF) DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF {
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
-	x, y = x*pdf.ptPerUnit, pdf.pageSize.heightPt-y*pdf.ptPerUnit
+	x, y = x*pdf.ptPerUnit, pdf.paperSize.heightPt-y*pdf.ptPerUnit
 	const ratio = 0.552284749830794   // (4/3) * tan(PI/8)
 	var r = xRadius * pdf.ptPerUnit   // horizontal radius
 	var v = yRadius * pdf.ptPerUnit   // vertical radius
@@ -1102,7 +1102,7 @@ func (pdf *PDF) DrawImage(
 	}
 	// draw the image
 	x *= pdf.ptPerUnit
-	y = pdf.pageSize.heightPt - y*pdf.ptPerUnit - height
+	y = pdf.paperSize.heightPt - y*pdf.ptPerUnit - height
 	var w = float64(img.width) / float64(img.height) * height
 	var h = height * pdf.ptPerUnit
 	return pdf.write("q\n %f 0 0 %f %f %f cm\n/IMG%d Do\nQ\n", w, h, x, y, idx)
@@ -1118,8 +1118,8 @@ func (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF {
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
-	x1, y1 = x1*pdf.ptPerUnit, pdf.pageSize.heightPt-y1*pdf.ptPerUnit
-	x2, y2 = x2*pdf.ptPerUnit, pdf.pageSize.heightPt-y2*pdf.ptPerUnit
+	x1, y1 = x1*pdf.ptPerUnit, pdf.paperSize.heightPt-y1*pdf.ptPerUnit
+	x2, y2 = x2*pdf.ptPerUnit, pdf.paperSize.heightPt-y2*pdf.ptPerUnit
 	pdf.writeMode(true) // prepare color/line width
 	return pdf.write("%.3f %.3f m %.3f %.3f l S\n", x1, y1, x2, y2)
 	// m: move  S: stroke path (for lines)
@@ -1218,7 +1218,7 @@ func (pdf *PDF) FillEllipse(x, y, xRadius, yRadius float64) *PDF {
 // the X-coordinate is reset to zero.
 func (pdf *PDF) NextLine() *PDF {
 	var y = pdf.Y() + pdf.FontSize()*pdf.ptPerUnit
-	if y > pdf.pageSize.heightPt*pdf.ptPerUnit {
+	if y > pdf.paperSize.heightPt*pdf.ptPerUnit {
 		pdf.AddPage()
 		y = 0
 	}
@@ -1230,10 +1230,10 @@ func (pdf *PDF) NextLine() *PDF {
 	return pdf.SetXY(x, y)
 } //                                                                    NextLine
 
-// Reset releases all resources and resets all variables, except page size.
+// Reset releases all resources and resets all variables, except paper size.
 func (pdf *PDF) Reset() *PDF {
 	pdf.ppage, pdf.pbuf = nil, nil
-	*pdf = NewPDF(pdf.pageSize.name)
+	*pdf = NewPDF(pdf.paperSize.name)
 	return pdf
 } //                                                                       Reset
 
@@ -1516,7 +1516,7 @@ func (pdf *PDF) drawTextBox(x, y, width, height float64,
 		}
 		return height/2 - allLinesHeight/2 - pdf.fontSizePt*0.15 // center
 	})() // IIFE
-	y = pdf.pageSize.heightPt - y
+	y = pdf.paperSize.heightPt - y
 	for _, line := range lines {
 		pdf.ppage.x, pdf.ppage.y = x+alignX(line), y
 		pdf.drawTextLine(line)
@@ -1716,7 +1716,7 @@ func (pdf *PDF) writeObj(objectType string) *PDF {
 // writePages writes all PDF pages
 func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
 	pdf.writeObj("/Pages").write("/Count %d/MediaBox[0 0 %d %d]",
-		len(pdf.pages), int(pdf.pageSize.widthPt), int(pdf.pageSize.heightPt))
+		len(pdf.pages), int(pdf.paperSize.widthPt), int(pdf.paperSize.heightPt))
 	//                                                        write page numbers
 	if len(pdf.pages) > 0 {
 		var pageObjNo = pdfPagesIndex
