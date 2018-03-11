@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-11 20:14:24 B91CED                              [one_file_pdf.go]
+// :v: 2018-03-11 20:29:47 0A20A7                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1456,14 +1456,14 @@ func (pdf *PDF) drawTextLine(s string) *PDF {
 		return pdf
 	}
 	// draw the text
+	var pg = pdf.ppage
 	pdf.applyFont()
-	if pdf.ppage.horizontalScaling != pdf.horizontalScaling {
-		pdf.ppage.horizontalScaling = pdf.horizontalScaling
-		pdf.write("BT %d Tz ET\n", pdf.ppage.horizontalScaling)
+	if pg.horizontalScaling != pdf.horizontalScaling {
+		pg.horizontalScaling = pdf.horizontalScaling
+		pdf.write("BT %d Tz ET\n", pg.horizontalScaling)
 		// BT: begin text   n0 Tz: set horiz. text scaling to n0%   ET: end text
 	}
 	pdf.writeMode(true) // fill/nonStroke
-	var pg = pdf.ppage
 	if pg.x < 0 || pg.y < 0 {
 		pdf.SetXY(0, 0)
 	}
