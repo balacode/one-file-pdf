@@ -23,10 +23,10 @@ The result is a single .go file with less than 1999 lines of code, about 400 of 
 All types in are prefixed with PDF for public, and 'pdf' for private types.
 The only type you need to use is PDF, while PDFColorNames are left public for reference.
 
-### Supported Features:  
+### Features:  
 - Use all built-in PDF fonts: Courier, Helvetica, Symbol, Times, ZapfDingbats, and their variants
 - Recognises 144 web colo(u)r names, or any RGB value
-- Stream compression can be turned on or off (normal PDF files compress streams to reduce file size, but turning it off helps in debugging or learning about PDF commands)
+- Stream compression can be turned on or off (PDF files normally compress streams to reduce file size, but turning it off helps in debugging or learning about PDF commands)
 - Metadata properties: author, creator, keywords, subject and title
 - Set the measurement units you want: mm, cm, inches, twips or points
 - Draw lines with different thickness
