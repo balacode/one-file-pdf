@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-12 14:27:41 E6C330                              [one_file_pdf.go]
+// :v: 2018-03-12 21:54:02 4B8308                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -707,69 +707,44 @@ func (pdf *PDF) PageWidth() float64 {
 // # Property Getters (pdf *PDF)
 
 // Color returns the current color, which is used for text, lines and fills.
-func (pdf *PDF) Color() color.RGBA {
-	return pdf.color
-} //                                                                       Color
+func (pdf *PDF) Color() color.RGBA { return pdf.color }
 
-// Compression returns the current compression mode.
-// If it is true, all PDF content will be compressed when
-// the PDF is generated. If false, most PDF content
-// (excluding images) will be in plain text, which is
-// useful for debugging or to study PDF commands.
-func (pdf *PDF) Compression() bool {
-	return pdf.compressStreams
-} //                                                                 Compression
+// Compression returns the current compression mode. If it is true,
+// all PDF content will be compressed when the PDF is generated. If
+// false, most PDF content (excluding images) will be in plain text,
+// which is useful for debugging or to study PDF commands.
+func (pdf *PDF) Compression() bool { return pdf.compressStreams }
 
 // DocAuthor returns the optional 'document author' metadata entry.
-func (pdf *PDF) DocAuthor() string {
-	return pdf.docAuthor
-} //                                                                   DocAuthor
+func (pdf *PDF) DocAuthor() string { return pdf.docAuthor }
 
 // DocCreator returns the optional 'document creator' metadata entry.
-func (pdf *PDF) DocCreator() string {
-	return pdf.docCreator
-} //                                                                  DocCreator
+func (pdf *PDF) DocCreator() string { return pdf.docCreator }
 
 // DocKeywords returns the optional 'document keywords' metadata entry.
-func (pdf *PDF) DocKeywords() string {
-	return pdf.docKeywords
-} //                                                                 DocKeywords
+func (pdf *PDF) DocKeywords() string { return pdf.docKeywords }
 
 // DocSubject returns the optional 'document subject' metadata entry.
-func (pdf *PDF) DocSubject() string {
-	return pdf.docSubject
-} //                                                                  DocSubject
+func (pdf *PDF) DocSubject() string { return pdf.docSubject }
 
 // DocTitle returns the optional 'document subject' metadata entry.
-func (pdf *PDF) DocTitle() string {
-	return pdf.docTitle
-} //                                                                    DocTitle
+func (pdf *PDF) DocTitle() string { return pdf.docTitle }
 
 // FontName returns the name of the currently-active typeface.
-func (pdf *PDF) FontName() string {
-	return pdf.fontName
-} //                                                                    FontName
+func (pdf *PDF) FontName() string { return pdf.fontName }
 
 // FontSize returns the current font size in points.
-func (pdf *PDF) FontSize() float64 {
-	return pdf.fontSizePt
-} //                                                                    FontSize
+func (pdf *PDF) FontSize() float64 { return pdf.fontSizePt }
 
 // HorizontalScaling returns the current horizontal scaling in percent.
-func (pdf *PDF) HorizontalScaling() uint16 {
-	return pdf.horizontalScaling
-} //                                                           HorizontalScaling
+func (pdf *PDF) HorizontalScaling() uint16 { return pdf.horizontalScaling }
 
 // LineWidth returns the current line width in points.
-func (pdf *PDF) LineWidth() float64 {
-	return pdf.lineWidth
-} //                                                                   LineWidth
+func (pdf *PDF) LineWidth() float64 { return pdf.lineWidth }
 
 // Units returns the currently selected measurement units.
-// E.g.: MM CM " IN INCH INCHES TW TWIP TWIPS PT POINT POINTS
-func (pdf *PDF) Units() string {
-	return pdf.unitName
-} //                                                                       Units
+// E.g.: mm cm " in inch inches tw twip twips pt point points
+func (pdf *PDF) Units() string { return pdf.unitName }
 
 // X returns the X-coordinate of the current drawing position.
 func (pdf *PDF) X() float64 {
@@ -906,9 +881,8 @@ func (pdf *PDF) SetLineWidth(points float64) *PDF {
 	return pdf
 } //                                                                SetLineWidth
 
-// SetUnits changes the current measurement units.
-// Can be upper/lowercase:
-// MM CM " IN INCH INCHES TW TWIP TWIPS PT POINT POINTS.
+// SetUnits changes the current measurement units:
+// mm cm " in inch inches tw twip twips pt point points (can be in any case)
 func (pdf *PDF) SetUnits(unitName string) *PDF {
 	pdf.unitName = pdf.toUpperLettersDigits(unitName, "")
 	pdf.ptPerUnit = pdf.getPointsPerUnit(pdf.unitName)
