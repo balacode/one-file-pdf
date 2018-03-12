@@ -1,23 +1,17 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-12 14:25:34 23D9D0                       [test/to_points_test.go]
+// :v: 2018-03-12 21:54:02 4F94B4                           [utest/to_points.go]
 // -----------------------------------------------------------------------------
 
-package main
-
-/*
-to generate a test coverage report use:
-	go test -coverprofile cover.out
-	go tool cover -html=cover.out
-*/
+package utest
 
 import "fmt"     // standard
 import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// go test --run Test_ToPoints_
-func Test_ToPoints_(t *testing.T) {
+func ToPoints(t *testing.T) {
+	fmt.Println("utest.ToPoints")
 	//
 	// test function
 	var test = func(expect float64, parts ...[]string) {
@@ -69,6 +63,6 @@ func Test_ToPoints_(t *testing.T) {
 	//
 	test(1, gaps, []string{"20"}, gaps, twips, gaps) // 1 point = 20 twips
 	test(-1, gaps, []string{"-20"}, gaps, twips, gaps)
-} //                                                              Test_ToPoints_
+} //                                                                    ToPoints
 
 //end

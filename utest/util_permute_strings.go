@@ -1,9 +1,9 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-11 00:26:09 5E7042                      [test/permute_strings.go]
+// :v: 2018-03-12 22:00:19 A0CE35               [utest/util_format_pdf_lines.go]
 // -----------------------------------------------------------------------------
 
-package main
+package utest
 
 import "bytes" // standard
 

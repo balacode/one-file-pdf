@@ -1,12 +1,12 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-11 00:38:55 90E51C                              [test/support.go]
+// :v: 2018-03-12 22:06:41 AE1DFD                        [utest/util_t_equal.go]
 // -----------------------------------------------------------------------------
 
-// Contains slightly-altered testing functions from Zircon-Go lib:
-// github.com/balacode/zr
+package utest
 
-package main
+// Provides a slightly-altered TEqual() function (and functions it uses)
+// from Zircon-Go lib: github.com/balacode/zr
 
 import "fmt"     // standard
 import "os"      // standard
@@ -18,10 +18,54 @@ import "time"    // standard
 
 const showSourceFileNames = false
 
-// does nothing, just allows this package to build properly
-// this package is only used for testing
-func main() {
-}
+// TEqual asserts that result is equal to expect.
+func TEqual(t *testing.T, result interface{}, expect interface{}) bool {
+	var makeStr = func(val interface{}) string {
+		switch val := val.(type) {
+		case nil:
+			return "nil"
+		case bool:
+			if val {
+				return "true"
+			}
+			return "false"
+		case int, int8, int16, int32, int64,
+			uint, uint8, uint16, uint32, uint64, uintptr:
+			return fmt.Sprintf("%d", val)
+		case float32, float64:
+			var s = fmt.Sprintf("%f", val)
+			if strings.Contains(s, ".") {
+				for strings.HasSuffix(s, "0") {
+					s = s[:len(s)-1]
+				}
+				for strings.HasSuffix(s, ".") {
+					s = s[:len(s)-1]
+				}
+			}
+			return s
+		case string:
+			return val
+		case time.Time: // use date part without time and time zone
+			var s = val.Format(time.RFC3339)[:19] // "2006-01-02T15:04:05Z07:00"
+			if strings.HasSuffix(s, "T00:00:00") {
+				s = s[:10]
+			}
+			return s
+		case fmt.Stringer:
+			return val.String()
+		}
+		return fmt.Sprintf("(type: %v value: %v)", reflect.TypeOf(val), val)
+	}
+	if makeStr(result) != makeStr(expect) {
+		t.Logf("\n LOCATION: %s \n EXPECTED: %s \n RETURNED: %s \n",
+			TCaller(), makeStr(expect), makeStr(result))
+		t.Fail()
+		return false
+	}
+	return true
+} //                                                                      TEqual
+
+// -----------------------------------------------------------------------------
 
 // CallerList returns a human-friendly list of strings showing the
 // call stack with each calling method or function's name and line number.
@@ -101,52 +145,5 @@ func TCaller() string {
 	}
 	return "<no-caller>"
 } //                                                                     TCaller
-
-// TEqual asserts that result is equal to expect.
-func TEqual(t *testing.T, result interface{}, expect interface{}) bool {
-	var makeStr = func(val interface{}) string {
-		switch val := val.(type) {
-		case nil:
-			return "nil"
-		case bool:
-			if val {
-				return "true"
-			}
-			return "false"
-		case int, int8, int16, int32, int64,
-			uint, uint8, uint16, uint32, uint64, uintptr:
-			return fmt.Sprintf("%d", val)
-		case float32, float64:
-			var s = fmt.Sprintf("%f", val)
-			if strings.Contains(s, ".") {
-				for strings.HasSuffix(s, "0") {
-					s = s[:len(s)-1]
-				}
-				for strings.HasSuffix(s, ".") {
-					s = s[:len(s)-1]
-				}
-			}
-			return s
-		case string:
-			return val
-		case time.Time: // use date part without time and time zone
-			var s = val.Format(time.RFC3339)[:19] // "2006-01-02T15:04:05Z07:00"
-			if strings.HasSuffix(s, "T00:00:00") {
-				s = s[:10]
-			}
-			return s
-		case fmt.Stringer:
-			return val.String()
-		}
-		return fmt.Sprintf("(type: %v value: %v)", reflect.TypeOf(val), val)
-	}
-	if makeStr(result) != makeStr(expect) {
-		t.Logf("\n LOCATION: %s \n EXPECTED: %s \n RETURNED: %s \n",
-			TCaller(), makeStr(expect), makeStr(result))
-		t.Fail()
-		return false
-	}
-	return true
-} //                                                                      TEqual
 
 //end
