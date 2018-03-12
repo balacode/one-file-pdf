@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-12 22:06:41 AE1DFD                        [utest/util_t_equal.go]
+// :v: 2018-03-12 23:01:13 E9F36F                        [utest/util_t_equal.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -17,6 +17,9 @@ import "testing" // standard
 import "time"    // standard
 
 const showSourceFileNames = false
+
+// PL is fmt.Println() but is used only for debugging.
+var PL = fmt.Println
 
 // TEqual asserts that result is equal to expect.
 func TEqual(t *testing.T, result interface{}, expect interface{}) bool {
