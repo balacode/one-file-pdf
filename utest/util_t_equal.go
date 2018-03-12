@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-12 23:01:13 E9F36F                        [utest/util_t_equal.go]
+// :v: 2018-03-12 23:56:35 23C7E1                        [utest/util_t_equal.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -79,28 +79,31 @@ func TEqual(t *testing.T, result interface{}, expect interface{}) bool {
 func CallerList() []string {
 	var ret []string
 	var i = 0
+mainLoop:
 	for {
 		i++
 		var programCounter, filename, lineNo, _ = runtime.Caller(i)
 		var funcName = runtime.FuncForPC(programCounter).Name()
 		//
 		// end loop on reaching a top-level runtime function
-		if funcName == "" ||
-			funcName == "runtime.goexit" ||
-			funcName == "runtime.main" ||
-			funcName == "testing.tRunner" ||
-			strings.Contains(funcName, "HandlerFunc.ServeHTTP") {
+		for _, s := range []string{
+			"", "runtime.goexit", "runtime.main", "testing.tRunner",
+		} {
+			if funcName == s {
+				break mainLoop
+			}
+		}
+		if strings.Contains(funcName, "HandlerFunc.ServeHTTP") {
 			break
 		}
 		// skip runtime/syscall functions, but continue the loop
-		if strings.Contains(funcName, "zr.Callers") ||
-			strings.Contains(funcName, "zr.CallerList") ||
-			strings.Contains(funcName, "zr.Error") ||
-			strings.Contains(funcName, "zr.Log") ||
-			strings.Contains(funcName, "zr.logAsync") ||
-			strings.HasPrefix(funcName, "runtime.") ||
-			strings.HasPrefix(funcName, "syscall.") {
-			continue
+		for _, s := range []string{
+			"zr.Callers", "zr.CallerList", "zr.Error", "zr.Log", "zr.logAsync",
+			"runtime.", "syscall.",
+		} {
+			if strings.Contains(funcName, s) {
+				continue mainLoop
+			}
 		}
 		// let the file name's path use the right kind of OS path separator
 		// (by default, the file name contains '/' on all platforms)
