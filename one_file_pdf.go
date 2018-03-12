@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-12 00:00:44 2F1610                              [one_file_pdf.go]
+// :v: 2018-03-12 14:27:41 E6C330                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1836,16 +1836,16 @@ func (pdf *PDF) getPaperSize(name string) (pdfPaperSize, error) {
 // getPointsPerUnit returns number of points per named measurement unit
 func (pdf *PDF) getPointsPerUnit(unitName string) float64 {
 	switch pdf.toUpperLettersDigits(unitName, `"`) {
-	case "MM":
-		return 2.83464566929134 //     1 inch / 25.4mm per " * 72 points per in.
 	case "CM":
-		return 28.3464566929134 //          " / 2.54cm per " * 72 points per in.
+		return 28.3464566929134 //         " / 2.54cm per " * 72 points per inch
 	case "IN", "INCH", "INCHES", `"`:
-		return 72.0 //                                           points per inch
-	case "TW", "TWIP", "TWIPS":
-		return 0.05 //                              1 point / 20 twips per point
+		return 72.0 //                                        72 points per inch
+	case "MM":
+		return 2.83464566929134 //    1 inch / 25.4mm per " * 72 points per inch
 	case "PT", "POINT", "POINTS":
 		return 1.0 // point
+	case "TW", "TWIP", "TWIPS":
+		return 0.05 //                              1 point / 20 twips per point
 	}
 	return 0
 } //                                                            getPointsPerUnit
