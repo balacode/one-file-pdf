@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-12 21:54:02 4B8308                              [one_file_pdf.go]
+// :v: 2018-03-12 23:36:46 858BE9                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -96,7 +96,6 @@ package pdf
 //   drawTextBox(x, y, width, height float64,
 //       wrapText bool, align, text string) *PDF
 //   loadImage(fileNameOrBytes interface{}) (img pdfImage, idx int)
-//   setCurrentPage(pageNo int) *PDF
 //   textWidthPt1000(s string) float64
 //   warnIfNoPage() bool
 //
@@ -923,9 +922,9 @@ func (pdf *PDF) AddPage() *PDF {
 		x: -1, y: -1, strokeColor: COLOR, nonStrokeColor: COLOR,
 		horizontalScaling: 100,
 	})
-	var pageNo = len(pdf.pages) - 1
-	pdf.setCurrentPage(pageNo)
-	pdf.pageNo = pageNo
+	pdf.pageNo = len(pdf.pages) - 1
+	pdf.ppage = &pdf.pages[pdf.pageNo]
+	pdf.pbuf = &pdf.ppage.content
 	return pdf.SetXY(0, 0)
 } //                                                                     AddPage
 
@@ -939,10 +938,12 @@ func (pdf *PDF) Bytes() []byte {
 	var fontsIndex = pdfPagesIndex + len(pdf.pages)*2
 	var imagesIndex = fontsIndex + len(pdf.fonts)
 	var infoIndex int // set when metadata found
+	var prevBuf = pdf.pbuf
 	pdf.content.Reset()
+	pdf.pbuf = &pdf.content
 	pdf.objOffsets = []int{}
 	pdf.objNo = 0
-	pdf.setCurrentPage(-1).write("%%PDF-1.4\n").
+	pdf.write("%%PDF-1.4\n").
 		writeObj("/Catalog").write("/Pages 2 0 R").writeEndobj()
 	//
 	//  write /Pages object (2 0 obj), page count, page size and the pages
@@ -987,8 +988,7 @@ func (pdf *PDF) Bytes() []byte {
 	}
 	// write cross-reference table at end of document
 	var startXref = pdf.content.Len()
-	pdf.setCurrentPage(-1).
-		write("xref\n0 %d\n0000000000 65535 f \n", len(pdf.objOffsets))
+	pdf.write("xref\n0 %d\n0000000000 65535 f \n", len(pdf.objOffsets))
 	for _, offset := range pdf.objOffsets[1:] {
 		pdf.write("%010d 00000 n \n", offset)
 	}
@@ -998,6 +998,7 @@ func (pdf *PDF) Bytes() []byte {
 		pdf.write("/Info %d 0 R", infoIndex) // optional reference to info
 	}
 	pdf.write(">>\nstartxref\n%d\n", startXref).write("%%%%EOF\n")
+	pdf.pbuf = prevBuf
 	return pdf.content.Bytes()
 } //                                                                       Bytes
 
@@ -1538,21 +1539,6 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}) (img pdfImage, idx int) {
 	return img, idx
 } //                                                                   loadImage
 
-// setCurrentPage selects the currently-active page
-func (pdf *PDF) setCurrentPage(pageNo int) *PDF {
-	if pageNo < 0 {
-		pdf.ppage = nil
-		pdf.pbuf = &pdf.content
-	} else if pageNo > len(pdf.pages)-1 {
-		return pdf.setError("Page number out of range:", pageNo)
-	} else {
-		pdf.ppage = &pdf.pages[pageNo]
-		pdf.pbuf = &pdf.ppage.content
-	}
-	pdf.pageNo = pageNo
-	return pdf
-} //                                                              setCurrentPage
-
 // textWidthPt1000 returns the width of text in thousandths of a point
 func (pdf *PDF) textWidthPt1000(s string) float64 {
 	if pdf.warnIfNoPage() || s == "" {
@@ -1595,15 +1581,7 @@ func (pdf *PDF) nextObj() int {
 // write writes formatted strings (like fmt.Sprintf) to the current page's
 // content stream or to the final generated PDF, if there is no active page
 func (pdf *PDF) write(format string, args ...interface{}) *PDF {
-	var buf *bytes.Buffer
-	if pdf.pageNo < 0 {
-		buf = pdf.pbuf
-	} else if pdf.pageNo > len(pdf.pages)-1 {
-		return pdf.setError("Invalid page index:", pdf.pageNo)
-	} else {
-		buf = &pdf.ppage.content
-	}
-	buf.Write([]byte(fmt.Sprintf(format, args...)))
+	pdf.pbuf.Write([]byte(fmt.Sprintf(format, args...)))
 	return pdf
 } //                                                                       write
 
