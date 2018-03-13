@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-13 16:35:06 1E31E6                              [one_file_pdf.go]
+// :v: 2018-03-13 17:40:00 CE0064                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -86,6 +86,7 @@ package pdf
 //
 // # Metrics Methods (pdf *PDF)
 //   TextWidth(s string) float64
+//   ToColor(nameOrHTMLColor string) (color.RGBA, error)
 //   ToPoints(numberAndUnit string) float64
 //   ToUnits(points float64) float64
 //   WrapTextLines(width float64, text string) (ret []string)
@@ -1240,6 +1241,38 @@ func (pdf *PDF) TextWidth(s string) float64 {
 	}
 	return pdf.ToUnits(pdf.textWidthPt1000(s))
 } //                                                                   TextWidth
+
+// ToColor returns an RGBA color value from a web/X11 color name
+// (e.g. "HoneyDew") or HTML color value such as "#191970"
+// If the name or code is unknown or invalid, returns zero value (black).
+func (pdf *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error) {
+	//
+	// if name starts with '#' treat it as HTML color (#RRGGBB)
+	var s = pdf.toUpperLettersDigits(nameOrHTMLColor, "#")
+	if len(s) >= 7 && s[0] == '#' {
+		var hex [6]uint8
+		for i, r := range s[1:7] {
+			switch {
+			case r >= '0' && r <= '9':
+				hex[i] = uint8(r - '0')
+			case r >= 'A' && r <= 'F':
+				hex[i] = uint8(r - 'A' + 10)
+			default:
+				return color.RGBA{}, fmt.Errorf("Bad color code '" + s + "'")
+			}
+		}
+		return color.RGBA{
+			hex[0]*16 + hex[1],
+			hex[2]*16 + hex[3],
+			hex[4]*16 + hex[5], 255}, nil
+	}
+	// otherwise search for color name
+	var c, found = PDFColorNames[s]
+	if found {
+		return color.RGBA{c.R, c.G, c.B, 255}, nil
+	}
+	return color.RGBA{}, fmt.Errorf("Unknown color name '" + s + "'")
+} //                                                                     ToColor
 
 // ToPoints converts a string composed of a number and unit to points.
 // For example '1 cm' or '1cm' becomes 28.346 points.
