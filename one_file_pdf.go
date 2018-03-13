@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-13 17:40:00 CE0064                              [one_file_pdf.go]
+// :v: 2018-03-13 17:47:08 87067D                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -771,32 +771,12 @@ func (pdf *PDF) Y() float64 {
 // for subsequent text and line drawing and fills.
 // If the name is unknown or valid, sets the current color to black.
 func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
-	//
-	// if name starts with '#' treat it as HTML color (#RRGGBB)
-	var s = pdf.toUpperLettersDigits(nameOrHTMLColor, "#")
-	if len(s) >= 7 && s[0] == '#' {
-		var hex [6]uint8
-		for i, r := range s[1:7] {
-			switch {
-			case r >= '0' && r <= '9':
-				hex[i] = uint8(r - '0')
-			case r >= 'A' && r <= 'F':
-				hex[i] = uint8(r - 'A' + 10)
-			default:
-				return pdf.SetColorRGB(0, 0, 0).
-					setError("Invalid color code '" + s + "'; setting to black")
-			}
-		}
-		return pdf.SetColorRGB(
-			hex[0]*16+hex[1], hex[2]*16+hex[3], hex[4]*16+hex[5])
+	var c, err = pdf.ToColor(nameOrHTMLColor)
+	if err != nil {
+		pdf.setError(err)
 	}
-	// otherwise search for color name
-	var color, exists = PDFColorNames[s]
-	if exists {
-		return pdf.SetColorRGB(color.R, color.G, color.B)
-	}
-	return pdf.SetColorRGB(0, 0, 0).
-		setError("Color name '" + s + "' not known; setting to black")
+	pdf.color = c
+	return pdf
 } //                                                                    SetColor
 
 // SetColorRGB sets the current color using red, green and blue values.
