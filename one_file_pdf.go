@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-13 17:47:08 87067D                              [one_file_pdf.go]
+// :v: 2018-03-13 19:07:04 95B1A5                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -65,8 +65,8 @@ package pdf
 //   DrawBox(x, y, width, height float64, fill ...bool) *PDF
 //   DrawCircle(x, y, radius float64, fill ...bool) *PDF
 //   DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF
-//   DrawImage(
-//       x, y, height float64, fileNameOrBytes interface{}) *PDF
+//   DrawImage(x, y, height float64, fileNameOrBytes interface{},
+//	     backColor ...string) *PDF
 //   DrawLine(x1, y1, x2, y2 float64) *PDF
 //   DrawText(s string) *PDF
 //   DrawTextAlignedToBox(
@@ -96,7 +96,8 @@ package pdf
 //   drawTextLine(s string) *PDF
 //   drawTextBox(x, y, width, height float64,
 //       wrapText bool, align, text string) *PDF
-//   loadImage(fileNameOrBytes interface{}) (img pdfImage, idx int)
+//   loadImage(fileNameOrBytes interface{}, back color.RGBA,
+//       ) (img pdfImage, idx int, err error)
 //   textWidthPt1000(s string) float64
 //   warnIfNoPage() bool
 //
@@ -131,7 +132,9 @@ import "reflect"       // standard
 import "strconv"       // standard
 import "strings"       // standard
 import "unicode"       // standard   only uses IsSpace(), IsLetter(), IsDigit()
-import _ "image/png"   // standard
+import _ "image/png"   // standard   init image decoders
+import _ "image/jpeg"  // standard
+import _ "image/gif"   // standard
 
 // -----------------------------------------------------------------------------
 // # Main Structure
@@ -337,11 +340,11 @@ type pdfFont struct {
 
 // pdfImage represents an image
 type pdfImage struct {
-	name      string
-	widthPx   int // width in pixels
-	heightPx  int // height in pixels
-	data      []byte
-	grayscale bool
+	name     string // filename
+	widthPx  int    // width in pixels
+	heightPx int    // height in pixels
+	data     []byte // data
+	isGray   bool   // image is grayscale? (otherwise a color image)
 } //                                                                    pdfImage
 
 // pdfPage holds references, state and the stream buffer for each page
@@ -941,9 +944,13 @@ func (pdf *PDF) Bytes() []byte {
 	}
 	// write images
 	for _, iter := range pdf.images {
+		var colorSpace = "DeviceRGB"
+		if iter.isGray {
+			colorSpace = "DeviceGray"
+		}
 		pdf.writeObj("/XObject").
-			write("/Subtype/Image/Width %d/Height %d/ColorSpace/DeviceGray/"+
-				"BitsPerComponent 8", iter.widthPx, iter.heightPx).
+			write("/Subtype/Image/Width %d/Height %d/ColorSpace/%s"+
+				"/BitsPerComponent 8", iter.widthPx, iter.heightPx, colorSpace).
 			writeStreamData(iter.data).write("\nendobj\n")
 	}
 	// write info object
@@ -1025,20 +1032,26 @@ func (pdf *PDF) DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF {
 		write(" %s\n", mode)                      // b: fill or S: stroke
 } //                                                                 DrawEllipse
 
-// DrawImage draws a grayscale PNG image. For now, only grayscale PNG
-// images are supported. x, y and height specify the position and height
-// of the image. (width is scaled to match the image's aspect ratio).
+// DrawImage draws a PNG image. x, y, height specify the position and height
+// of the image. Width is scaled to match the image's aspect ratio.
 // fileNameOrBytes is either a string specifying a file name,
 // or a byte slice with PNG image data.
-func (pdf *PDF) DrawImage(
-	x, y, height float64, fileNameOrBytes interface{}) *PDF {
+func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
+	backColor ...string) *PDF {
 	//
 	if pdf.warnIfNoPage() {
 		return pdf
 	}
+	var back = color.RGBA{R: 255, G: 255, B: 255} // white by default
+	if len(backColor) > 0 {
+		back, _ = pdf.ToColor(backColor[0])
+	}
 	// add the image to the current page, if not already referenced
 	var pg = pdf.ppage
-	var img, idx = pdf.loadImage(fileNameOrBytes)
+	var img, idx, err = pdf.loadImage(fileNameOrBytes, back)
+	if err != nil {
+		return pdf.setError(err)
+	}
 	var found bool
 	for _, iter := range pg.imageNos {
 		if iter == idx {
@@ -1051,9 +1064,9 @@ func (pdf *PDF) DrawImage(
 	}
 	// draw the image
 	x *= pdf.ptPerUnit
-	y = pdf.paperSize.heightPt - y*pdf.ptPerUnit - height
-	var w = float64(img.widthPx) / float64(img.heightPx) * height
 	var h = height * pdf.ptPerUnit
+	var w = float64(img.widthPx) / float64(img.heightPx) * h
+	y = pdf.paperSize.heightPt - y*pdf.ptPerUnit - h
 	return pdf.write("q\n %f 0 0 %f %f %f cm\n/IMG%d Do\nQ\n", w, h, x, y, idx)
 	//                     w      h  x  y
 	//                q: save graphics state
@@ -1496,60 +1509,80 @@ func (pdf *PDF) drawTextBox(x, y, width, height float64,
 
 // loadImage reads an image from a file or byte array, stores its data in
 // the PDF's images array, and returns a pdfImage and its reference index
-func (pdf *PDF) loadImage(fileNameOrBytes interface{}) (img pdfImage, idx int) {
+func (pdf *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
+) (img pdfImage, idx int, err error) {
 	idx = -1
-	var name string
 	var buf *bytes.Buffer
 	switch val := fileNameOrBytes.(type) {
 	case string:
 		var data, err = ioutil.ReadFile(val)
 		if err != nil {
 			pdf.setError("File "+val+":", err)
-			return pdfImage{}, -1
+			return pdfImage{}, -1, err
 		}
-		name = val
+		img.name = val
 		buf = bytes.NewBuffer(data)
 	case []byte:
 		var n = len(val)
 		if n > 32 {
 			n = 32
 		}
-		name = fmt.Sprintf("%x", val[:n])
+		img.name = fmt.Sprintf("%x", val[:n])
 		buf = bytes.NewBuffer(val)
 	default:
-		pdf.setError("Invalid type in fileNameOrBytes:",
+		var msg = fmt.Sprint("Invalid type in fileNameOrBytes:",
 			reflect.TypeOf(fileNameOrBytes), "value:", fileNameOrBytes)
-		return pdfImage{}, -1
+		pdf.setError(msg)
+		return pdfImage{}, -1, fmt.Errorf(msg)
 	}
 	for i, iter := range pdf.images {
-		if iter.name == name {
+		if iter.name == img.name && bytes.Equal(iter.data, img.data) {
 			img, idx = iter, i
 			break
 		}
 	}
+	// blends color into the background 'back', using opacity (alpha) value
+	var blend = func(color, alpha uint32, back uint8) uint8 {
+		var c = float64(color) // range 0-65535
+		var a = 65535 - float64(alpha)
+		var n = float64(back)*255 - c
+		return uint8((c + n/65536*a) / 65536 * 255)
+	}
 	if idx == -1 {
 		var decoded, _, err = image.Decode(buf)
 		if err != nil {
-			pdf.setError("Image not decoded:", err)
-			return pdfImage{}, -1
+			var msg = fmt.Sprint("Image not decoded:", err)
+			pdf.setError(msg)
+			return pdfImage{}, -1, fmt.Errorf(msg)
 		}
-		var bounds = decoded.Bounds()
-		var w, h = bounds.Max.X, bounds.Max.Y
-		var data []byte
-		for y := 0; y < h; y++ {
-			for x := 0; x < w; x++ {
-				var rd, gr, bl, _ = decoded.At(x, y).RGBA()
-				data = append(data, byte(
-					float64(rd)*0.2126+float64(gr)*0.7152+float64(bl)*0.0722,
-				))
+		img.widthPx = decoded.Bounds().Max.X
+		img.heightPx = decoded.Bounds().Max.Y
+		img.isGray = decoded.ColorModel() == color.GrayModel ||
+			decoded.ColorModel() == color.Gray16Model
+		var ar []byte
+		for y := 0; y < img.heightPx; y++ {
+			for x := 0; x < img.widthPx; x++ {
+				var r, g, b, a = decoded.At(x, y).RGBA() // value range: 0-65535
+				switch {
+				case img.isGray:
+					ar = append(ar, byte(float64(r)))
+				case a == 65535: //                             if fully opaque:
+					ar = append(ar, byte(r), byte(g), byte(b)) // use pix. color
+				case a == 0: //                                  if transparent:
+					ar = append(ar, back.R, back.G, back.B) //   use back. color
+				default: //                                 if semi-transparent:
+					ar = append(ar,
+						blend(r, a, back.R), //      blend pixel and back colors
+						blend(g, a, back.G), //         based on the alpha value
+						blend(b, a, back.B))
+				}
 			}
 		}
-		img = pdfImage{name: name, widthPx: w, heightPx: h, data: data,
-			grayscale: true} //TODO: determine actual grayscale mode
+		img.data = ar
 		idx = len(pdf.images)
 		pdf.images = append(pdf.images, img)
 	}
-	return img, idx
+	return img, idx, nil
 } //                                                                   loadImage
 
 // textWidthPt1000 returns the width of text in thousandths of a point
