@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-12 23:36:46 858BE9                              [one_file_pdf.go]
+// :v: 2018-03-13 16:35:06 1E31E6                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -337,8 +337,8 @@ type pdfFont struct {
 // pdfImage represents an image
 type pdfImage struct {
 	name      string
-	width     int
-	height    int
+	widthPx   int // width in pixels
+	heightPx  int // height in pixels
 	data      []byte
 	grayscale bool
 } //                                                                    pdfImage
@@ -962,7 +962,7 @@ func (pdf *PDF) Bytes() []byte {
 	for _, iter := range pdf.images {
 		pdf.writeObj("/XObject").
 			write("/Subtype/Image/Width %d/Height %d/ColorSpace/DeviceGray/"+
-				"BitsPerComponent 8", iter.width, iter.height).
+				"BitsPerComponent 8", iter.widthPx, iter.heightPx).
 			writeStreamData(iter.data).write("\nendobj\n")
 	}
 	// write info object
@@ -1071,7 +1071,7 @@ func (pdf *PDF) DrawImage(
 	// draw the image
 	x *= pdf.ptPerUnit
 	y = pdf.paperSize.heightPt - y*pdf.ptPerUnit - height
-	var w = float64(img.width) / float64(img.height) * height
+	var w = float64(img.widthPx) / float64(img.heightPx) * height
 	var h = height * pdf.ptPerUnit
 	return pdf.write("q\n %f 0 0 %f %f %f cm\n/IMG%d Do\nQ\n", w, h, x, y, idx)
 	//                     w      h  x  y
@@ -1531,7 +1531,7 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}) (img pdfImage, idx int) {
 				))
 			}
 		}
-		img = pdfImage{name: name, width: w, height: h, data: data,
+		img = pdfImage{name: name, widthPx: w, heightPx: h, data: data,
 			grayscale: true} //TODO: determine actual grayscale mode
 		idx = len(pdf.images)
 		pdf.images = append(pdf.images, img)
