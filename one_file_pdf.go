@@ -1815,7 +1815,7 @@ func (pdf *PDF) getPaperSize(name string) (pdfPaperSize, error) {
 	var landscape = strings.HasSuffix(name, "-L")
 	var s = pdf.toUpperLettersDigits(name, "")
 	if landscape {
-		s = s[:len(s)-2]
+		s = s[:len(s)-1]	// The "-" was already removed above. Now remove the "L"
 	}
 	var wh, found = pdfStandardPaperSizes[s]
 	if !found {
