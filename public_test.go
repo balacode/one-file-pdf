@@ -1,12 +1,12 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-12 22:27:28 A8C15F                                  [run_test.go]
+// :v: 2018-03-13 23:49:55 31F8E6                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
 
 /*
-This file provides the entry points to run unit tests.
+This file provides the entry points to run unit tests on the public API.
 
 The actual unit test functions are implemented in a separate 'utest'
 package, each named after the PDF method it tests, and not prefixed
