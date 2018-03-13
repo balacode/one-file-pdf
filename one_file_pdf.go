@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-13 19:07:04 95B1A5                              [one_file_pdf.go]
+// :v: 2018-03-14 00:04:46 1AEF4A                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1815,7 +1815,7 @@ func (pdf *PDF) getPaperSize(name string) (pdfPaperSize, error) {
 	var landscape = strings.HasSuffix(name, "-L")
 	var s = pdf.toUpperLettersDigits(name, "")
 	if landscape {
-		s = s[:len(s)-1]	// The "-" was already removed above. Now remove the "L"
+		s = s[:len(s)-1] // The "-" was already removed above. Now remove the "L"
 	}
 	var wh, found = pdfStandardPaperSizes[s]
 	if !found {

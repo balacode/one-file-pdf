@@ -1,0 +1,7 @@
+# [.gitignore]
+
+# ignore this file till it can be made smaller
+# It is about 6MB now!
+png_images.pdf 
+
+#end

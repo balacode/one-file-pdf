@@ -17,7 +17,8 @@ __*
 
 # ignore generated PDF files
 # (reference samples are in demo/sample)
-demo/hello.pdf 
 demo/corporate.pdf 
+demo/hello.pdf 
+demo/png_images.pdf 
 
 #end

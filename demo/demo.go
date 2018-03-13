@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-09 01:23:06 F05AA5                                      [demo.go]
+// :v: 2018-03-14 00:05:12 84F475                                      [demo.go]
 // -----------------------------------------------------------------------------
 
 package main
@@ -16,6 +16,7 @@ import "github.com/balacode/one-file-pdf"
 func main() {
 	helloWorld()
 	corporateIpsum()
+	pngImages()
 } //                                                                        main
 
 func helloWorld() {
@@ -102,5 +103,37 @@ func corporateIpsum() {
 	// save the file
 	pdf.SaveFile("corporate.pdf")
 } //                                                              corporateIpsum
+
+func pngImages() {
+	const filename = "png_images.pdf"
+	fmt.Println("Generating sample PDF:", filename, "...")
+	var pdf = pdf.NewPDF("A4")
+	pdf.AddPage().SetUnits("cm")
+	//
+	// draw background pattern
+	for x := 0.0; x < pdf.PageWidth(); x += 6 {
+		for y := 0.0; y < pdf.PageHeight(); y += 5 {
+			pdf.DrawImage(x, y, 5, "../image/gophers.png", "cyan")
+		}
+	}
+	// draw dice
+	pdf.SetColor("WHITE")
+	pdf.FillBox(3.5, 4.5, 14.7, 17)
+	//
+	pdf.DrawImage(4, 5, 5, "../image/dice.png", "WHITE")
+	pdf.DrawImage(11, 5, 5, "../image/dice.png", "RED")
+	//
+	pdf.DrawImage(4, 10.5, 5, "../image/dice.png", "GREEN")
+	pdf.DrawImage(11, 10.5, 5, "../image/dice.png", "BLUE")
+	//
+	pdf.DrawImage(4, 16, 5, "../image/dice.png", "BLACK")
+
+	pdf.SetFont("Helvetica-Bold", 50)
+	pdf.SetXY(3, 3).SetColor("#009150").
+		DrawText("PNG Image Demo")
+
+	//pdf.DrawUnitGrid()
+	pdf.SaveFile(filename)
+} //                                                                   pngImages
 
 //end
