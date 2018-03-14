@@ -31,7 +31,7 @@ The only type you need to use is PDF, while PDFColorNames are left public for re
 - Set the measurement units you want: mm, cm, inches, twips or points
 - Draw lines with different thickness
 - Filled or outline rectangles, circles and ellipses
-- Grayscale PNG images
+- JPEG, GIF and transparent PNG images (filled with specified background color)
 - Set columns for text (like tab stops on the page)
 - Built-in grid option to help measurement and positioning
 
@@ -116,3 +116,15 @@ func main() {
 - SetColumnWidths() is no longer limited to 100 columns
 - Font names and color names can be specified with spaces, underscores or '-' delimiting words
 - Removed module-global PDFErrorHandler, created SetErrorLogger() to set the handler for each PDF instance
+
+**2018-MAR-14**
+- Added support for color JPEG, GIF and PNG images with transparency blending
+- Added all standard A, B, and C paper sizes, and US Tabloid and Ledger
+- DrawImage(): added backColor optional parameter (using ...) so you can specify the background color for transparent PNGs
+- DrawImage(): changed to draw images down from the Y-coordinate position (below, not above Y)
+- Created "PNG Images Demo", which outputs to png_images.pdf
+- Created ToColor() function to convert named colors and HTML color codes to RGBA color values
+- Created ToUnits() method to convert points to the currently-active units of measurement
+- Removed PDFNoPage constant
+- Created basic unit tests and test helper functions
+- Various internal changes, reducing file length by about 60 lines
