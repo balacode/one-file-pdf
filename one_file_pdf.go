@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-15 01:14:12 BD1D97                              [one_file_pdf.go]
+// :v: 2018-03-15 02:19:56 540E8E                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -124,6 +124,7 @@ package pdf
 
 import "bytes"         // standard
 import "compress/zlib" // standard
+import "crypto/sha512" // standard
 import "fmt"           // standard
 import "image"         // standard
 import "image/color"   // standard
@@ -131,10 +132,10 @@ import "io/ioutil"     // standard
 import "reflect"       // standard
 import "strconv"       // standard
 import "strings"       // standard
-import "unicode"       // standard   only uses IsSpace(), IsLetter(), IsDigit()
-import _ "image/png"   // standard   init image decoders
-import _ "image/jpeg"  // standard
+import "unicode"       // standard   only uses IsDigit(), IsLetter(), IsSpace()
 import _ "image/gif"   // standard
+import _ "image/jpeg"  // standard
+import _ "image/png"   // standard   init image decoders
 
 // -----------------------------------------------------------------------------
 // # Main Structure
@@ -340,11 +341,13 @@ type pdfFont struct {
 
 // pdfImage represents an image
 type pdfImage struct {
-	name     string // filename
-	widthPx  int    // width in pixels
-	heightPx int    // height in pixels
-	data     []byte // data
-	isGray   bool   // image is grayscale? (otherwise a color image)
+	filename  string     // name of file from which image was read
+	widthPx   int        // width in pixels
+	heightPx  int        // height in pixels
+	data      []byte     // data
+	hash      [64]byte   // hash of data: determines if two images are the same
+	backColor color.RGBA // background color: determines if two images are same
+	isGray    bool       // image is grayscale? (otherwise a color image)
 } //                                                                    pdfImage
 
 // pdfPage holds references, state and the stream buffer for each page
@@ -1513,24 +1516,25 @@ func (pdf *PDF) drawTextBox(x, y, width, height float64,
 // the PDF's images array, and returns a pdfImage and its reference index
 func (pdf *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 ) (img pdfImage, idx int, err error) {
-	idx = -1
 	var buf *bytes.Buffer
 	switch val := fileNameOrBytes.(type) {
 	case string:
+		for i, iter := range pdf.images {
+			if iter.filename == val && iter.backColor == back {
+				return iter, i, nil
+			}
+		}
+		img.filename = val
 		var data, err = ioutil.ReadFile(val)
 		if err != nil {
 			pdf.setError("File "+val+":", err)
 			return pdfImage{}, -1, err
 		}
-		img.name = val
 		buf = bytes.NewBuffer(data)
+		img.hash = sha512.Sum512(data)
 	case []byte:
-		var n = len(val)
-		if n > 32 {
-			n = 32
-		}
-		img.name = fmt.Sprintf("%x", val[:n])
 		buf = bytes.NewBuffer(val)
+		img.hash = sha512.Sum512(val)
 	default:
 		var msg = fmt.Sprint("Invalid type in fileNameOrBytes:",
 			reflect.TypeOf(fileNameOrBytes), "value:", fileNameOrBytes)
@@ -1538,9 +1542,8 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 		return pdfImage{}, -1, fmt.Errorf(msg)
 	}
 	for i, iter := range pdf.images {
-		if iter.name == img.name && bytes.Equal(iter.data, img.data) {
-			img, idx = iter, i
-			break
+		if bytes.Equal(iter.hash[:], img.hash[:]) && iter.backColor == back {
+			return iter, i, nil
 		}
 	}
 	// blends color into the background 'back', using opacity (alpha) value
@@ -1550,41 +1553,39 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 		var n = float64(back)*255 - c
 		return uint8((c + n/65536*a) / 65536 * 255)
 	}
-	if idx == -1 {
-		var decoded, _, err = image.Decode(buf)
-		if err != nil {
-			var msg = fmt.Sprint("Image not decoded:", err)
-			pdf.setError(msg)
-			return pdfImage{}, -1, fmt.Errorf(msg)
-		}
-		img.widthPx = decoded.Bounds().Max.X
-		img.heightPx = decoded.Bounds().Max.Y
-		img.isGray = decoded.ColorModel() == color.GrayModel ||
-			decoded.ColorModel() == color.Gray16Model
-		var ar []byte
-		for y := 0; y < img.heightPx; y++ {
-			for x := 0; x < img.widthPx; x++ {
-				var r, g, b, a = decoded.At(x, y).RGBA() // value range: 0-65535
-				switch {
-				case img.isGray:
-					ar = append(ar, byte(float64(r)))
-				case a == 65535: //                             if fully opaque:
-					ar = append(ar, byte(r), byte(g), byte(b)) // use pix. color
-				case a == 0: //                                  if transparent:
-					ar = append(ar, back.R, back.G, back.B) //   use back. color
-				default: //                                 if semi-transparent:
-					ar = append(ar,
-						blend(r, a, back.R), //      blend pixel and back colors
-						blend(g, a, back.G), //         based on the alpha value
-						blend(b, a, back.B))
-				}
+	var decoded, _, err2 = image.Decode(buf)
+	if err2 != nil {
+		var msg = fmt.Sprint("Image not decoded:", err2)
+		pdf.setError(msg)
+		return pdfImage{}, -1, fmt.Errorf(msg)
+	}
+	img.widthPx = decoded.Bounds().Max.X
+	img.heightPx = decoded.Bounds().Max.Y
+	img.backColor = back
+	img.isGray = decoded.ColorModel() == color.GrayModel ||
+		decoded.ColorModel() == color.Gray16Model
+	var ar []byte
+	for y := 0; y < img.heightPx; y++ {
+		for x := 0; x < img.widthPx; x++ {
+			var r, g, b, a = decoded.At(x, y).RGBA() // value range: 0-65535
+			switch {
+			case img.isGray:
+				ar = append(ar, byte(float64(r)))
+			case a == 65535: //                                 if fully opaque:
+				ar = append(ar, byte(r), byte(g), byte(b)) //    use pixel color
+			case a == 0: //                                      if transparent:
+				ar = append(ar, back.R, back.G, back.B) //  use background color
+			default: //                                     if semi-transparent:
+				ar = append(ar,
+					blend(r, a, back.R), //          blend pixel and back colors
+					blend(g, a, back.G), //             based on the alpha value
+					blend(b, a, back.B))
 			}
 		}
-		img.data = ar
-		idx = len(pdf.images)
-		pdf.images = append(pdf.images, img)
 	}
-	return img, idx, nil
+	img.data = ar
+	pdf.images = append(pdf.images, img)
+	return img, len(pdf.images) - 1, nil
 } //                                                                   loadImage
 
 // textWidthPt1000 returns the width of text in thousandths of a point
