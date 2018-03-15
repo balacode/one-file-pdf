@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-14 00:05:12 84F475                                      [demo.go]
+// :v: 2018-03-15 01:06:15 DA4D01                                      [demo.go]
 // -----------------------------------------------------------------------------
 
 package main
@@ -63,8 +63,8 @@ func helloWorld() {
 } //                                                                  helloWorld
 
 func corporateIpsum() {
-	const filename = "corporate.pdf"
-	fmt.Println("Generating sample PDF:", filename, "...")
+	const FILENAME = "corporate.pdf"
+	fmt.Println("Generating sample PDF:", FILENAME, "...")
 	var pdf = pdf.NewPDF("A4") // create a new PDF using 'A4' page size
 	pdf.SetUnits("cm")
 	pdf.AddPage() // add a new page
@@ -77,15 +77,15 @@ func corporateIpsum() {
 		SetXY(3.5, 2.7).DrawText("Synergy Ipsum")
 	//
 	// draw the green circle
-	pdf.SetColor("#74C365 Mantis").FillCircle(21, 21, 10) // xywh
+	pdf.SetColor("#74C365 Mantis").FillCircle(21, 21, 10) // x, y, radius
 	//
 	// draw the left column of text (in a box)
 	var col1 = strings.Replace(CorporateFiller1, "\n", " ", -1)
-	pdf.SetColor("#73C2FB MayaBlue")
-	pdf.FillBox(0, 4, 10, 15) // xywh
-	pdf.SetColor("black")
-	pdf.SetFont("times-roman", 11)
-	pdf.DrawTextInBox(0.5, 4.5, 9, 15, "LT", col1)
+	pdf.SetColor("#73C2FB MayaBlue").
+		FillBox(0, 4, 10, 15). // xywh
+		SetColor("black").
+		SetFont("times-roman", 11).
+		DrawTextInBox(0.5, 4.5, 9, 15, "LT", col1)
 	//
 	// draw the right column of text
 	var col2 = strings.Replace(CorporateFiller2, "\n", " ", -1)
@@ -101,12 +101,12 @@ func corporateIpsum() {
 		DrawTextInBox(0, 25, 5, 5, "C", string(rune(063)))
 	//
 	// save the file
-	pdf.SaveFile("corporate.pdf")
+	pdf.SaveFile(FILENAME)
 } //                                                              corporateIpsum
 
 func pngImages() {
-	const filename = "png_images.pdf"
-	fmt.Println("Generating sample PDF:", filename, "...")
+	const FILENAME = "png_images.pdf"
+	fmt.Println("Generating sample PDF:", FILENAME, "...")
 	var pdf = pdf.NewPDF("A4")
 	pdf.AddPage().SetUnits("cm")
 	//
@@ -133,7 +133,7 @@ func pngImages() {
 		DrawText("PNG Image Demo")
 
 	//pdf.DrawUnitGrid()
-	pdf.SaveFile(filename)
+	pdf.SaveFile(FILENAME)
 } //                                                                   pngImages
 
 //end
