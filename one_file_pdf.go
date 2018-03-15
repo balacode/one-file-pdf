@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-14 00:04:46 1AEF4A                              [one_file_pdf.go]
+// :v: 2018-03-15 01:14:12 BD1D97                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -676,6 +676,8 @@ var pdfStandardPaperSizes = map[string][2]int{
 // NewPDF creates and initializes a new PDF object. Specify paperSize as:
 // A, B, C series (e.g. "A4") or "LEGAL", "TABLOID", "LETTER", or "LEDGER".
 // To specify a landscape orientation, add "-L" suffix e.g. "A4-L".
+// You can also specify custom paper sizes using "width unit x height unit",
+// for example "20 cm x 20 cm" or even "15cm x 10inch", etc.
 func NewPDF(paperSize string) PDF {
 	var pdf = PDF{pageNo: -1, horizontalScaling: 100, compressStreams: true,
 		errorLogger: fmt.Println}
@@ -1808,14 +1810,20 @@ func (*PDF) toUpperLettersDigits(s, extras string) string {
 	return buf.String()
 } //                                                        toUpperLettersDigits
 
-// getPaperSize returns a pdfPaperSize based on the specified paper name
-// if the paper size is not found, returns a zero-initialized structure
+// getPaperSize returns a pdfPaperSize based on the specified paper name.
+// Specify custom paper sizes using "width x height", e.g. "9cm x 20cm"
+// If the paper size is not found, returns a zero-initialized structure
 func (pdf *PDF) getPaperSize(name string) (pdfPaperSize, error) {
+	name = strings.ToUpper(name)
+	if strings.Contains(name, " X ") {
+		var wh = strings.Split(name, " X ")
+		return pdfPaperSize{name, pdf.ToPoints(wh[0]), pdf.ToPoints(wh[1])}, nil
+	}
 	name = pdf.toUpperLettersDigits(name, "-")
 	var landscape = strings.HasSuffix(name, "-L")
 	var s = pdf.toUpperLettersDigits(name, "")
 	if landscape {
-		s = s[:len(s)-1] // The "-" was already removed above. Now remove the "L"
+		s = s[:len(s)-1] // "-" is already removed above. now remove the "L"
 	}
 	var wh, found = pdfStandardPaperSizes[s]
 	if !found {
