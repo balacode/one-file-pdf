@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-17 00:49:19 827D85                              [one_file_pdf.go]
+// :v: 2018-03-17 00:51:37 B7A35B                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -89,6 +89,8 @@ package pdf
 //       wrapText bool, align, text string) *PDF
 //   loadImage(fileNameOrBytes interface{}, back color.RGBA,
 //       ) (img pdfImage, idx int, err error)
+//   makeImage(source image.Image, back color.RGBA,
+//       ) (widthPx, heightPx int, isGray bool, data []byte)
 //   textWidthPt1000(s string) float64
 //
 // # Private Generation Methods (pdf *PDF)
@@ -575,6 +577,9 @@ func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 		back, _ = pdf.ToColor(backColor[0])
 	}
 	// add the image to the current page, if not already referenced
+	if len(pdf.pages) == 0 {
+		pdf.AddPage()
+	}
 	var pg = pdf.ppage
 	var img, idx, err = pdf.loadImage(fileNameOrBytes, back)
 	if err != nil {
@@ -1055,6 +1060,22 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 			return iter, i, nil
 		}
 	}
+	var decoded, _, err2 = image.Decode(buf)
+	if err2 != nil {
+		var msg = fmt.Sprint("Image not decoded:", err2)
+		pdf.putError(msg)
+		return pdfImage{}, -1, fmt.Errorf(msg)
+	}
+	img.backColor = back
+	img.widthPx, img.heightPx, img.isGray, img.data = makeImage(decoded, back)
+	pdf.images = append(pdf.images, img)
+	return img, len(pdf.images) - 1, nil
+} //                                                                   loadImage
+
+// makeImage __
+func makeImage(source image.Image, back color.RGBA,
+) (widthPx, heightPx int, isGray bool, ar []byte) {
+	//
 	// blends color into the background 'back', using opacity (alpha) value
 	var blend = func(color, alpha uint32, back uint8) uint8 {
 		var c = float64(color) // range 0-65535
@@ -1062,23 +1083,14 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 		var n = float64(back)*255 - c
 		return uint8((c + n/65536*a) / 65536 * 255)
 	}
-	var decoded, _, err2 = image.Decode(buf)
-	if err2 != nil {
-		var msg = fmt.Sprint("Image not decoded:", err2)
-		pdf.putError(msg)
-		return pdfImage{}, -1, fmt.Errorf(msg)
-	}
-	img.widthPx = decoded.Bounds().Max.X
-	img.heightPx = decoded.Bounds().Max.Y
-	img.backColor = back
-	img.isGray = decoded.ColorModel() == color.GrayModel ||
-		decoded.ColorModel() == color.Gray16Model
-	var ar []byte
-	for y := 0; y < img.heightPx; y++ {
-		for x := 0; x < img.widthPx; x++ {
-			var r, g, b, a = decoded.At(x, y).RGBA() // value range: 0-65535
+	widthPx, heightPx = source.Bounds().Max.X, source.Bounds().Max.Y
+	var model = source.ColorModel()
+	isGray = model == color.GrayModel || model == color.Gray16Model
+	for y := 0; y < heightPx; y++ {
+		for x := 0; x < widthPx; x++ {
+			var r, g, b, a = source.At(x, y).RGBA() //      value range: 0-65535
 			switch {
-			case img.isGray:
+			case isGray:
 				ar = append(ar, byte(float64(r)))
 			case a == 65535: //                                 if fully opaque:
 				ar = append(ar, byte(r), byte(g), byte(b)) //    use pixel color
@@ -1092,10 +1104,8 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 			}
 		}
 	}
-	img.data = ar
-	pdf.images = append(pdf.images, img)
-	return img, len(pdf.images) - 1, nil
-} //                                                                   loadImage
+	return widthPx, heightPx, isGray, ar
+} //                                                                   makeImage
 
 // textWidthPt1000 returns the width of text in thousandths of a point
 func (pdf *PDF) textWidthPt1000(s string) float64 {
