@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-16 16:21:46 44A300                                      [demo.go]
+// :v: 2018-03-16 16:38:02 A70026                                      [demo.go]
 // -----------------------------------------------------------------------------
 
 package main
@@ -103,7 +103,8 @@ func corporateIpsum() {
 func pngImages() {
 	const FILENAME = "png_images.pdf"
 	fmt.Println("Generating sample PDF:", FILENAME, "...")
-	var pdf = pdf.NewPDF("A4").SetUnits("cm")
+	var pdf = pdf.NewPDF("A4")
+	pdf.SetUnits("cm")
 	//
 	// draw background pattern
 	for x := 0.0; x < pdf.PageWidth(); x += 6 {
