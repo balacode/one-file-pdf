@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-17 00:41:04 620300                              [one_file_pdf.go]
+// :v: 2018-03-17 00:49:19 827D85                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -121,22 +121,20 @@ package pdf
 //   pdfPagesIndex = 3
 //   pdfStandardPaperSizes = []pdfPaperSize
 
-import (
-	"bytes"
-	"compress/zlib"
-	"crypto/sha512"
-	"fmt"
-	"image"
-	"image/color"
-	_ "image/gif"
-	_ "image/jpeg"
-	_ "image/png" // init image decoders
-	"io/ioutil"
-	"reflect"
-	"strconv"
-	"strings"
-	"unicode" // only uses IsDigit(), IsLetter(), IsSpace()
-)
+import "bytes"         // standard
+import "compress/zlib" // standard
+import "crypto/sha512" // standard
+import "fmt"           // standard
+import "image"         // standard
+import "image/color"   // standard
+import "io/ioutil"     // standard
+import "reflect"       // standard
+import "strconv"       // standard
+import "strings"       // standard
+import "unicode"       // standard   only uses IsDigit(), IsLetter(), IsSpace()
+import _ "image/gif"   // standard
+import _ "image/jpeg"  // standard
+import _ "image/png"   // standard   init image decoders
 
 // -----------------------------------------------------------------------------
 // # Main Structure
@@ -320,11 +318,11 @@ func (pdf *PDF) Y() float64 {
 // for subsequent text and line drawing and fills.
 // If the name is unknown or valid, sets the current color to black.
 func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
-	var c, err = pdf.ToColor(nameOrHTMLColor)
+	var color, err = pdf.ToColor(nameOrHTMLColor)
 	if err != nil {
 		pdf.putError(err)
 	}
-	pdf.color = c
+	pdf.color = color
 	return pdf
 } //                                                                    SetColor
 
@@ -438,7 +436,7 @@ func (pdf *PDF) SetY(y float64) *PDF {
 // -----------------------------------------------------------------------------
 // # Methods (pdf *PDF)
 
-// AddPage appends a new blank page to the document and makes it selected.
+// AddPage appends a new blank page to the PDF and makes it the current page.
 func (pdf *PDF) AddPage() *PDF {
 	var COLOR = color.RGBA{1, 0, 1, 0x01} // unlikely default color
 	pdf.pages = append(pdf.pages, pdfPage{
@@ -725,7 +723,8 @@ func (pdf *PDF) SaveFile(filename string) error {
 	return nil
 } //                                                                    SaveFile
 
-// SetColumnWidths creates columns along the X-axis.
+// SetColumnWidths creates column positions (tab stops) along the X-axis.
+// To remove all column positions, call this method without any argument.
 func (pdf *PDF) SetColumnWidths(widths ...float64) *PDF {
 	if len(widths) < 1 {
 		return pdf.putError("Argument not specified: widths")
