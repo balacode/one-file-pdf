@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-16 16:02:09 6CC1ED                              [one_file_pdf.go]
+// :v: 2018-03-16 16:07:05 6D393A                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1630,6 +1630,9 @@ func (pdf *PDF) nextObj() int {
 // write writes formatted strings (like fmt.Sprintf) to the current page's
 // content stream or to the final generated PDF, if there is no active page
 func (pdf *PDF) write(format string, args ...interface{}) *PDF {
+	if len(pdf.pages) == 0 {
+		pdf.AddPage()
+	}
 	pdf.pbuf.Write([]byte(fmt.Sprintf(format, args...)))
 	return pdf
 } //                                                                       write
@@ -1650,6 +1653,9 @@ func (pdf *PDF) writeEndobj() *PDF {
 // writeMode sets the stroking or non-stroking color and line width.
 // 'fill' arg specifies non-stroking (true) or stroking mode (none/false)
 func (pdf *PDF) writeMode(fill ...bool) (mode string) {
+	if len(pdf.pages) == 0 {
+		pdf.AddPage()
+	}
 	mode = "S" // S: stroke path (for lines)
 	if len(fill) > 0 && fill[0] {
 		mode = "b" // b: fill / text
@@ -1700,11 +1706,7 @@ func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
 		pdf.write("]")
 	}
 	pdf.writeEndobj()
-	for i, pg := range pdf.pages { //                            write each page
-		if pg.content.Len() == 0 {
-			pdf.putError("Warning: empty page", i+1)
-			continue
-		}
+	for _, pg := range pdf.pages { //                            write each page
 		pdf.writeObj("/Page").
 			write("/Parent 2 0 R/Contents %d 0 R", pdf.objNo+1)
 		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
