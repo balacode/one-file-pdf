@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-15 01:06:15 DA4D01                                      [demo.go]
+// :v: 2018-03-16 16:21:46 44A300                                      [demo.go]
 // -----------------------------------------------------------------------------
 
 package main
@@ -24,9 +24,6 @@ func helloWorld() {
 	//
 	// create a new PDF using 'A4' page size
 	var pdf = pdf.NewPDF("A4")
-	//
-	// add a page: this must be done before drawing
-	pdf.AddPage()
 	//
 	// set the measurement units to centimeters
 	pdf.SetUnits("cm")
@@ -67,7 +64,6 @@ func corporateIpsum() {
 	fmt.Println("Generating sample PDF:", FILENAME, "...")
 	var pdf = pdf.NewPDF("A4") // create a new PDF using 'A4' page size
 	pdf.SetUnits("cm")
-	pdf.AddPage() // add a new page
 	//
 	// draw the heading
 	pdf.SetColor("#002FA7 InternationalKleinBlue").
@@ -107,8 +103,7 @@ func corporateIpsum() {
 func pngImages() {
 	const FILENAME = "png_images.pdf"
 	fmt.Println("Generating sample PDF:", FILENAME, "...")
-	var pdf = pdf.NewPDF("A4")
-	pdf.AddPage().SetUnits("cm")
+	var pdf = pdf.NewPDF("A4").SetUnits("cm")
 	//
 	// draw background pattern
 	for x := 0.0; x < pdf.PageWidth(); x += 6 {

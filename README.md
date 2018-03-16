@@ -55,9 +55,6 @@ func main() {
 	// create a new PDF using 'A4' page size
 	var pdf = pdf.NewPDF("A4")
 
-	// add a page: this must be done before drawing
-	pdf.AddPage()
-
 	// set the measurement units to centimeters
 	pdf.SetUnits("cm")
 

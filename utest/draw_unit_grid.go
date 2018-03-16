@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-12 21:58:10 CCECC5                      [utest/draw_unit_grid.go]
+// :v: 2018-03-16 16:15:45 29864F                      [utest/draw_unit_grid.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -15,7 +15,6 @@ import "github.com/balacode/one-file-pdf"
 func gridTestResult() string {
 	var pdf = pdf.NewPDF("A4")
 	pdf.SetCompression(false).
-		AddPage().
 		SetUnits("cm").
 		DrawUnitGrid()
 	return string(pdf.Bytes())
