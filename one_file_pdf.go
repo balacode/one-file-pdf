@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-16 16:07:05 6D393A                              [one_file_pdf.go]
+// :v: 2018-03-16 16:15:45 69F404                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -99,7 +99,6 @@ package pdf
 //   loadImage(fileNameOrBytes interface{}, back color.RGBA,
 //       ) (img pdfImage, idx int, err error)
 //   textWidthPt1000(s string) float64
-//   warnIfNoPage() bool
 //
 // # Private Generation Methods (pdf *PDF)
 //   nextObj() int
@@ -756,17 +755,11 @@ func (pdf *PDF) Units() string { return pdf.unitName }
 
 // X returns the X-coordinate of the current drawing position.
 func (pdf *PDF) X() float64 {
-	if pdf.warnIfNoPage() {
-		return 0
-	}
 	return pdf.ToUnits(pdf.ppage.x)
 } //                                                                           X
 
 // Y returns the Y-coordinate of the current drawing position.
 func (pdf *PDF) Y() float64 {
-	if pdf.warnIfNoPage() {
-		return 0
-	}
 	return pdf.ToUnits(pdf.paperSize.heightPt - pdf.ppage.y)
 } //                                                                           Y
 
@@ -879,25 +872,18 @@ func (pdf *PDF) SetUnits(unitName string) *PDF {
 
 // SetX changes the X-coordinate of the current drawing position.
 func (pdf *PDF) SetX(x float64) *PDF {
-	if !pdf.warnIfNoPage() {
-		pdf.ppage.x = x * pdf.ptPerUnit
-	}
+	pdf.ppage.x = x * pdf.ptPerUnit
 	return pdf
 } //                                                                        SetX
 
 // SetXY changes both X- and Y-coordinates of the current drawing position.
 func (pdf *PDF) SetXY(x, y float64) *PDF {
-	if pdf.warnIfNoPage() {
-		return pdf
-	}
 	return pdf.SetX(x).SetY(y)
 } //                                                                       SetXY
 
 // SetY changes the Y-coordinate of the current drawing position.
 func (pdf *PDF) SetY(y float64) *PDF {
-	if !pdf.warnIfNoPage() {
-		pdf.ppage.y = pdf.paperSize.heightPt - y*pdf.ptPerUnit
-	}
+	pdf.ppage.y = pdf.paperSize.heightPt - y*pdf.ptPerUnit
 	return pdf
 } //                                                                        SetY
 
@@ -997,9 +983,6 @@ func (pdf *PDF) Bytes() []byte {
 
 // DrawBox draws a rectangle.
 func (pdf *PDF) DrawBox(x, y, width, height float64, fill ...bool) *PDF {
-	if pdf.warnIfNoPage() {
-		return pdf
-	}
 	width, height = width*pdf.ptPerUnit, height*pdf.ptPerUnit
 	x *= pdf.ptPerUnit
 	y = pdf.paperSize.heightPt - y*pdf.ptPerUnit - height
@@ -1018,9 +1001,6 @@ func (pdf *PDF) DrawCircle(x, y, radius float64, fill ...bool) *PDF {
 // with horizontal radius xRadius and vertical radius yRadius
 // by drawing 4 Bézier curves (PDF has no ellipse primitive)
 func (pdf *PDF) DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF {
-	if pdf.warnIfNoPage() {
-		return pdf
-	}
 	x, y = x*pdf.ptPerUnit, pdf.paperSize.heightPt-y*pdf.ptPerUnit
 	const ratio = 0.552284749830794   // (4/3) * tan(PI/8)
 	var r = xRadius * pdf.ptPerUnit   // horizontal radius
@@ -1044,9 +1024,6 @@ func (pdf *PDF) DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF {
 func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 	backColor ...string) *PDF {
 	//
-	if pdf.warnIfNoPage() {
-		return pdf
-	}
 	var back = color.RGBA{R: 255, G: 255, B: 255} // white by default
 	if len(backColor) > 0 {
 		back, _ = pdf.ToColor(backColor[0])
@@ -1082,9 +1059,6 @@ func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 
 // DrawLine draws a straight line from point (x1, y1) to point (x2, y2).
 func (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF {
-	if pdf.warnIfNoPage() {
-		return pdf
-	}
 	x1, y1 = x1*pdf.ptPerUnit, pdf.paperSize.heightPt-y1*pdf.ptPerUnit
 	x2, y2 = x2*pdf.ptPerUnit, pdf.paperSize.heightPt-y2*pdf.ptPerUnit
 	pdf.writeMode(true) // prepare color/line width
@@ -1094,9 +1068,6 @@ func (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF {
 
 // DrawText draws a text string at the current position (X, Y).
 func (pdf *PDF) DrawText(s string) *PDF {
-	if pdf.warnIfNoPage() {
-		return pdf
-	}
 	if len(pdf.columnWidths) == 0 {
 		return pdf.drawTextLine(s)
 	}
@@ -1124,9 +1095,6 @@ func (pdf *PDF) DrawTextAlignedToBox(
 
 // DrawTextAt draws text at the specified point (x, y).
 func (pdf *PDF) DrawTextAt(x, y float64, text string) *PDF {
-	if pdf.warnIfNoPage() {
-		return pdf
-	}
 	return pdf.SetXY(x, y).DrawText(text)
 } //                                                                  DrawTextAt
 
@@ -1144,9 +1112,6 @@ func (pdf *PDF) DrawTextInBox(
 // current measurement unit. The grid fills the entire page.
 // It helps with item positioning.
 func (pdf *PDF) DrawUnitGrid() *PDF {
-	if pdf.warnIfNoPage() {
-		return pdf
-	}
 	var pw, ph = pdf.PageWidth(), pdf.PageHeight()
 	pdf.SetLineWidth(0.1).SetFont("Helvetica", 8)
 	for i, x := 0, 0.0; x < pw; x++ { //                        vertical lines |
@@ -1234,9 +1199,6 @@ func (pdf *PDF) SetErrorLogger(fn func(a ...interface{}) (int, error)) *PDF {
 
 // TextWidth returns the width of the text in current units.
 func (pdf *PDF) TextWidth(s string) float64 {
-	if pdf.warnIfNoPage() {
-		return 0
-	}
 	return pdf.ToUnits(pdf.textWidthPt1000(s))
 } //                                                                   TextWidth
 
@@ -1472,7 +1434,7 @@ func (pdf *PDF) drawTextLine(s string) *PDF {
 func (pdf *PDF) drawTextBox(x, y, width, height float64,
 	wrapText bool, align, text string,
 ) *PDF {
-	if pdf.warnIfNoPage() || text == "" {
+	if text == "" {
 		return pdf
 	}
 	var lines []string
@@ -1590,7 +1552,7 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 
 // textWidthPt1000 returns the width of text in thousandths of a point
 func (pdf *PDF) textWidthPt1000(s string) float64 {
-	if pdf.warnIfNoPage() || s == "" {
+	if s == "" {
 		return 0
 	}
 	var w = 0.0
@@ -1604,16 +1566,6 @@ func (pdf *PDF) textWidthPt1000(s string) float64 {
 	}
 	return w * pdf.fontSizePt / 1000 * float64(pdf.horizontalScaling) / 100
 } //                                                             textWidthPt1000
-
-// warnIfNoPage outputs a warning and returns true if there is no active
-// page. This can only happen when the user didn't call AddPage().
-func (pdf *PDF) warnIfNoPage() bool {
-	if pdf.ppage == nil || pdf.pageNo < 0 || pdf.pageNo > len(pdf.pages)-1 {
-		pdf.putError("No current page")
-		return true
-	}
-	return false
-} //                                                                warnIfNoPage
 
 // -----------------------------------------------------------------------------
 // # Private Generation Methods (pdf *PDF)
