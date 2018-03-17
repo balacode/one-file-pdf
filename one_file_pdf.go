@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-17 12:01:50 10073E                              [one_file_pdf.go]
+// :v: 2018-03-17 12:42:31 51640E                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1384,9 +1384,7 @@ func (pdf *PDF) getPaperSize(name string) (pdfPaperSize, error) {
 	}
 	var wh, found = pdfStandardPaperSizes[s]
 	if !found {
-		s = "Unknown paper size '" + name + "'"
-		pdf.putError(s)
-		return pdfPaperSize{}, fmt.Errorf(s)
+		return pdfPaperSize{}, fmt.Errorf("Unknown paper size %q", name)
 	}
 	// convert mm to points: div by 25.4mm/inch; mul by 72 points/inch
 	var w, h = float64(wh[0]) / 25.4 * 72, float64(wh[1]) / 25.4 * 72
