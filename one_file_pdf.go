@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-17 11:06:19 4D58EF                              [one_file_pdf.go]
+// :v: 2018-03-17 12:01:50 10073E                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -78,7 +78,7 @@ package pdf
 // # Metrics Methods (pdf *PDF)
 //   TextWidth(s string) float64
 //   ToColor(nameOrHTMLColor string) (color.RGBA, error)
-//   ToPoints(numberAndUnit string) float64
+//   ToPoints(numberAndUnit string) (float64, error)
 //   ToUnits(points float64) float64
 //   WrapTextLines(width float64, text string) (ret []string)
 //
@@ -116,7 +116,7 @@ package pdf
 //   toUpperLettersDigits(s, extras string) string
 //   (pdf *PDF):
 //   getPaperSize(name string) pdfPaperSize
-//   getPointsPerUnit(unitName string) float64
+//   getPointsPerUnit(unitName string) (ret float64, err error)
 //   putError(a ...interface{}) *PDF
 //
 // # Constants
@@ -418,8 +418,11 @@ func (pdf *PDF) SetLineWidth(points float64) *PDF {
 // SetUnits changes the current measurement units:
 // mm cm " in inch inches tw twip twips pt point points (can be in any case)
 func (pdf *PDF) SetUnits(unitName string) *PDF {
-	pdf.unitName = pdf.toUpperLettersDigits(unitName, "")
-	pdf.ptPerUnit = pdf.getPointsPerUnit(pdf.unitName)
+	var ppu, err = pdf.getPointsPerUnit(unitName)
+	if err != nil {
+		return pdf.putError(err)
+	}
+	pdf.ptPerUnit, pdf.unitName = ppu, pdf.toUpperLettersDigits(unitName, "")
 	return pdf
 } //                                                                    SetUnits
 
@@ -791,9 +794,9 @@ func (pdf *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error) {
 // ToPoints converts a string composed of a number and unit to points.
 // For example '1 cm' or '1cm' becomes 28.346 points.
 // Recognised units: mm cm " in inch inches tw twip twips pt point points
-func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
+func (pdf *PDF) ToPoints(numberAndUnit string) (float64, error) {
 	var num, unit string //                              extract number and unit
-	for _, r := range pdf.toUpperLettersDigits(numberAndUnit, `-."`) {
+	for _, r := range numberAndUnit {
 		switch {
 		case r == '-', r == '.', unicode.IsDigit(r):
 			num += string(r)
@@ -801,15 +804,19 @@ func (pdf *PDF) ToPoints(numberAndUnit string) float64 {
 			unit += string(r)
 		}
 	}
-	var ppu = pdf.getPointsPerUnit(unit)
-	if int(ppu*100) == 0 && unit != "" {
-		pdf.putError("Unknown unit name: '" + unit + "'")
+	var ppu = 1.0
+	if unit != "" {
+		var err error
+		ppu, err = pdf.getPointsPerUnit(unit)
+		if err != nil {
+			return 0, err
+		}
 	}
-	var n, _ = strconv.ParseFloat(num, 64)
-	if unit == "" {
-		return n
+	var n, err = strconv.ParseFloat(num, 64)
+	if err != nil {
+		return 0, err
 	}
-	return n * ppu
+	return n * ppu, nil
 } //                                                                    ToPoints
 
 // ToUnits converts points to the currently selected unit of measurement.
@@ -1358,7 +1365,16 @@ func (pdf *PDF) getPaperSize(name string) (pdfPaperSize, error) {
 	name = strings.ToUpper(name)
 	if strings.Contains(name, " X ") {
 		var wh = strings.Split(name, " X ")
-		return pdfPaperSize{name, pdf.ToPoints(wh[0]), pdf.ToPoints(wh[1])}, nil
+		var w, err = pdf.ToPoints(wh[0])
+		if err != nil {
+			return pdfPaperSize{}, err
+		}
+		var h float64
+		h, err = pdf.ToPoints(wh[1])
+		if err != nil {
+			return pdfPaperSize{}, err
+		}
+		return pdfPaperSize{name, w, h}, nil
 	}
 	name = pdf.toUpperLettersDigits(name, "-")
 	var landscape = strings.HasSuffix(name, "-L")
@@ -1381,20 +1397,22 @@ func (pdf *PDF) getPaperSize(name string) (pdfPaperSize, error) {
 } //                                                                getPaperSize
 
 // getPointsPerUnit returns number of points per named measurement unit
-func (pdf *PDF) getPointsPerUnit(unitName string) float64 {
+func (pdf *PDF) getPointsPerUnit(unitName string) (ret float64, err error) {
 	switch pdf.toUpperLettersDigits(unitName, `"`) {
 	case "CM":
-		return 28.3464566929134 //         " / 2.54cm per " * 72 points per inch
+		ret = 28.3464566929134 //          " / 2.54cm per " * 72 points per inch
 	case "IN", "INCH", "INCHES", `"`:
-		return 72.0 //                                        72 points per inch
+		ret = 72.0 //                                         72 points per inch
 	case "MM":
-		return 2.83464566929134 //    1 inch / 25.4mm per " * 72 points per inch
+		ret = 2.83464566929134 //     1 inch / 25.4mm per " * 72 points per inch
 	case "PT", "POINT", "POINTS":
-		return 1.0 // point
+		ret = 1.0 //                                                     1 point
 	case "TW", "TWIP", "TWIPS":
-		return 0.05 //                              1 point / 20 twips per point
+		ret = 0.05 //                               1 point / 20 twips per point
+	default:
+		err = fmt.Errorf("Unknown unit name: %q", unitName)
 	}
-	return 0
+	return ret, err
 } //                                                            getPointsPerUnit
 
 // putError calls errorLogger (set to fmt.Println by default) to log an error
