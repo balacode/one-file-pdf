@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-17 12:42:31 51640E                              [one_file_pdf.go]
+// :v: 2018-03-17 12:49:46 8B9419                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -235,8 +235,7 @@ type pdfPaperSize struct {
 // You can also specify custom paper sizes using "width unit x height unit",
 // for example "20 cm x 20 cm" or even "15cm x 10inch", etc.
 func NewPDF(paperSize string) PDF {
-	var pdf = PDF{pageNo: -1, horizontalScaling: 100, compressStreams: true,
-		errorLogger: fmt.Println}
+	var pdf = PDF{pageNo: -1, horizontalScaling: 100, compressStreams: true}
 	var size, err = pdf.getPaperSize(paperSize)
 	if err != nil {
 		pdf.putError(err)
@@ -744,8 +743,8 @@ func (pdf *PDF) SetColumnWidths(widths ...float64) *PDF {
 } //                                                             SetColumnWidths
 
 // SetErrorLogger sets the handler function for error logging.
-// By default, NewPDF() sets it to fmt.Println. You can set it
-// to a custom function, or set to nil to disable logging.
+// By default it is nil. You can set it to a custom
+// function with the same signature as fmt.Println.
 func (pdf *PDF) SetErrorLogger(fn func(a ...interface{}) (int, error)) *PDF {
 	pdf.errorLogger = fn
 	return pdf
