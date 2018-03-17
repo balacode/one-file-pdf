@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-16 16:15:45 29864F                      [utest/draw_unit_grid.go]
+// :v: 2018-03-17 21:57:04 B1E5A6                      [utest/draw_unit_grid.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -360,6 +360,7 @@ startxref
 
 // -----------------------------------------------------------------------------
 
+// DrawUnitGrid is the unit test for PDF.DrawUnitGrid()
 func DrawUnitGrid(t *testing.T) {
 	fmt.Println("utest.DrawUnitGrid")
 	//
