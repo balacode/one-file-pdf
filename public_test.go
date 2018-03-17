@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-13 23:49:55 31F8E6                               [public_test.go]
+// :v: 2018-03-17 12:46:30 EF798D                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -25,6 +25,11 @@ To generate a test coverage report use:
 import "testing" // standard
 
 import "github.com/balacode/one-file-pdf/utest"
+
+// Every tested public method must be added here, or it won't be tested:
+
+// go test --run Test_Clean_
+func Test_Clean_(t *testing.T) { utest.Clean(t) }
 
 // go test --run Test_DrawUnitGrid_
 func Test_DrawUnitGrid_(t *testing.T) { utest.DrawUnitGrid(t) }
