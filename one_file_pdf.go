@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-17 00:51:37 B7A35B                              [one_file_pdf.go]
+// :v: 2018-03-17 01:16:40 E1B229                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1072,7 +1072,7 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 	return img, len(pdf.images) - 1, nil
 } //                                                                   loadImage
 
-// makeImage __
+// makeImage encodes the source image in a PDF image data stream
 func makeImage(source image.Image, back color.RGBA,
 ) (widthPx, heightPx int, isGray bool, ar []byte) {
 	//
