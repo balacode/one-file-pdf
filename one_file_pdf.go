@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-17 10:56:46 E3218F                              [one_file_pdf.go]
+// :v: 2018-03-17 11:03:03 9202CA                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -995,7 +995,9 @@ func (pdf *PDF) drawTextLine(s string) *PDF {
 	}
 	// draw the text
 	var pg = pdf.ppage
-	pdf.applyFont()
+	if err := pdf.applyFont(); err != nil {
+		pdf.putError(err)
+	}
 	if pg.horizontalScaling != pdf.horizontalScaling {
 		pg.horizontalScaling = pdf.horizontalScaling
 		pdf.write("BT %d Tz ET\n", pg.horizontalScaling)
