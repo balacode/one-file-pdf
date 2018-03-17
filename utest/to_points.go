@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-17 21:57:04 93725F                           [utest/to_points.go]
+// :v: 2018-03-17 22:17:56 B2EBCD                           [utest/to_points.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -49,24 +49,25 @@ func ToPoints(t *testing.T) {
 		spc = []string{ // various spaces
 			"", " ", "  ", "\t",
 		}
-		_, _, _, _, _, _ = cm, inches, mm, points, twips, spc
 	)
 	// if unit is not specified at all, there's no error, but assume it's points
 	test(123, nil, spc, []string{"123"}, spc)
 	//
 	// test single units
-	test(72, nil, spc, []string{"1"}, spc, inches, spc)   // 1 inch = 72 points
-	test(2.835, nil, spc, []string{"1"}, spc, mm, spc)    // 1 mm = 2.835 points
-	test(28.346, nil, spc, []string{"1"}, spc, cm, spc)   // 1 cm = 28.346 points
-	test(0.050, nil, spc, []string{"1"}, spc, twips, spc) // 1 twip = 0.05 points
-	test(1, nil, spc, []string{"1"}, spc, points, spc)    // 1 point = 1 point :)
+	var one = []string{"1"}
+	test(72, nil, spc, one, spc, inches, spc)   // 1 inch = 72 points
+	test(2.835, nil, spc, one, spc, mm, spc)    // 1 mm = 2.835 points
+	test(28.346, nil, spc, one, spc, cm, spc)   // 1 cm = 28.346 points
+	test(0.050, nil, spc, one, spc, twips, spc) // 1 twip = 0.05 points
+	test(1, nil, spc, one, spc, points, spc)    // 1 point = 1 point :)
 	//
 	// test negative number with decimals
-	test(-888.840, nil, spc, []string{"-12.345"}, spc, inches, spc)
-	test(-34.994, nil, spc, []string{"-12.345"}, spc, mm, spc)
-	test(-349.937, nil, spc, []string{"-12.345"}, spc, cm, spc)
-	test(-0.617, nil, spc, []string{"-12.345"}, spc, twips, spc)
-	test(-12.345, nil, spc, []string{"-12.345"}, spc, points, spc)
+	var negative = []string{"-12.345"}
+	test(-888.840, nil, spc, negative, spc, inches, spc)
+	test(-34.994, nil, spc, negative, spc, mm, spc)
+	test(-349.937, nil, spc, negative, spc, cm, spc)
+	test(-0.617, nil, spc, negative, spc, twips, spc)
+	test(-12.345, nil, spc, negative, spc, points, spc)
 	//
 	test(1, nil, spc, []string{"20"}, spc, twips, spc) // 1 point = 20 twips
 	test(-1, nil, spc, []string{"-20"}, spc, twips, spc)
