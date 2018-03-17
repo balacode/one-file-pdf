@@ -1,9 +1,17 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-13 23:41:43 D21FD0                              [private_test.go]
+// :v: 2018-03-17 23:50:16 537713                              [private_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf
+
+/*
+This file contains unit tests for internal methods/functions.
+
+To generate a test coverage report use:
+	go test -coverprofile cover.out
+	go tool cover -html=cover.out
+*/
 
 import "fmt"     // standard
 import "testing" // standard

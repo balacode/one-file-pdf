@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-16 16:38:02 A70026                                      [demo.go]
+// :v: 2018-03-17 23:45:54 BD8B54                                      [demo.go]
 // -----------------------------------------------------------------------------
 
 package main
@@ -24,6 +24,10 @@ func helloWorld() {
 	//
 	// create a new PDF using 'A4' page size
 	var pdf = pdf.NewPDF("A4")
+	//
+	// you can call AddPage() to add the first page, but it is
+	// not required: the first page is added automatically
+	// pdf.AddPage()
 	//
 	// set the measurement units to centimeters
 	pdf.SetUnits("cm")

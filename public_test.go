@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-17 12:46:30 EF798D                               [public_test.go]
+// :v: 2018-03-17 21:35:40 82E654                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -31,8 +31,14 @@ import "github.com/balacode/one-file-pdf/utest"
 // go test --run Test_Clean_
 func Test_Clean_(t *testing.T) { utest.Clean(t) }
 
+// go test --run Test_CurrentPage_
+func Test_CurrentPage_(t *testing.T) { utest.CurrentPage(t) }
+
 // go test --run Test_DrawUnitGrid_
 func Test_DrawUnitGrid_(t *testing.T) { utest.DrawUnitGrid(t) }
+
+// go test --run Test_Errors_
+func Test_Errors_(t *testing.T) { utest.Errors(t) }
 
 // go test --run Test_ToPoints_
 func Test_ToPoints_(t *testing.T) { utest.ToPoints(t) }
