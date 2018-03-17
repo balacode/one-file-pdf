@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-17 01:47:15 14CD94                              [one_file_pdf.go]
+// :v: 2018-03-17 10:56:46 E3218F                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -88,7 +88,7 @@ package pdf
 //   PullError() error
 //
 // # Private Methods (pdf *PDF)
-//   applyFont() {
+//   applyFont() (err error)
 //   drawTextLine(s string) *PDF
 //   drawTextBox(x, y, width, height float64,
 //       wrapText bool, align, text string) *PDF
@@ -925,7 +925,7 @@ func (pdf *PDF) PullError() error {
 //   standard (built-in) font like Helvetica or a TrueType font.
 // - Fills the document-wide list of fonts (pdf.fonts).
 // - Adds items to the list of font ID's used on the current page.
-func (pdf *PDF) applyFont() {
+func (pdf *PDF) applyFont() (err error) {
 	var font pdfFont
 	var name = pdf.toUpperLettersDigits(pdf.fontName, "")
 	var valid = name != ""
@@ -949,7 +949,7 @@ func (pdf *PDF) applyFont() {
 	}
 	// if there is no selected font or it's invalid, use Helvetica
 	if !valid {
-		pdf.putError("Invalid font name: '" + pdf.fontName + "'")
+		err = fmt.Errorf("Invalid font name: %q", pdf.fontName)
 		font = pdfFont{fontName: "Helvetica", isBuiltIn: true}
 	}
 	// has the font been added to the global list? If not, add it:
@@ -966,7 +966,7 @@ func (pdf *PDF) applyFont() {
 	var pg = pdf.ppage
 	if pg.fontID == font.fontID &&
 		int(pg.fontSizePt*100) == int(pdf.fontSizePt)*100 {
-		return
+		return err
 	}
 	// add the font ID to the current page, if not already referenced
 	var alreadyUsedOnPage bool
@@ -984,6 +984,7 @@ func (pdf *PDF) applyFont() {
 	pg.fontSizePt = pdf.fontSizePt
 	pdf.write("BT /FNT%d %d Tf ET\n", pg.fontID, int(pg.fontSizePt))
 	// BT: begin text   /FNT0 i0 Tf: set font to FNT0 index i0   ET: end text
+	return err
 } //                                                                   applyFont
 
 // drawTextLine writes a line of text at the current coordinates to the
