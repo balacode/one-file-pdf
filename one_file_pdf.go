@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-17 11:05:36 1204BB                              [one_file_pdf.go]
+// :v: 2018-03-17 11:06:19 4D58EF                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -736,9 +736,6 @@ func (pdf *PDF) SaveFile(filename string) error {
 // SetColumnWidths creates column positions (tab stops) along the X-axis.
 // To remove all column positions, call this method without any argument.
 func (pdf *PDF) SetColumnWidths(widths ...float64) *PDF {
-	if len(widths) < 1 {
-		return pdf.putError("Argument not specified: widths")
-	}
 	pdf.columnWidths = widths
 	return pdf
 } //                                                             SetColumnWidths
