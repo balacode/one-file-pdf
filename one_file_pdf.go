@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-17 11:03:03 9202CA                              [one_file_pdf.go]
+// :v: 2018-03-17 11:05:36 1204BB                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -380,10 +380,9 @@ func (pdf *PDF) SetDocTitle(s string) *PDF {
 	return pdf
 } //                                                                 SetDocTitle
 
-// SetFont changes the current font name and size
-// in points. For the font name, use one of the
-// standard font names, such as 'Helvetica'. This
-// font will be used for subsequent text drawing.
+// SetFont changes the current font name and size in points.
+// For the font name, use one of the standard font names, e.g. 'Helvetica'.
+// This font will be used for subsequent text drawing.
 func (pdf *PDF) SetFont(name string, points float64) *PDF {
 	return pdf.SetFontName(name).SetFontSize(points)
 } //                                                                     SetFont
