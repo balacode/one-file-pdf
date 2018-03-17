@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-17 01:16:40 E1B229                              [one_file_pdf.go]
+// :v: 2018-03-17 01:47:15 14CD94                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -81,6 +81,11 @@ package pdf
 //   ToPoints(numberAndUnit string) float64
 //   ToUnits(points float64) float64
 //   WrapTextLines(width float64, text string) (ret []string)
+//
+// # Error Handling Methods (pdf *PDF)
+//   Clean() *PDF
+//   Errors() []error
+//   PullError() error
 //
 // # Private Methods (pdf *PDF)
 //   applyFont() {
@@ -168,6 +173,7 @@ type PDF struct {
 	pbuf              *bytes.Buffer // pointer to PDF/current page's buffer
 	objOffsets        []int         // used by Bytes() and write..()
 	objNo             int           // used by Bytes() and write..()
+	errors            []error       // errors that occurred during method calls
 	//
 	// Function that handles error logging: it is set to fmt.Println
 	// by default (by NewPDF). You can redefine it as needed or
@@ -878,6 +884,30 @@ func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
 } //                                                               WrapTextLines
 
 // -----------------------------------------------------------------------------
+// # Error Handling Methods (pdf *PDF)
+
+// Clean clears all accumulated errors.
+func (pdf *PDF) Clean() *PDF {
+	pdf.errors = nil
+	return pdf
+} //                                                                       Clean
+
+// Errors returns a slice of all accumulated errors.
+func (pdf *PDF) Errors() []error {
+	return pdf.errors
+} //                                                                      Errors
+
+// PullError removes and returns the first error from the errors collection.
+func (pdf *PDF) PullError() error {
+	if len(pdf.errors) == 0 {
+		return nil
+	}
+	var ret = pdf.errors[0]
+	pdf.errors = pdf.errors[1:]
+	return ret
+} //                                                                   PullError
+
+// -----------------------------------------------------------------------------
 // # Private Methods (pdf *PDF)
 
 // applyFont writes a font change command, provided the font has
@@ -1373,6 +1403,7 @@ func (pdf *PDF) putError(a ...interface{}) *PDF {
 	if pdf.errorLogger != nil {
 		pdf.errorLogger(a...)
 	}
+	pdf.errors = append(pdf.errors, fmt.Errorf(fmt.Sprint(a...)))
 	return pdf
 } //                                                                    putError
 
