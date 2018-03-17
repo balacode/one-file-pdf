@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-17 12:49:46 8B9419                              [one_file_pdf.go]
+// :v: 2018-03-17 21:48:35 75F58C                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -235,7 +235,7 @@ type pdfPaperSize struct {
 // You can also specify custom paper sizes using "width unit x height unit",
 // for example "20 cm x 20 cm" or even "15cm x 10inch", etc.
 func NewPDF(paperSize string) PDF {
-	var pdf = PDF{pageNo: -1, horizontalScaling: 100, compressStreams: true}
+	var pdf = PDF{pageNo: 0, horizontalScaling: 100, compressStreams: true}
 	var size, err = pdf.getPaperSize(paperSize)
 	if err != nil {
 		pdf.putError(err)
