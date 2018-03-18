@@ -1,11 +1,54 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-12 21:58:10 CC7777               [utest/util_format_pdf_lines.go]
+// :v: 2018-03-18 01:26:36 CD8272                           [utest/util_func.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
 import "strings" // standard
+import "testing" // standard
+
+// comparePDF compares generated result bytes to the expected PDF content:
+// - convert result to a string
+// - format both result and expected string using formatPDFLines()
+// - compare result and expected lines
+// - raise an error if there are diffs (report up to 5 differences)
+func comparePDF(t *testing.T, result []byte, expect string) {
+	//
+	var results = formatPDFLines(string(result))
+	var expects = formatPDFLines(expect)
+	var lenResults = len(results)
+	var lenExpects = len(expects)
+	var max = lenResults
+	if max < lenExpects {
+		max = lenExpects
+	}
+	var errCount = 0
+	for i := 0; i < max; i++ {
+		//
+		// get the expected and the result line at i
+		// if the slice is too short, leave it blank
+		var expect, result string
+		if i < lenExpects {
+			expect = expects[i]
+		}
+		if i < lenResults {
+			result = results[i]
+		}
+		if expect == result { // no problem, move along
+			continue
+		}
+		// only report the first 5 mismatches
+		errCount++
+		if errCount > 5 {
+			break
+		}
+		t.Errorf("MISMATCH ON LINE %d:\n"+
+			"EXPECTED: %s\n"+
+			"PRODUCED: %s\n"+
+			"\n", i+1, expect, result)
+	}
+} //                                                                  comparePDF
 
 // formatPDFLines accepts an uncompressed PDF document as a string,
 // and returns an array of trimmed, non-empty lines
