@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-17 21:48:35 75F58C                              [one_file_pdf.go]
+// :v: 2018-03-18 01:34:28 D25768                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -463,7 +463,9 @@ func (pdf *PDF) AddPage() *PDF {
 // identical to the content of a PDF file. This method is where
 // you'll find the core structure of a PDF document.
 func (pdf *PDF) Bytes() []byte {
-	//
+	if len(pdf.pages) == 0 {
+		pdf.AddPage()
+	}
 	// free any existing generated content and write PDF header
 	var fontsIndex = pdfPagesIndex + len(pdf.pages)*2
 	var imagesIndex = fontsIndex + len(pdf.fonts)
