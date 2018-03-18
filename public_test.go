@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-17 21:35:40 82E654                               [public_test.go]
+// :v: 2018-03-18 01:39:08 AB118A                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -42,5 +42,8 @@ func Test_Errors_(t *testing.T) { utest.Errors(t) }
 
 // go test --run Test_ToPoints_
 func Test_ToPoints_(t *testing.T) { utest.ToPoints(t) }
+
+// go test --run Test_NewPDF_
+func Test_NewPDF_(t *testing.T) { utest.NewPDF(t) }
 
 //end
