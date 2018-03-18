@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-18 01:39:08 AB118A                               [public_test.go]
+// :v: 2018-03-18 22:36:03 4E57F8                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -28,22 +28,51 @@ import "github.com/balacode/one-file-pdf/utest"
 
 // Every tested public method must be added here, or it won't be tested:
 
-// go test --run Test_Clean_
-func Test_Clean_(t *testing.T) { utest.Clean(t) }
+// -----------------------------------------------------------------------------
+// # Constructor
 
+// NewPDF(paperSize string) PDF
+// go test --run Test_NewPDF_
+func Test_NewPDF_(t *testing.T) { utest.NewPDF(t) }
+
+// -----------------------------------------------------------------------------
+// # Read-Only Properties (pdf *PDF)
+
+// CurrentPage() int
 // go test --run Test_CurrentPage_
 func Test_CurrentPage_(t *testing.T) { utest.CurrentPage(t) }
 
+// -----------------------------------------------------------------------------
+// # Methods (pdf *PDF)
+
+// DrawUnitGrid() *PDF
 // go test --run Test_DrawUnitGrid_
 func Test_DrawUnitGrid_(t *testing.T) { utest.DrawUnitGrid(t) }
 
-// go test --run Test_Errors_
-func Test_Errors_(t *testing.T) { utest.Errors(t) }
+// FillBox(x, y, width, height float64) *PDF
+// go test --run Test_FillBox_
+func Test_FillBox_(t *testing.T) { utest.FillBox(t) }
 
+// FillCircle(x, y, radius float64) *PDF
+// go test --run Test_FillCircle_
+func Test_FillCircle_(t *testing.T) { utest.FillCircle(t) }
+
+// -----------------------------------------------------------------------------
+// # Metrics Methods (pdf *PDF)
+
+// ToPoints(numberAndUnit string) (float64, error)
 // go test --run Test_ToPoints_
 func Test_ToPoints_(t *testing.T) { utest.ToPoints(t) }
 
-// go test --run Test_NewPDF_
-func Test_NewPDF_(t *testing.T) { utest.NewPDF(t) }
+// -----------------------------------------------------------------------------
+// # Error Handling Methods (pdf *PDF)
+
+// Clean() *PDF
+// go test --run Test_Clean_
+func Test_Clean_(t *testing.T) { utest.Clean(t) }
+
+// Errors() []error
+// go test --run Test_Errors_
+func Test_Errors_(t *testing.T) { utest.Errors(t) }
 
 //end
