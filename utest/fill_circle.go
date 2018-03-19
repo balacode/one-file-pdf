@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-18 22:32:23 E3432F                         [utest/fill_circle.go]
+// :v: 2018-03-19 23:08:24 F63982                         [utest/fill_circle.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -56,7 +56,7 @@ func FillCircle(t *testing.T) {
 		487
 		%%EOF
         `
-	comparePDF(t, ob.Bytes(), expect)
+	pdfCompare(t, ob.Bytes(), expect)
 } //                                                                  FillCircle
 
 //end

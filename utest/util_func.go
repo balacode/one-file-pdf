@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-18 01:26:36 CD8272                           [utest/util_func.go]
+// :v: 2018-03-19 23:06:24 71D523                           [utest/util_func.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -8,12 +8,12 @@ package utest
 import "strings" // standard
 import "testing" // standard
 
-// comparePDF compares generated result bytes to the expected PDF content:
+// pdfCompare compares generated result bytes to the expected PDF content:
 // - convert result to a string
 // - format both result and expected string using formatPDFLines()
 // - compare result and expected lines
 // - raise an error if there are diffs (report up to 5 differences)
-func comparePDF(t *testing.T, result []byte, expect string) {
+func pdfCompare(t *testing.T, result []byte, expect string) {
 	//
 	var results = formatPDFLines(string(result))
 	var expects = formatPDFLines(expect)
@@ -48,7 +48,7 @@ func comparePDF(t *testing.T, result []byte, expect string) {
 			"PRODUCED: %s\n"+
 			"\n", i+1, expect, result)
 	}
-} //                                                                  comparePDF
+} //                                                                  pdfCompare
 
 // formatPDFLines accepts an uncompressed PDF document as a string,
 // and returns an array of trimmed, non-empty lines
