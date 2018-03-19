@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-19 23:06:24 71D523                           [utest/util_func.go]
+// :v: 2018-03-19 23:10:01 2D22F3                           [utest/util_func.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,13 +10,13 @@ import "testing" // standard
 
 // pdfCompare compares generated result bytes to the expected PDF content:
 // - convert result to a string
-// - format both result and expected string using formatPDFLines()
+// - format both result and expected string using pdfFormatLines()
 // - compare result and expected lines
 // - raise an error if there are diffs (report up to 5 differences)
 func pdfCompare(t *testing.T, result []byte, expect string) {
 	//
-	var results = formatPDFLines(string(result))
-	var expects = formatPDFLines(expect)
+	var results = pdfFormatLines(string(result))
+	var expects = pdfFormatLines(expect)
 	var lenResults = len(results)
 	var lenExpects = len(expects)
 	var max = lenResults
@@ -50,9 +50,9 @@ func pdfCompare(t *testing.T, result []byte, expect string) {
 	}
 } //                                                                  pdfCompare
 
-// formatPDFLines accepts an uncompressed PDF document as a string,
+// pdfFormatLines accepts an uncompressed PDF document as a string,
 // and returns an array of trimmed, non-empty lines
-func formatPDFLines(s string) []string {
+func pdfFormatLines(s string) []string {
 	// change all newlines to "\n"
 	s = strings.Replace(s, "\r\n", "\n", -1)
 	s = strings.Replace(s, "\r", "\n", -1)
@@ -86,6 +86,6 @@ func formatPDFLines(s string) []string {
 		ret = append(ret, line)
 	}
 	return ret
-} //                                                              formatPDFLines
+} //                                                              pdfFormatLines
 
 //end
