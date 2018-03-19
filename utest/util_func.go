@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-19 23:29:32 E6B62B                           [utest/util_func.go]
+// :v: 2018-03-19 23:38:33 18D561                           [utest/util_func.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -9,6 +9,8 @@ import "bytes"   // standard
 import "fmt"     // standard
 import "strings" // standard
 import "testing" // standard
+
+import "github.com/balacode/one-file-pdf"
 
 type pdfStreamFmt int
 
@@ -58,6 +60,17 @@ func pdfCompare(t *testing.T, result []byte, expect string, sfmt pdfStreamFmt) {
 			"\n", i+1, expect, result)
 	}
 } //                                                                  pdfCompare
+
+// pdfFailIfErrors raises a test failure if the supplied PDF has errors
+func pdfFailIfErrors(t *testing.T, pdf *pdf.PDF) {
+	if len(pdf.Errors()) == 0 {
+		return
+	}
+	for i, err := range pdf.Errors() {
+		t.Errorf("ERROR %d: %s\n\n", i+1, err)
+	}
+	t.Fail()
+} //                                                             pdfFailIfErrors
 
 // pdfFormatLines accepts an uncompressed PDF document as a string,
 // and returns an array of trimmed, non-empty lines
