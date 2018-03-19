@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-18 01:34:28 D25768                              [one_file_pdf.go]
+// :v: 2018-03-19 23:14:17 6673A0                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -34,7 +34,7 @@ package pdf
 // # Property Setters (pdf *PDF)
 //   SetColor(nameOrHTMLColor string) *PDF
 //   SetColorRGB(red, green, blue int) *PDF
-//   SetCompression(compress bool) *PDF
+//   SetCompression(val bool) *PDF
 //   SetDocAuthor(s string) *PDF
 //   SetDocCreator(s string) *PDF
 //   SetDocKeywords(s string) *PDF
@@ -168,7 +168,7 @@ type PDF struct {
 	fontName          string        // current font's name
 	fontSizePt        float64       // current font's size (in points)
 	horizontalScaling uint16        // horizontal scaling factor (in %)
-	compressStreams   bool          // enable stream compression?
+	compression       bool          // enable stream compression?
 	content           bytes.Buffer  // content buffer where PDF is written
 	pbuf              *bytes.Buffer // pointer to PDF/current page's buffer
 	objOffsets        []int         // used by Bytes() and write..()
@@ -235,7 +235,7 @@ type pdfPaperSize struct {
 // You can also specify custom paper sizes using "width unit x height unit",
 // for example "20 cm x 20 cm" or even "15cm x 10inch", etc.
 func NewPDF(paperSize string) PDF {
-	var pdf = PDF{pageNo: 0, horizontalScaling: 100, compressStreams: true}
+	var pdf = PDF{pageNo: 0, horizontalScaling: 100, compression: true}
 	var size, err = pdf.getPaperSize(paperSize)
 	if err != nil {
 		pdf.putError(err)
@@ -273,7 +273,7 @@ func (pdf *PDF) Color() color.RGBA { return pdf.color }
 // all PDF content will be compressed when the PDF is generated. If
 // false, most PDF content (excluding images) will be in plain text,
 // which is useful for debugging or to study PDF commands.
-func (pdf *PDF) Compression() bool { return pdf.compressStreams }
+func (pdf *PDF) Compression() bool { return pdf.compression }
 
 // DocAuthor returns the optional 'document author' metadata entry.
 func (pdf *PDF) DocAuthor() string { return pdf.docAuthor }
@@ -344,8 +344,8 @@ func (pdf *PDF) SetColorRGB(r, g, b uint8) *PDF {
 // If set to true, all PDF steams will be compressed when the PDF is
 // generated. If false, most content (excluding images) will be in
 // plain text, which is useful for debugging or to study PDF commands.
-func (pdf *PDF) SetCompression(compress bool) *PDF {
-	pdf.compressStreams = compress
+func (pdf *PDF) SetCompression(val bool) *PDF {
+	pdf.compression = val
 	return pdf
 } //                                                              SetCompression
 
@@ -1288,7 +1288,7 @@ func (pdf *PDF) writeStream(content []byte) *PDF {
 // writeStreamData writes a stream or image stream
 func (pdf *PDF) writeStreamData(ar []byte) *PDF {
 	var s string // filter
-	if pdf.compressStreams {
+	if pdf.compression {
 		var buf bytes.Buffer
 		var wr = zlib.NewWriter(&buf)
 		var _, err = wr.Write([]byte(ar))
