@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-18 22:36:03 4E57F8                               [public_test.go]
+// :v: 2018-03-19 23:43:04 144294                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -44,6 +44,11 @@ func Test_CurrentPage_(t *testing.T) { utest.CurrentPage(t) }
 
 // -----------------------------------------------------------------------------
 // # Methods (pdf *PDF)
+
+// DrawImage(x, y, height float64, fileNameOrBytes interface{},
+//     backColor ...string) *PDF
+// go test --run Test_DrawImage_
+func Test_DrawImage_(t *testing.T) { utest.DrawImage(t) }
 
 // DrawUnitGrid() *PDF
 // go test --run Test_DrawUnitGrid_
