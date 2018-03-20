@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-19 23:38:33 18D561                           [utest/util_func.go]
+// :v: 2018-03-20 19:18:58 CB9375                           [utest/util_func.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -30,11 +30,12 @@ func pdfCompare(t *testing.T, result []byte, expect string, sfmt pdfStreamFmt) {
 	var expects = pdfFormatLines(expect, pdfStreamsInText)
 	var lenResults = len(results)
 	var lenExpects = len(expects)
+	var errCount = 0
+	var mismatch = false
 	var max = lenResults
 	if max < lenExpects {
 		max = lenExpects
 	}
-	var errCount = 0
 	for i := 0; i < max; i++ {
 		//
 		// get the expected and the result line at i
@@ -50,6 +51,7 @@ func pdfCompare(t *testing.T, result []byte, expect string, sfmt pdfStreamFmt) {
 			continue
 		}
 		// only report the first 5 mismatches
+		mismatch = true
 		errCount++
 		if errCount > 5 {
 			break
@@ -58,6 +60,9 @@ func pdfCompare(t *testing.T, result []byte, expect string, sfmt pdfStreamFmt) {
 			"EXPECTED: %s\n"+
 			"PRODUCED: %s\n"+
 			"\n", i+1, expect, result)
+	}
+	if mismatch {
+		t.Errorf("RETURNED >>>>>>> \n %s \n", strings.Join(results, "\n"))
 	}
 } //                                                                  pdfCompare
 
