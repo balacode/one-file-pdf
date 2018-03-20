@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-20 18:32:27 72D722                              [one_file_pdf.go]
+// :v: 2018-03-20 18:39:58 F2D62C                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -337,7 +337,7 @@ func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 // SetColorRGB sets the current color using red, green and blue values.
 // The current color is used for subsequent text/line drawing and fills.
 func (pdf *PDF) SetColorRGB(r, g, b uint8) *PDF {
-	pdf.color = color.RGBA{r, g, b, 0xFF}
+	pdf.color = color.RGBA{r, g, b, 255}
 	return pdf
 } //                                                                 SetColorRGB
 
@@ -582,7 +582,7 @@ func (pdf *PDF) DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF {
 func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 	backColor ...string) *PDF {
 	//
-	var back = color.RGBA{R: 255, G: 255, B: 255} // white by default
+	var back = color.RGBA{R: 255, G: 255, B: 255, A: 255} // white by default
 	if len(backColor) > 0 {
 		back, _ = pdf.ToColor(backColor[0])
 	}
@@ -775,7 +775,8 @@ func (pdf *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error) {
 			case r >= 'A' && r <= 'F':
 				hex[i] = uint8(r - 'A' + 10)
 			default:
-				return color.RGBA{}, fmt.Errorf("Bad color code '" + s + "'")
+				return pdfBlack,
+					fmt.Errorf("Bad color code %q", nameOrHTMLColor)
 			}
 		}
 		return color.RGBA{
@@ -788,7 +789,7 @@ func (pdf *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error) {
 	if found {
 		return color.RGBA{c.R, c.G, c.B, 255}, nil
 	}
-	return color.RGBA{}, fmt.Errorf("Unknown color name '" + s + "'")
+	return pdfBlack, fmt.Errorf("Unknown color name %q", nameOrHTMLColor)
 } //                                                                     ToColor
 
 // ToPoints converts a string composed of a number and unit to points.
@@ -1413,7 +1414,7 @@ func (pdf *PDF) getPointsPerUnit(unitName string) (ret float64, err error) {
 	case "TW", "TWIP", "TWIPS":
 		ret = 0.05 //                               1 point / 20 twips per point
 	default:
-		err = fmt.Errorf("Unknown unit name: %q", unitName)
+		err = fmt.Errorf("Unknown unit name %q", unitName)
 	}
 	return ret, err
 } //                                                            getPointsPerUnit
@@ -1582,6 +1583,8 @@ var PDFColorNames = map[string]color.RGBA{
 
 // -----------------------------------------------------------------------------
 // # Internal Constants
+
+var pdfBlack = color.RGBA{A: 255}
 
 // pdfFontNames contains font names available on all PDF implementations
 var pdfFontNames = []string{
