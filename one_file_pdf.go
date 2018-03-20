@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-19 23:14:17 6673A0                              [one_file_pdf.go]
+// :v: 2018-03-20 18:32:27 72D722                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -96,6 +96,7 @@ package pdf
 //       ) (img pdfImage, idx int, err error)
 //   makeImage(source image.Image, back color.RGBA,
 //       ) (widthPx, heightPx int, isGray bool, data []byte)
+//   reservePage() *PDF
 //   textWidthPt1000(s string) float64
 //
 // # Private Generation Methods (pdf *PDF)
@@ -308,12 +309,12 @@ func (pdf *PDF) Units() string { return pdf.unitName }
 
 // X returns the X-coordinate of the current drawing position.
 func (pdf *PDF) X() float64 {
-	return pdf.ToUnits(pdf.ppage.x)
+	return pdf.reservePage().ToUnits(pdf.ppage.x)
 } //                                                                           X
 
 // Y returns the Y-coordinate of the current drawing position.
 func (pdf *PDF) Y() float64 {
-	return pdf.ToUnits(pdf.paperSize.heightPt - pdf.ppage.y)
+	return pdf.reservePage().ToUnits(pdf.paperSize.heightPt - pdf.ppage.y)
 } //                                                                           Y
 
 // -----------------------------------------------------------------------------
@@ -427,6 +428,7 @@ func (pdf *PDF) SetUnits(unitName string) *PDF {
 
 // SetX changes the X-coordinate of the current drawing position.
 func (pdf *PDF) SetX(x float64) *PDF {
+	pdf.reservePage()
 	pdf.ppage.x = x * pdf.ptPerUnit
 	return pdf
 } //                                                                        SetX
@@ -438,6 +440,7 @@ func (pdf *PDF) SetXY(x, y float64) *PDF {
 
 // SetY changes the Y-coordinate of the current drawing position.
 func (pdf *PDF) SetY(y float64) *PDF {
+	pdf.reservePage()
 	pdf.ppage.y = pdf.paperSize.heightPt - y*pdf.ptPerUnit
 	return pdf
 } //                                                                        SetY
@@ -463,10 +466,8 @@ func (pdf *PDF) AddPage() *PDF {
 // identical to the content of a PDF file. This method is where
 // you'll find the core structure of a PDF document.
 func (pdf *PDF) Bytes() []byte {
-	if len(pdf.pages) == 0 {
-		pdf.AddPage()
-	}
 	// free any existing generated content and write PDF header
+	pdf.reservePage()
 	var fontsIndex = pdfPagesIndex + len(pdf.pages)*2
 	var imagesIndex = fontsIndex + len(pdf.fonts)
 	var infoIndex int // set when metadata found
@@ -586,9 +587,7 @@ func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 		back, _ = pdf.ToColor(backColor[0])
 	}
 	// add the image to the current page, if not already referenced
-	if len(pdf.pages) == 0 {
-		pdf.AddPage()
-	}
+	pdf.reservePage()
 	var pg = pdf.ppage
 	var img, idx, err = pdf.loadImage(fileNameOrBytes, back)
 	if err != nil {
@@ -1026,6 +1025,7 @@ func (pdf *PDF) drawTextBox(x, y, width, height float64,
 	if text == "" {
 		return pdf
 	}
+	pdf.reservePage()
 	var lines []string
 	if wrapText {
 		lines = pdf.WrapTextLines(width, text)
@@ -1144,6 +1144,14 @@ func makeImage(source image.Image, back color.RGBA,
 	return widthPx, heightPx, isGray, ar
 } //                                                                   makeImage
 
+// reservePage ensures there is at least one page in the PDF
+func (pdf *PDF) reservePage() *PDF {
+	if len(pdf.pages) == 0 {
+		pdf.AddPage()
+	}
+	return pdf
+} //                                                                  reservePage
+
 // textWidthPt1000 returns the width of text in thousandths of a point
 func (pdf *PDF) textWidthPt1000(s string) float64 {
 	if s == "" {
@@ -1176,9 +1184,7 @@ func (pdf *PDF) nextObj() int {
 // write writes formatted strings (like fmt.Sprintf) to the current page's
 // content stream or to the final generated PDF, if there is no active page
 func (pdf *PDF) write(format string, args ...interface{}) *PDF {
-	if len(pdf.pages) == 0 {
-		pdf.AddPage()
-	}
+	pdf.reservePage()
 	pdf.pbuf.Write([]byte(fmt.Sprintf(format, args...)))
 	return pdf
 } //                                                                       write
@@ -1199,9 +1205,7 @@ func (pdf *PDF) writeEndobj() *PDF {
 // writeMode sets the stroking or non-stroking color and line width.
 // 'fill' arg specifies non-stroking (true) or stroking mode (none/false)
 func (pdf *PDF) writeMode(fill ...bool) (mode string) {
-	if len(pdf.pages) == 0 {
-		pdf.AddPage()
-	}
+	pdf.reservePage()
 	mode = "S" // S: stroke path (for lines)
 	if len(fill) > 0 && fill[0] {
 		mode = "b" // b: fill / text
