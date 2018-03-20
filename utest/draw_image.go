@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-20 19:21:16 962776                          [utest/draw_image.go]
+// :v: 2018-03-20 19:24:32 570457                          [utest/draw_image.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -15,7 +15,8 @@ import "github.com/balacode/one-file-pdf"
 //     backColor ...string) *PDF
 //
 // Runs the test by drawing rgbw64.png:
-// a small 64 x 64 PNG split into pure red, green, blue and white squares
+// a small 64 x 64 PNG split into pure red, green, blue
+// and transparent gradient squares
 func DrawImage(t *testing.T) {
 	fmt.Println("utest.DrawImage")
 	var (
