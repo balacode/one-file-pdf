@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-19 23:43:04 144294                               [public_test.go]
+// :v: 2018-03-21 01:11:49 BB78F8                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -43,12 +43,47 @@ func Test_NewPDF_(t *testing.T) { utest.NewPDF(t) }
 func Test_CurrentPage_(t *testing.T) { utest.CurrentPage(t) }
 
 // -----------------------------------------------------------------------------
+// # Properties
+
+// Color() color.RGBA
+// SetColor(nameOrHTMLColor string) *PDF
+// SetColorRGB(red, green, blue int) *PDF
+// go test --run Test_Color_
+func Test_Color_(t *testing.T) { utest.Color(t) }
+
+// Units() string
+// SetUnits(unitName string) *PDF
+// go test --run Test_Units_
+func Test_Units_(t *testing.T) { utest.Units(t) }
+
+// -----------------------------------------------------------------------------
 // # Methods (pdf *PDF)
+
+// DrawBox(x, y, width, height float64, fill ...bool) *PDF
+// go test --run Test_DrawBox_
+func Test_DrawBox_(t *testing.T) { utest.DrawBox(t) }
+
+// DrawCircle(x, y, radius float64, fill ...bool) *PDF
+// go test --run Test_DrawCircle_
+func Test_DrawCircle_(t *testing.T) { utest.DrawCircle(t) }
 
 // DrawImage(x, y, height float64, fileNameOrBytes interface{},
 //     backColor ...string) *PDF
 // go test --run Test_DrawImage_
 func Test_DrawImage_(t *testing.T) { utest.DrawImage(t) }
+
+// DrawText(s string) *PDF
+// go test --run Test_DrawText_
+func Test_DrawText_(t *testing.T) { utest.DrawText(t) }
+
+// DrawTextAt(x, y float64, text string) *PDF
+// go test --run Test_DrawTextAt_
+func Test_DrawTextAt_(t *testing.T) { utest.DrawTextAt(t) }
+
+// DrawTextInBox(
+//     x, y, width, height float64, align, text string ) *PDF
+// go test --run Test_DrawTextInBox_
+func Test_DrawTextInBox_(t *testing.T) { utest.DrawTextInBox(t) }
 
 // DrawUnitGrid() *PDF
 // go test --run Test_DrawUnitGrid_
