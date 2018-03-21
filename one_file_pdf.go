@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-20 18:39:58 F2D62C                              [one_file_pdf.go]
+// :v: 2018-03-21 01:06:33 805461                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -236,7 +236,8 @@ type pdfPaperSize struct {
 // You can also specify custom paper sizes using "width unit x height unit",
 // for example "20 cm x 20 cm" or even "15cm x 10inch", etc.
 func NewPDF(paperSize string) PDF {
-	var pdf = PDF{pageNo: 0, horizontalScaling: 100, compression: true}
+	var pdf = PDF{color: pdfBlack, pageNo: 0, horizontalScaling: 100,
+		compression: true}
 	var size, err = pdf.getPaperSize(paperSize)
 	if err != nil {
 		pdf.putError(err)
@@ -775,8 +776,8 @@ func (pdf *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error) {
 			case r >= 'A' && r <= 'F':
 				hex[i] = uint8(r - 'A' + 10)
 			default:
-				return pdfBlack,
-					fmt.Errorf("Bad color code %q", nameOrHTMLColor)
+				var err = fmt.Errorf("Bad color code %q", nameOrHTMLColor)
+				return pdfBlack, err
 			}
 		}
 		return color.RGBA{
