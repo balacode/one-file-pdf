@@ -1,7 +1,7 @@
 ## one-file-pdf - A minimalist PDF generator in &lt;2K lines and 1 file
 [![Go Report Card](https://goreportcard.com/badge/github.com/balacode/one-file-pdf)](https://goreportcard.com/report/github.com/balacode/one-file-pdf)
 [![Build Status](https://travis-ci.org/balacode/one-file-pdf.svg?branch=master)](https://travis-ci.org/balacode/one-file-pdf)
-[![Test Coverage](https://coveralls.io/repos/github/balacode/one-file-pdf/badge.svg?branch=master)](https://coveralls.io/github/balacode/one-file-pdf?branch=master)
+[![Test Coverage](https://coveralls.io/repos/github/balacode/one-file-pdf/badge.svg?branch=master&service=github)](https://coveralls.io/github/balacode/one-file-pdf?branch=master)
 [![Gitter chat](https://badges.gitter.im/balacode/one-file-pdf.png)](https://gitter.im/one-file-pdf/Lobby)
 [![godoc](https://godoc.org/github.com/balacode/one-file-pdf?status.svg)](https://godoc.org/github.com/balacode/one-file-pdf)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)    
