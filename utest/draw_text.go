@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-21 01:14:03 0F2C0A                           [utest/draw_text.go]
+// :v: 2018-03-22 02:48:21 6BE89B                           [utest/draw_text.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -15,20 +15,20 @@ import "github.com/balacode/one-file-pdf"
 func DrawText(t *testing.T) {
 	fmt.Println("utest.DrawText")
 	//
-	var pdf = pdf.NewPDF("A4")
-	pdf.
-		SetCompression(false).
-		SetUnits("cm").
-		SetColumnWidths(1, 4, 9).
-		SetColor("#006B3C CadmiumGreen").
-		SetFont("Helvetica-Bold", 10).
-		SetX(5).
-		SetY(5).
-		DrawText("FIRST").
-		DrawText("SECOND").
-		DrawText("THIRD")
-	//
-	var expect = `
+	func() {
+		var ob = pdf.NewPDF("A4")
+		ob.SetCompression(false).
+			SetUnits("cm").
+			SetColumnWidths(1, 4, 9).
+			SetColor("#006B3C CadmiumGreen").
+			SetFont("Helvetica-Bold", 10).
+			SetX(5).
+			SetY(5).
+			DrawText("FIRST").
+			DrawText("SECOND").
+			DrawText("THIRD")
+		//
+		var expect = `
 		%PDF-1.4
 		1 0 obj<</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -62,7 +62,8 @@ func DrawText(t *testing.T) {
 		501
 		%%EOF
 		`
-	pdfCompare(t, pdf.Bytes(), expect, pdfStreamsInText)
+		pdfCompare(t, ob.Bytes(), expect, pdfStreamsInText)
+	}()
 } //                                                                    DrawText
 
 //end

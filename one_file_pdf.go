@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-21 01:06:33 805461                              [one_file_pdf.go]
+// :v: 2018-03-22 02:48:21 C6898F                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -116,7 +116,7 @@ package pdf
 //   splitLines(s string) []string
 //   toUpperLettersDigits(s, extras string) string
 //   (pdf *PDF):
-//   getPaperSize(name string) pdfPaperSize
+//   getPaperSize(name string) (pdfPaperSize, error)
 //   getPointsPerUnit(unitName string) (ret float64, err error)
 //   putError(a ...interface{}) *PDF
 //
@@ -957,7 +957,7 @@ func (pdf *PDF) applyFont() (err error) {
 		err = fmt.Errorf("Invalid font name: %q", pdf.fontName)
 		font = pdfFont{fontName: "Helvetica", isBuiltIn: true}
 	}
-	// has the font been added to the global list? If not, add it:
+	// has the font been added to the global list? if not, add it:
 	for _, iter := range pdf.fonts {
 		if font.fontName == iter.fontName {
 			font.fontID = iter.fontID

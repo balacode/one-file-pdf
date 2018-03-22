@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-21 01:14:03 055364                               [utest/color.go]
+// :v: 2018-03-22 02:48:21 B8E2EC                               [utest/color.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -14,22 +14,23 @@ import "github.com/balacode/one-file-pdf"
 func Color(t *testing.T) {
 
 	// -------------------------------------------------------------------------
-	// Color() color.RGBA
-
+	// (pdf *PDF) Color() color.RGBA
+	//
 	fmt.Println("utest.Color")
+
 	func() {
-		var ob pdf.PDF
+		var ob pdf.PDF // uninitialized PDF
 		TEqual(t, ob.Color(), color.RGBA{})
 	}()
-	// test property getters of initialized PDF
+
 	func() {
-		var ob = pdf.NewPDF("A4")
+		var ob = pdf.NewPDF("A4") // initialized PDF
 		TEqual(t, ob.Color(), color.RGBA{A: 255})
 	}()
 
 	// -------------------------------------------------------------------------
-	// SetColor(nameOrHTMLColor string) *PDF
-
+	// (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF
+	//
 	// TODO: test various named colors
 	// TODO: test setting HTML color codes
 	// TODO: test if alpha is always 255
@@ -50,9 +51,10 @@ func Color(t *testing.T) {
 			TEqual(t, &a, b)
 		}()
 	}
+
 	// try setting a blank color name
 	func() {
-		var ob pdf.PDF
+		var ob pdf.PDF // uninitialized PDF
 		TEqual(t, len(ob.Errors()), 0)
 		ob.SetColor("")
 		TEqual(t, len(ob.Errors()), 1)
@@ -64,9 +66,10 @@ func Color(t *testing.T) {
 		}
 		TEqual(t, ob.Color(), color.RGBA{A: 255})
 	}()
+
 	// try setting an unknown color name
 	func() {
-		var ob pdf.PDF
+		var ob pdf.PDF // uninitialized PDF
 		TEqual(t, len(ob.Errors()), 0)
 		ob.SetColor("TheColourOutOfSpace")
 		TEqual(t, len(ob.Errors()), 1)
@@ -81,8 +84,9 @@ func Color(t *testing.T) {
 
 	// -------------------------------------------------------------------------
 	// SetColorRGB(red, green, blue int) *PDF
-
+	//
 	fmt.Println("utest.SetColorRGB")
+
 	func() {
 		// red
 		var a = pdf.NewPDF("A4")
@@ -90,6 +94,7 @@ func Color(t *testing.T) {
 		TEqual(t, a.Color(), color.RGBA{R: 128, A: 255})
 		TEqual(t, &a, b)
 	}()
+
 	func() {
 		// green
 		var a = pdf.NewPDF("A4")
@@ -97,6 +102,7 @@ func Color(t *testing.T) {
 		TEqual(t, a.Color(), color.RGBA{G: 128, A: 255})
 		TEqual(t, &a, b)
 	}()
+
 	func() {
 		// blue
 		var a = pdf.NewPDF("A4")
@@ -104,6 +110,7 @@ func Color(t *testing.T) {
 		TEqual(t, a.Color(), color.RGBA{B: 128, A: 255})
 		TEqual(t, &a, b)
 	}()
+
 } //                                                                       Color
 
 //end

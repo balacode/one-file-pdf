@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-20 19:24:32 570457                          [utest/draw_image.go]
+// :v: 2018-03-22 02:48:21 81506B                          [utest/draw_image.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -99,24 +99,27 @@ func DrawImage(t *testing.T) {
 	576
 	%%EOF
 	`
+
 	// generate image from an array of PNG bytes
 	func() {
-		var pdf = pdf.NewPDF("20cm x 20cm")
-		pdf.SetCompression(true).
+		var ob = pdf.NewPDF("20cm x 20cm")
+		ob.SetCompression(true).
 			SetUnits("cm").
 			DrawImage(x, y, height, pngData)
-		pdfFailIfErrors(t, &pdf)
-		pdfCompare(t, pdf.Bytes(), expectOpaque, pdfStreamsInHex)
+		pdfFailIfErrors(t, &ob)
+		pdfCompare(t, ob.Bytes(), expectOpaque, pdfStreamsInHex)
 	}()
+
 	// the same test, but reading direcly from PNG file
 	func() {
-		var pdf = pdf.NewPDF("20cm x 20cm")
-		pdf.SetCompression(true).
+		var ob = pdf.NewPDF("20cm x 20cm")
+		ob.SetCompression(true).
 			SetUnits("cm").
 			DrawImage(x, y, height, "./image/rgbw64.png")
-		pdfFailIfErrors(t, &pdf)
-		pdfCompare(t, pdf.Bytes(), expectOpaque, pdfStreamsInHex)
+		pdfFailIfErrors(t, &ob)
+		pdfCompare(t, ob.Bytes(), expectOpaque, pdfStreamsInHex)
 	}()
+
 	// PNG transparency test
 	func() {
 		var (
@@ -274,13 +277,13 @@ func DrawImage(t *testing.T) {
 			%%EOF
 			`
 		)
-		var pdf = pdf.NewPDF("20cm x 20cm")
-		pdf.SetCompression(true).
+		var ob = pdf.NewPDF("20cm x 20cm")
+		ob.SetCompression(true).
 			SetUnits("cm").
 			DrawImage(x, y, height, "./image/rgbt64.png", "Yellow").
 			DrawImage(x, y+height+1, height, "./image/rgbt64.png", "Cyan")
-		pdfFailIfErrors(t, &pdf)
-		pdfCompare(t, pdf.Bytes(), expectTransparent, pdfStreamsInHex)
+		pdfFailIfErrors(t, &ob)
+		pdfCompare(t, ob.Bytes(), expectTransparent, pdfStreamsInHex)
 	}()
 } //                                                                   DrawImage
 
