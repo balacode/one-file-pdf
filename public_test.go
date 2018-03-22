@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 03:08:40 BA7615                               [public_test.go]
+// :v: 2018-03-22 03:14:56 715989                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -48,6 +48,26 @@ func TestPublicAPI(t *testing.T) {
 		// SetColorRGB(red, green, blue int) *PDF
 		utest.Color,
 
+		// DocAuthor() string
+		// SetDocAuthor(s string) *PDF
+		utest.DocAuthor,
+
+		// DocCreator() string
+		// SetDocCreator(s string) *PDF
+		utest.DocCreator,
+
+		// DocKeywords() string
+		// SetDocKeywords(s string) *PDF
+		utest.DocKeywords,
+
+		// DocSubject() string
+		// SetDocSubject(s string) *PDF
+		utest.DocSubject,
+
+		// DocTitle() string
+		// SetDocTitle(s string) *PDF
+		utest.DocTitle,
+
 		// Units() string
 		// SetUnits(unitName string) *PDF
 		utest.Units,
@@ -87,8 +107,17 @@ func TestPublicAPI(t *testing.T) {
 		// ---------------------------------------------------------------------
 		// # Metrics Methods (pdf *PDF)
 
+		// ToColor(nameOrHTMLColor string) (color.RGBA, error)
+		utest.ToColor,
+
+		// ---------------------------------------------------------------------
+		// # Metrics Methods (pdf *PDF)
+
 		// ToPoints(numberAndUnit string) (float64, error)
 		utest.ToPoints,
+
+		// ToUnits(points float64) float64
+		utest.ToUnits,
 
 		// ---------------------------------------------------------------------
 		// # Error Handling Methods (pdf *PDF)
@@ -98,6 +127,9 @@ func TestPublicAPI(t *testing.T) {
 
 		// Errors() []error
 		utest.Errors,
+
+		// PullError() error
+		utest.PullError,
 	} {
 		fn(t)
 	}
