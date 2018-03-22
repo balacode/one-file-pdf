@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-17 23:50:16 537713                              [private_test.go]
+// :v: 2018-03-22 03:22:15 202E80                              [private_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -13,8 +13,11 @@ To generate a test coverage report use:
 	go tool cover -html=cover.out
 */
 
-import "fmt"     // standard
-import "testing" // standard
+import "fmt"           // standard
+import "runtime"       // standard
+import "strings"       // standard
+import "testing"       // standard
+import "path/filepath" // standard
 
 // go test --run Test_getPapreSize_
 func Test_getPapreSize_(t *testing.T) {
@@ -54,8 +57,21 @@ func floatStr(val float64) string {
 func mismatch(t *testing.T, tag string, expected, got interface{}) {
 	var expStr = fmt.Sprintf("%v", expected)
 	var gotStr = fmt.Sprintf("%v", got)
-	t.Errorf("%s mismatch: expected: %s got: %s", tag, expStr, gotStr)
-	t.Fail()
+	t.Errorf("%s mismatch: expected: %s got: %s \n%s",
+		tag, expStr, gotStr, getStack())
 } //                                                                    mismatch
+
+// getStack returns a list of line numbers and function names on the call stack
+func getStack() string {
+	var buf = make([]byte, 8192)
+	runtime.Stack(buf, true)
+	var ar []string
+	for _, s := range strings.Split(string(buf), "\n") {
+		if strings.Contains(s, "\t") && !strings.Contains(s, "/testing.go") {
+			ar = append(ar, "<- "+filepath.Base(s))
+		}
+	}
+	return strings.Join(ar, "\n")
+} //                                                                    getStack
 
 //end
