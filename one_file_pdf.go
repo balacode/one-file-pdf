@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 02:55:11 2F23FA                              [one_file_pdf.go]
+// :v: 2018-03-22 03:00:44 534A4E                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1090,10 +1090,9 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 		buf = bytes.NewBuffer(val)
 		img.hash = sha512.Sum512(val)
 	default:
-		var msg = fmt.Sprint("Invalid type in fileNameOrBytes:",
-			reflect.TypeOf(fileNameOrBytes), "value:", fileNameOrBytes)
-		pdf.putError(msg)
-		return pdfImage{}, -1, fmt.Errorf(msg)
+		return pdfImage{}, -1, fmt.Errorf(
+			"Invalid type %q in fileNameOrBytes (value: %v)",
+			reflect.TypeOf(fileNameOrBytes), fileNameOrBytes)
 	}
 	for i, iter := range pdf.images {
 		if bytes.Equal(iter.hash[:], img.hash[:]) && iter.backColor == back {
