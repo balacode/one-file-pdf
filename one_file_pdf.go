@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 03:00:44 534A4E                              [one_file_pdf.go]
+// :v: 2018-03-22 03:02:01 00D0CB                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1369,9 +1369,9 @@ func (*PDF) toUpperLettersDigits(s, extras string) string {
 // Specify custom paper sizes using "width x height", e.g. "9cm x 20cm"
 // If the paper size is not found, returns a zero-initialized structure
 func (pdf *PDF) getPaperSize(name string) (pdfPaperSize, error) {
-	name = strings.ToUpper(name)
-	if strings.Contains(name, " X ") {
-		var wh = strings.Split(name, " X ")
+	var s = strings.ToUpper(name)
+	if strings.Contains(s, " X ") {
+		var wh = strings.Split(s, " X ")
 		var w, err = pdf.ToPoints(wh[0])
 		if err != nil {
 			return pdfPaperSize{}, err
@@ -1381,11 +1381,11 @@ func (pdf *PDF) getPaperSize(name string) (pdfPaperSize, error) {
 		if err != nil {
 			return pdfPaperSize{}, err
 		}
-		return pdfPaperSize{name, w, h}, nil
+		return pdfPaperSize{s, w, h}, nil
 	}
-	name = pdf.toUpperLettersDigits(name, "-")
-	var landscape = strings.HasSuffix(name, "-L")
-	var s = pdf.toUpperLettersDigits(name, "")
+	s = pdf.toUpperLettersDigits(s, "-")
+	var landscape = strings.HasSuffix(s, "-L")
+	s = pdf.toUpperLettersDigits(s, "")
 	if landscape {
 		s = s[:len(s)-1] // "-" is already removed above. now remove the "L"
 	}
@@ -1396,9 +1396,9 @@ func (pdf *PDF) getPaperSize(name string) (pdfPaperSize, error) {
 	// convert mm to points: div by 25.4mm/inch; mul by 72 points/inch
 	var w, h = float64(wh[0]) / 25.4 * 72, float64(wh[1]) / 25.4 * 72
 	if landscape {
-		return pdfPaperSize{name, h, w}, nil
+		return pdfPaperSize{s + "-L", h, w}, nil
 	}
-	return pdfPaperSize{name, w, h}, nil
+	return pdfPaperSize{s, w, h}, nil
 } //                                                                getPaperSize
 
 // getPointsPerUnit returns number of points per named measurement unit
