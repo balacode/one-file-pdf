@@ -4,7 +4,7 @@
 [![Test Coverage](https://coveralls.io/repos/github/balacode/one-file-pdf/badge.svg?branch=master)](https://coveralls.io/github/balacode/one-file-pdf?branch=master)
 [![Gitter chat](https://badges.gitter.im/balacode/one-file-pdf.png)](https://gitter.im/one-file-pdf/Lobby)
 [![godoc](https://godoc.org/github.com/balacode/one-file-pdf?status.svg)](https://godoc.org/github.com/balacode/one-file-pdf)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)  
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)    
 
 The main idea behind this project was:  
 *"How small can I make a PDF generator for it to still be useful for 80% of common PDF generation needs?"*
