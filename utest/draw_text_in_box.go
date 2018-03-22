@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-21 01:14:03 CF9B46                    [utest/draw_text_in_box.go]
+// :v: 2018-03-22 03:10:56 FE9272                    [utest/draw_text_in_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -36,6 +36,7 @@ func DrawTextInBox(t *testing.T) {
 		SetColor("Light Gray").
 		FillBox(5, 5, 3, 15).
 		SetColor("Black").
+		DrawTextInBox(5, 5, 3, 15, "C", ""). // no effect
 		DrawTextInBox(5, 5, 3, 15, "C", lorem)
 	//
 	var expect = `

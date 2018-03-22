@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 02:48:21 81506B                          [utest/draw_image.go]
+// :v: 2018-03-22 03:10:56 AC9290                          [utest/draw_image.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -285,6 +285,48 @@ func DrawImage(t *testing.T) {
 		pdfFailIfErrors(t, &ob)
 		pdfCompare(t, ob.Bytes(), expectTransparent, pdfStreamsInHex)
 	}()
+
+	// wrong argument in fileNameOrBytes
+	func() {
+		var ob = pdf.NewPDF("20cm x 20cm")
+		var fileNameOrBytes = []int{0xBAD, 0xBAD, 0xBAD}
+		const expect = `
+		%PDF-1.4
+		1 0 obj<</Type/Catalog/Pages 2 0 R>>
+		endobj
+		2 0 obj<</Type/Pages/Count 1/MediaBox[0 0 566 566]/Kids[3 0 R]>>
+		endobj
+		3 0 obj<</Type/Page/Parent 2 0 R/Contents 4 0 R>>
+		endobj
+		4 0 obj <</Filter/FlateDecode/Length 11>>stream
+		0A 78 9C 01 00 00 FF FF 00 00 00 01 0A
+		endstream
+		xref
+		0 5
+		0000000000 65535 f
+		0000000009 00000 n
+		0000000053 00000 n
+		0000000125 00000 n
+		0000000182 00000 n
+		trailer
+		<</Size 5/Root 1 0 R>>
+		startxref
+		252
+		%%EOF
+		`
+		ob.SetCompression(true).
+			SetUnits("cm").
+			DrawImage(x, y, height, fileNameOrBytes)
+		pdfCompare(t, ob.Bytes(), expect, pdfStreamsInHex)
+		//
+		TEqual(t, len(ob.Errors()), 1)
+		if len(ob.Errors()) > 0 {
+			TEqual(t, ob.Errors()[0], fmt.Errorf(
+				`Invalid type "[]int" in fileNameOrBytes`+
+					` (value: [2989 2989 2989]) @DrawImage`))
+		}
+	}()
+
 } //                                                                   DrawImage
 
 //end

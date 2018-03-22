@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-21 01:14:03 BDB8D7                        [utest/draw_text_at.go]
+// :v: 2018-03-22 03:10:56 869A01                        [utest/draw_text_at.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -20,8 +20,11 @@ func DrawTextAt(t *testing.T) {
 		SetUnits("cm").
 		SetColor("#36454F Charcoal").
 		SetFont("Helvetica-Bold", 20).
+		DrawTextAt(5, 5, ""). // no effect
 		DrawTextAt(5, 5, "(5,5)").
+		DrawTextAt(10, 10, ""). // no effect
 		DrawTextAt(10, 10, "(10,10)").
+		DrawTextAt(15, 15, ""). // no effect
 		DrawTextAt(15, 15, "(15,15)").
 		SetColor("#E03C31 CGRed").
 		FillBox(5, 5, 0.1, 0.1).
