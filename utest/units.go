@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 02:48:21 3B4645                               [utest/units.go]
+// :v: 2018-03-22 02:55:11 8BF1F2                               [utest/units.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -47,7 +47,7 @@ func Units(t *testing.T) {
 		if len(ob.Errors()) == 1 {
 			TEqual(t,
 				ob.Errors()[0],
-				fmt.Errorf(`Unknown unit name "fathoms"`))
+				fmt.Errorf(`Unknown unit name "fathoms" @SetUnits`))
 		}
 		TEqual(t, ob.Units(), "POINT")
 	}()

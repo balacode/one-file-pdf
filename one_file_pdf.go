@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 02:48:21 C6898F                              [one_file_pdf.go]
+// :v: 2018-03-22 02:55:11 2F23FA                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -137,6 +137,7 @@ import "image"         // standard
 import "image/color"   // standard
 import "io/ioutil"     // standard
 import "reflect"       // standard
+import "runtime"       // standard
 import "strconv"       // standard
 import "strings"       // standard
 import "unicode"       // standard   only uses IsDigit(), IsLetter(), IsSpace()
@@ -1425,7 +1426,17 @@ func (pdf *PDF) putError(a ...interface{}) *PDF {
 	if pdf.errorLogger != nil {
 		pdf.errorLogger(a...)
 	}
-	pdf.errors = append(pdf.errors, fmt.Errorf(fmt.Sprint(a...)))
+	var fn string
+	for i := 0; i < 10; i++ {
+		var programCounter, _, _, _ = runtime.Caller(i)
+		fn = runtime.FuncForPC(programCounter).Name()
+		fn = fn[strings.LastIndex(fn, ".")+1:]
+		if unicode.IsLower(rune(fn[0])) {
+			continue
+		}
+		break
+	}
+	pdf.errors = append(pdf.errors, fmt.Errorf(fmt.Sprint(a...)+" @"+fn))
 	return pdf
 } //                                                                    putError
 

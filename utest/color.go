@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 02:48:21 B8E2EC                               [utest/color.go]
+// :v: 2018-03-22 02:55:11 72CD01                               [utest/color.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -62,7 +62,7 @@ func Color(t *testing.T) {
 		if len(ob.Errors()) == 1 {
 			TEqual(t,
 				ob.Errors()[0],
-				fmt.Errorf(`Unknown color name ""`))
+				fmt.Errorf(`Unknown color name "" @SetColor`))
 		}
 		TEqual(t, ob.Color(), color.RGBA{A: 255})
 	}()
@@ -77,7 +77,8 @@ func Color(t *testing.T) {
 		if len(ob.Errors()) == 1 {
 			TEqual(t,
 				ob.Errors()[0],
-				fmt.Errorf(`Unknown color name "TheColourOutOfSpace"`))
+				fmt.Errorf(
+					`Unknown color name "TheColourOutOfSpace" @SetColor`))
 		}
 		TEqual(t, ob.Color(), color.RGBA{A: 255})
 	}()
