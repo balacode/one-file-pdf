@@ -93,6 +93,7 @@ func main() {
 ```
 
 ### Samples:
+Click on a sample to see the PDF in more detail.
 
 [!["Hello World!" sample image](demo/samples/hello.png)](demo/samples/hello.pdf)  
 
