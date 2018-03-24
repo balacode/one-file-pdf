@@ -6,10 +6,8 @@
 package utest
 
 import (
-	"errors"
 	"fmt" // standard
 	"image/color"
-	"strings"
 	"testing"
 
 	pdf "github.com/balacode/one-file-pdf"
@@ -28,14 +26,14 @@ func ToColor(t *testing.T) {
 	}{
 		{description: "valid hex", input: "#c83296", color: color.RGBA{200, 50, 150, 255}, err: nil},
 		{description: "hex with more than seven characters", input: "#c83296XXXXXXX", color: color.RGBA{200, 50, 150, 255}, err: nil},
-		{description: "invalid hex", input: "#wrongcolor", color: color.RGBA{A: 255}, err: errors.New("Bad color code \"#wrongcolor\"")},
+		{description: "invalid hex", input: "#wrongcolor", color: color.RGBA{A: 255}, err: pdf.ErrBadColorCode{Code: "#wrongcolor"}},
 
 		// X is not a valid hex char. Only valid values are: 0-9 and A-F
-		{description: "hex with an invalid character", input: "#845X76", color: color.RGBA{A: 255}, err: errors.New("Bad color code \"#845X76\"")},
+		{description: "hex with an invalid character", input: "#845X76", color: color.RGBA{A: 255}, err: pdf.ErrBadColorCode{Code: "#845X76"}},
 
 		{description: "valid color name", input: "MEDIUMPURPLE", color: color.RGBA{147, 112, 219, 255}, err: nil},
 		{description: "valid lowercase color name", input: "mediumpurple", color: color.RGBA{147, 112, 219, 255}, err: nil},
-		{description: "unknown color name", input: "picasso", color: color.RGBA{A: 255}, err: errors.New("Unknown color name \"picasso\"")},
+		{description: "unknown color name", input: "picasso", color: color.RGBA{A: 255}, err: pdf.ErrUnknownColor{Color: "picasso"}},
 	}
 
 	for _, test := range testCases {
@@ -44,10 +42,8 @@ func ToColor(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			color, err := ob.ToColor(test.input)
 
-			if test.err != nil {
-				if strings.Compare(test.err.Error(), err.Error()) != 0 {
-					t.Fatalf("expected err %v got %v", test.err, err)
-				}
+			if err != test.err {
+				t.Fatalf("expected err %v got %v", test.err, err)
 			}
 
 			if test.color != color {
