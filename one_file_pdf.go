@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 22:12:32 8E859D                              [one_file_pdf.go]
+// :v: 2018-03-24 22:49:34 2E7D7F                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -169,7 +169,7 @@ type PDF struct {
 	lineWidth    float64       // current line width (in points)
 	fontName     string        // current font's name
 	fontSizePt   float64       // current font's size (in points)
-	hScaling     uint16        // horizontal scaling factor (in %)
+	horzScaling  uint16        // horizontal scaling factor (in %)
 	compression  bool          // enable stream compression?
 	content      bytes.Buffer  // content buffer where PDF is written
 	pbuf         *bytes.Buffer // pointer to PDF/current page's buffer
@@ -217,7 +217,7 @@ type pdfPage struct {
 	fontID         int
 	strokeColor    color.RGBA
 	nonStrokeColor color.RGBA
-	hScaling       uint16
+	horzScaling    uint16
 	content        bytes.Buffer // write..() calls send output here
 } //                                                                     pdfPage
 
@@ -237,7 +237,7 @@ type pdfPaperSize struct {
 // You can also specify custom paper sizes using "width unit x height unit",
 // for example "20 cm x 20 cm" or even "15cm x 10inch", etc.
 func NewPDF(paperSize string) PDF {
-	var pdf = PDF{color: pdfBlack, pageNo: 0, hScaling: 100,
+	var pdf = PDF{color: pdfBlack, pageNo: 0, horzScaling: 100,
 		compression: true}
 	var size, err = pdf.getPaperSize(paperSize)
 	if err != nil {
@@ -300,7 +300,7 @@ func (pdf *PDF) FontName() string { return pdf.fontName }
 func (pdf *PDF) FontSize() float64 { return pdf.fontSizePt }
 
 // HorizontalScaling returns the current horizontal scaling in percent.
-func (pdf *PDF) HorizontalScaling() uint16 { return pdf.hScaling }
+func (pdf *PDF) HorizontalScaling() uint16 { return pdf.horzScaling }
 
 // LineWidth returns the current line width in points.
 func (pdf *PDF) LineWidth() float64 { return pdf.lineWidth }
@@ -407,7 +407,7 @@ func (pdf *PDF) SetFontSize(points float64) *PDF {
 // SetHorizontalScaling changes the horizontal scaling in percent.
 // For example, 200 will stretch text to double its normal width.
 func (pdf *PDF) SetHorizontalScaling(percent uint16) *PDF {
-	pdf.hScaling = percent
+	pdf.horzScaling = percent
 	return pdf
 } //                                                        SetHorizontalScaling
 
@@ -455,7 +455,7 @@ func (pdf *PDF) AddPage() *PDF {
 	var COLOR = color.RGBA{1, 0, 1, 0x01} // unlikely default color
 	pdf.pages = append(pdf.pages, pdfPage{
 		x: -1, y: -1, strokeColor: COLOR, nonStrokeColor: COLOR,
-		hScaling: 100,
+		horzScaling: 100,
 	})
 	pdf.pageNo = len(pdf.pages) - 1
 	pdf.ppage = &pdf.pages[pdf.pageNo]
@@ -1004,9 +1004,9 @@ func (pdf *PDF) drawTextLine(s string) *PDF {
 	if err := pdf.applyFont(); err != nil {
 		pdf.putError(err)
 	}
-	if pg.hScaling != pdf.hScaling {
-		pg.hScaling = pdf.hScaling
-		pdf.write("BT %d Tz ET\n", pg.hScaling)
+	if pg.horzScaling != pdf.horzScaling {
+		pg.horzScaling = pdf.horzScaling
+		pdf.write("BT %d Tz ET\n", pg.horzScaling)
 		// BT: begin text   n0 Tz: set horiz. text scaling to n0%   ET: end text
 	}
 	pdf.writeMode(true) // fill/nonStroke
@@ -1168,7 +1168,7 @@ func (pdf *PDF) textWidthPt1000(s string) float64 {
 		w += float64(pdfFontWidths[r][0])
 		// TODO: [0] is not considering the current font!
 	}
-	return w * pdf.fontSizePt / 1000 * float64(pdf.hScaling) / 100
+	return w * pdf.fontSizePt / 1000 * float64(pdf.horzScaling) / 100
 } //                                                             textWidthPt1000
 
 // -----------------------------------------------------------------------------
