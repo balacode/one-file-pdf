@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 18:58:45 325E43                               [utest/color.go]
+// :v: 2018-03-24 22:53:34 141BC1                               [utest/color.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -20,7 +20,7 @@ func Color(t *testing.T) {
 
 	func() {
 		var doc pdf.PDF // uninitialized PDF
-		TEqual(t, doc.Color(), color.RGBA{})
+		TEqual(t, doc.Color(), color.RGBA{A: 255})
 	}()
 
 	func() {

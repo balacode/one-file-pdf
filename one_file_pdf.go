@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 22:49:34 2E7D7F                              [one_file_pdf.go]
+// :v: 2018-03-24 22:54:21 C7761B                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -92,6 +92,7 @@ package pdf
 //   drawTextLine(s string) *PDF
 //   drawTextBox(x, y, width, height float64,
 //       wrapText bool, align, text string) *PDF
+//   init() *PDF
 //   loadImage(fileNameOrBytes interface{}, back color.RGBA,
 //       ) (img pdfImage, idx int, err error)
 //   makeImage(source image.Image, back color.RGBA,
@@ -176,6 +177,7 @@ type PDF struct {
 	objOffsets   []int         // used by Bytes() and write..()
 	objNo        int           // used by Bytes() and write..()
 	errors       []error       // errors that occurred during method calls
+	isInit       bool          // has the PDF been initialized?
 	//
 	// Function that handles error logging: it is set to fmt.Println
 	// by default (by NewPDF). You can redefine it as needed or
@@ -237,9 +239,8 @@ type pdfPaperSize struct {
 // You can also specify custom paper sizes using "width unit x height unit",
 // for example "20 cm x 20 cm" or even "15cm x 10inch", etc.
 func NewPDF(paperSize string) PDF {
-	var pdf = PDF{color: pdfBlack, pageNo: 0, horzScaling: 100,
-		compression: true}
-	var size, err = pdf.getPaperSize(paperSize)
+	var pdf PDF
+	var size, err = pdf.init().getPaperSize(paperSize)
 	if err != nil {
 		pdf.putError(err)
 		pdf.paperSize, _ = pdf.getPaperSize("A4")
@@ -270,44 +271,47 @@ func (pdf *PDF) PageWidth() float64 {
 // # Property Getters (pdf *PDF)
 
 // Color returns the current color, which is used for text, lines and fills.
-func (pdf *PDF) Color() color.RGBA { return pdf.color }
+func (pdf *PDF) Color() color.RGBA { pdf.init(); return pdf.color }
 
 // Compression returns the current compression mode. If it is true,
 // all PDF content will be compressed when the PDF is generated. If
 // false, most PDF content (excluding images) will be in plain text,
 // which is useful for debugging or to study PDF commands.
-func (pdf *PDF) Compression() bool { return pdf.compression }
+func (pdf *PDF) Compression() bool { pdf.init(); return pdf.compression }
 
 // DocAuthor returns the optional 'document author' metadata entry.
-func (pdf *PDF) DocAuthor() string { return pdf.docAuthor }
+func (pdf *PDF) DocAuthor() string { pdf.init(); return pdf.docAuthor }
 
 // DocCreator returns the optional 'document creator' metadata entry.
-func (pdf *PDF) DocCreator() string { return pdf.docCreator }
+func (pdf *PDF) DocCreator() string { pdf.init(); return pdf.docCreator }
 
 // DocKeywords returns the optional 'document keywords' metadata entry.
-func (pdf *PDF) DocKeywords() string { return pdf.docKeywords }
+func (pdf *PDF) DocKeywords() string { pdf.init(); return pdf.docKeywords }
 
 // DocSubject returns the optional 'document subject' metadata entry.
-func (pdf *PDF) DocSubject() string { return pdf.docSubject }
+func (pdf *PDF) DocSubject() string { pdf.init(); return pdf.docSubject }
 
 // DocTitle returns the optional 'document subject' metadata entry.
-func (pdf *PDF) DocTitle() string { return pdf.docTitle }
+func (pdf *PDF) DocTitle() string { pdf.init(); return pdf.docTitle }
 
 // FontName returns the name of the currently-active typeface.
-func (pdf *PDF) FontName() string { return pdf.fontName }
+func (pdf *PDF) FontName() string { pdf.init(); return pdf.fontName }
 
 // FontSize returns the current font size in points.
-func (pdf *PDF) FontSize() float64 { return pdf.fontSizePt }
+func (pdf *PDF) FontSize() float64 { pdf.init(); return pdf.fontSizePt }
 
 // HorizontalScaling returns the current horizontal scaling in percent.
-func (pdf *PDF) HorizontalScaling() uint16 { return pdf.horzScaling }
+func (pdf *PDF) HorizontalScaling() uint16 {
+	pdf.init()
+	return pdf.horzScaling
+}
 
 // LineWidth returns the current line width in points.
-func (pdf *PDF) LineWidth() float64 { return pdf.lineWidth }
+func (pdf *PDF) LineWidth() float64 { pdf.init(); return pdf.lineWidth }
 
 // Units returns the currently selected measurement units.
 // E.g.: mm cm " in inch inches tw twip twips pt point points
-func (pdf *PDF) Units() string { return pdf.unitName }
+func (pdf *PDF) Units() string { pdf.init(); return pdf.unitName }
 
 // X returns the X-coordinate of the current drawing position.
 func (pdf *PDF) X() float64 {
@@ -328,7 +332,7 @@ func (pdf *PDF) Y() float64 {
 // for subsequent text and line drawing and fills.
 // If the name is unknown or valid, sets the current color to black.
 func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
-	var color, err = pdf.ToColor(nameOrHTMLColor)
+	var color, err = pdf.init().ToColor(nameOrHTMLColor)
 	if err != nil {
 		pdf.putError(err)
 	}
@@ -339,6 +343,7 @@ func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 // SetColorRGB sets the current color using red, green and blue values.
 // The current color is used for subsequent text/line drawing and fills.
 func (pdf *PDF) SetColorRGB(r, g, b uint8) *PDF {
+	pdf.init()
 	pdf.color = color.RGBA{r, g, b, 255}
 	return pdf
 } //                                                                 SetColorRGB
@@ -348,6 +353,7 @@ func (pdf *PDF) SetColorRGB(r, g, b uint8) *PDF {
 // generated. If false, most content (excluding images) will be in
 // plain text, which is useful for debugging or to study PDF commands.
 func (pdf *PDF) SetCompression(val bool) *PDF {
+	pdf.init()
 	pdf.compression = val
 	return pdf
 } //                                                              SetCompression
@@ -386,13 +392,14 @@ func (pdf *PDF) SetDocTitle(s string) *PDF {
 // For the font name, use one of the standard font names, e.g. 'Helvetica'.
 // This font will be used for subsequent text drawing.
 func (pdf *PDF) SetFont(name string, points float64) *PDF {
-	return pdf.SetFontName(name).SetFontSize(points)
+	return pdf.init().SetFontName(name).SetFontSize(points)
 } //                                                                     SetFont
 
 // SetFontName changes the current font, while using the
 // same font size as the previous font. Use one of the
 // standard font names, such as 'Helvetica'.
 func (pdf *PDF) SetFontName(name string) *PDF {
+	pdf.init()
 	pdf.fontName = name
 	return pdf
 } //                                                                 SetFontName
@@ -400,6 +407,7 @@ func (pdf *PDF) SetFontName(name string) *PDF {
 // SetFontSize changes the current font size in points,
 // without changing the currently-selected font typeface.
 func (pdf *PDF) SetFontSize(points float64) *PDF {
+	pdf.init()
 	pdf.fontSizePt = points
 	return pdf
 } //                                                                 SetFontSize
@@ -407,12 +415,14 @@ func (pdf *PDF) SetFontSize(points float64) *PDF {
 // SetHorizontalScaling changes the horizontal scaling in percent.
 // For example, 200 will stretch text to double its normal width.
 func (pdf *PDF) SetHorizontalScaling(percent uint16) *PDF {
+	pdf.init()
 	pdf.horzScaling = percent
 	return pdf
 } //                                                        SetHorizontalScaling
 
 // SetLineWidth changes the line width in points.
 func (pdf *PDF) SetLineWidth(points float64) *PDF {
+	pdf.init()
 	pdf.lineWidth = points
 	return pdf
 } //                                                                SetLineWidth
@@ -420,7 +430,7 @@ func (pdf *PDF) SetLineWidth(points float64) *PDF {
 // SetUnits changes the current measurement units:
 // mm cm " in inch inches tw twip twips pt point points (can be in any case)
 func (pdf *PDF) SetUnits(unitName string) *PDF {
-	var ppu, err = pdf.getPointsPerUnit(unitName)
+	var ppu, err = pdf.init().getPointsPerUnit(unitName)
 	if err != nil {
 		return pdf.putError(err)
 	}
@@ -430,7 +440,7 @@ func (pdf *PDF) SetUnits(unitName string) *PDF {
 
 // SetX changes the X-coordinate of the current drawing position.
 func (pdf *PDF) SetX(x float64) *PDF {
-	pdf.reservePage()
+	pdf.init().reservePage()
 	pdf.ppage.x = x * pdf.ptPerUnit
 	return pdf
 } //                                                                        SetX
@@ -442,7 +452,7 @@ func (pdf *PDF) SetXY(x, y float64) *PDF {
 
 // SetY changes the Y-coordinate of the current drawing position.
 func (pdf *PDF) SetY(y float64) *PDF {
-	pdf.reservePage()
+	pdf.init().reservePage()
 	pdf.ppage.y = pdf.paperSize.heightPt - y*pdf.ptPerUnit
 	return pdf
 } //                                                                        SetY
@@ -454,13 +464,13 @@ func (pdf *PDF) SetY(y float64) *PDF {
 func (pdf *PDF) AddPage() *PDF {
 	var COLOR = color.RGBA{1, 0, 1, 0x01} // unlikely default color
 	pdf.pages = append(pdf.pages, pdfPage{
-		x: -1, y: -1, strokeColor: COLOR, nonStrokeColor: COLOR,
-		horzScaling: 100,
+		x: -1, y: -1, lineWidth: 1, strokeColor: COLOR, nonStrokeColor: COLOR,
+		fontSizePt: 10, horzScaling: 100,
 	})
 	pdf.pageNo = len(pdf.pages) - 1
 	pdf.ppage = &pdf.pages[pdf.pageNo]
 	pdf.pbuf = &pdf.ppage.content
-	return pdf.SetXY(0, 0)
+	return pdf
 } //                                                                     AddPage
 
 // Bytes generates the PDF document from various page and
@@ -741,6 +751,7 @@ func (pdf *PDF) SaveFile(filename string) error {
 // SetColumnWidths creates column positions (tab stops) along the X-axis.
 // To remove all column positions, call this method without any argument.
 func (pdf *PDF) SetColumnWidths(widths ...float64) *PDF {
+	pdf.init()
 	pdf.columnWidths = widths
 	return pdf
 } //                                                             SetColumnWidths
@@ -749,6 +760,7 @@ func (pdf *PDF) SetColumnWidths(widths ...float64) *PDF {
 // By default it is nil. You can set it to a custom
 // function with the same signature as fmt.Println.
 func (pdf *PDF) SetErrorLogger(fn func(a ...interface{}) (int, error)) *PDF {
+	pdf.init()
 	pdf.errorLogger = fn
 	return pdf
 } //                                                              SetErrorLogger
@@ -1065,6 +1077,21 @@ func (pdf *PDF) drawTextBox(x, y, width, height float64,
 	}
 	return pdf
 } //                                                                 drawTextBox
+
+// init initializes the PDF object, if not initialized already
+func (pdf *PDF) init() *PDF {
+	if pdf.isInit {
+		return pdf
+	}
+	pdf.unitName = "CM"
+	pdf.paperSize, _ = pdf.getPaperSize("A4")
+	pdf.ptPerUnit, _ = pdf.getPointsPerUnit(pdf.unitName)
+	pdf.color, pdf.lineWidth = pdfBlack, 1 // point
+	pdf.fontName, pdf.fontSizePt = "Helvetica", 10
+	pdf.horzScaling, pdf.compression = 100, true
+	pdf.isInit = true
+	return pdf
+} //                                                                        init
 
 // loadImage reads an image from a file or byte array, stores its data in
 // the PDF's images array, and returns a pdfImage and its reference index
