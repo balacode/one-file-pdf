@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 18:56:20 34A45C                           [utest/util_func.go]
+// :v: 2018-03-24 22:04:39 6421B8                           [utest/util_func.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -56,10 +56,11 @@ func pdfCompare(t *testing.T, result []byte, expect string, sfmt pdfStreamFmt) {
 		if errCount > 5 {
 			break
 		}
-		t.Errorf("MISMATCH ON LINE %d:\n"+
+		t.Errorf("LOCATION: %s:\n"+
+			"MISMATCH: L%d:\n"+
 			"EXPECTED: %s\n"+
 			"PRODUCED: %s\n"+
-			"\n", i+1, expect, result)
+			"\n", TCaller(), i+1, expect, result)
 	}
 	if mismatch {
 		t.Errorf("RETURNED >>>>>>> \n %s \n", strings.Join(results, "\n"))

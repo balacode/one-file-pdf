@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-12 23:56:35 23C7E1                        [utest/util_t_equal.go]
+// :v: 2018-03-24 22:04:39 007CFE                        [utest/util_t_equal.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -98,8 +98,8 @@ mainLoop:
 		}
 		// skip runtime/syscall functions, but continue the loop
 		for _, s := range []string{
-			"zr.Callers", "zr.CallerList", "zr.Error", "zr.Log", "zr.logAsync",
-			"runtime.", "syscall.",
+			".Callers", ".CallerList", ".Error", ".Log", ".logAsync",
+			"mismatch", "runtime.", "syscall.",
 		} {
 			if strings.Contains(funcName, s) {
 				continue mainLoop
@@ -138,13 +138,9 @@ mainLoop:
 // TCaller returns the name of the unit test function.
 func TCaller() string {
 	for _, funcName := range CallerList() {
-		if strings.HasPrefix(funcName, "TCaller") ||
-			strings.HasPrefix(funcName, "TEqual") ||
-			strings.HasPrefix(funcName, "TFail") ||
-			strings.HasPrefix(funcName, "TFalse") ||
-			strings.HasPrefix(funcName, "TTrue") ||
-			strings.Contains(funcName, ".func") ||
-			!strings.Contains(funcName, ".Test") {
+		if strings.HasPrefix(funcName, "utest.TCaller") ||
+			strings.HasPrefix(funcName, "utest.TEqual") ||
+			strings.HasPrefix(funcName, "utest.pdfCompare") {
 			continue
 		}
 		return funcName

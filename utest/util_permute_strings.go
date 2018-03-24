@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-12 22:00:19 A0CE35               [utest/util_format_pdf_lines.go]
+// :v: 2018-03-24 22:04:39 DF4DFF               [utest/util_format_pdf_lines.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -33,9 +33,9 @@ loop:
 		// construct permutated string
 		buf.Reset()
 		for i, ar := range parts {
-			var p = at[i]
-			if p >= 0 && p < len(ar) {
-				buf.WriteString(ar[p])
+			var j = at[i]
+			if j >= 0 && j < len(ar) {
+				buf.WriteString(ar[j])
 			}
 		}
 		ret = append(ret, buf.String())
