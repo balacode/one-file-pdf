@@ -6,15 +6,14 @@
 package utest
 
 import (
-	"fmt" // standard
-	"image/color"
-	"testing"
+	"fmt"         // standard
+	"image/color" // standard
+	"testing"     // standard
 
 	pdf "github.com/balacode/one-file-pdf"
 )
 
-// standard
-
+// ToColor is the unit test for PDF.ToColor()
 func ToColor(t *testing.T) {
 	fmt.Println("utest.ToColor")
 
@@ -24,16 +23,46 @@ func ToColor(t *testing.T) {
 		color       color.RGBA
 		err         error
 	}{
-		{description: "valid hex", input: "#c83296", color: color.RGBA{200, 50, 150, 255}, err: nil},
-		{description: "hex with more than seven characters", input: "#c83296XXXXXXX", color: color.RGBA{200, 50, 150, 255}, err: nil},
-		{description: "invalid hex", input: "#wrongcolor", color: color.RGBA{A: 255}, err: pdf.ErrBadColorCode{Code: "#wrongcolor"}},
+		{
+			description: "valid hex",
+			input:       "#c83296",
+			color:       color.RGBA{200, 50, 150, 255},
+		},
+		{
+			description: "hex with more than seven characters",
+			input:       "#c83296XXXXXXX",
+			color:       color.RGBA{200, 50, 150, 255},
+		},
+		{
+			description: "invalid hex",
+			input:       "#wrongcolor",
+			color:       color.RGBA{A: 255},
+			err:         pdf.ErrBadColorCode{Code: "#wrongcolor"},
+		},
 
 		// X is not a valid hex char. Only valid values are: 0-9 and A-F
-		{description: "hex with an invalid character", input: "#845X76", color: color.RGBA{A: 255}, err: pdf.ErrBadColorCode{Code: "#845X76"}},
-
-		{description: "valid color name", input: "MEDIUMPURPLE", color: color.RGBA{147, 112, 219, 255}, err: nil},
-		{description: "valid lowercase color name", input: "mediumpurple", color: color.RGBA{147, 112, 219, 255}, err: nil},
-		{description: "unknown color name", input: "picasso", color: color.RGBA{A: 255}, err: pdf.ErrUnknownColor{Color: "picasso"}},
+		{
+			description: "hex with an invalid character",
+			input:       "#845X76",
+			color:       color.RGBA{A: 255},
+			err:         pdf.ErrBadColorCode{Code: "#845X76"},
+		},
+		{
+			description: "valid color name",
+			input:       "MEDIUMPURPLE",
+			color:       color.RGBA{147, 112, 219, 255},
+		},
+		{
+			description: "valid lowercase color name",
+			input:       "mediumpurple",
+			color:       color.RGBA{147, 112, 219, 255},
+		},
+		{
+			description: "unknown color name",
+			input:       "picasso",
+			color:       color.RGBA{A: 255},
+			err:         pdf.ErrUnknownColor{Color: "picasso"},
+		},
 	}
 
 	for _, test := range testCases {
