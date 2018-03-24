@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 03:22:15 202E80                              [private_test.go]
+// :v: 2018-03-24 22:06:38 D15986                              [private_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -23,8 +23,8 @@ import "path/filepath" // standard
 func Test_getPapreSize_(t *testing.T) {
 	//
 	var test = func(input, name string, widthPt, heightPt float64, err error) {
-		var pdf PDF
-		var got, gotErr = pdf.getPaperSize(name)
+		var doc PDF
+		var got, gotErr = doc.getPaperSize(name)
 		//
 		if gotErr != err {
 			t.Errorf("'error' mismatch: expected: %v returned %v", err, gotErr)
