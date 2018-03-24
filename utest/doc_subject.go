@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 03:14:56 8BF24C                         [utest/doc_subject.go]
+// :v: 2018-03-24 18:56:20 C24B13                         [utest/doc_subject.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -19,13 +19,13 @@ func DocSubject(t *testing.T) {
 	fmt.Println("utest.DocSubject")
 
 	func() {
-		var ob pdf.PDF // uninitialized PDF
-		TEqual(t, ob.DocSubject(), "")
+		var doc pdf.PDF // uninitialized PDF
+		TEqual(t, doc.DocSubject(), "")
 	}()
 
 	func() {
-		var ob = pdf.NewPDF("A4") // initialized PDF
-		TEqual(t, ob.DocSubject(), "")
+		var doc = pdf.NewPDF("A4") // initialized PDF
+		TEqual(t, doc.DocSubject(), "")
 	}()
 
 	// -------------------------------------------------------------------------
@@ -34,21 +34,20 @@ func DocSubject(t *testing.T) {
 	fmt.Println("utest.SetDocSubject")
 
 	func() {
-		var ob pdf.PDF // uninitialized PDF
-		TEqual(t, ob.SetDocSubject("Abcdefg").DocSubject(), "Abcdefg")
+		var doc pdf.PDF // uninitialized PDF
+		TEqual(t, doc.SetDocSubject("Abcdefg").DocSubject(), "Abcdefg")
 	}()
 
 	func() {
-		var ob = pdf.NewPDF("A4") // initialized PDF
-		TEqual(t, ob.SetDocSubject("Abcdefg").DocSubject(), "Abcdefg")
+		var doc = pdf.NewPDF("A4") // initialized PDF
+		TEqual(t, doc.SetDocSubject("Abcdefg").DocSubject(), "Abcdefg")
 	}()
 
 	// -------------------------------------------------------------------------
 	// Test PDF generation
 	func() {
-		var pdf = pdf.NewPDF("A4")
-		pdf.SetCompression(false).
-			SetDocSubject("'Subject' metadata entry")
+		var doc = pdf.NewPDF("A4") // initialized PDF
+		doc.SetCompression(false).SetDocSubject("'Subject' metadata entry")
 		var expect = `
 		%PDF-1.4
 		1 0 obj<</Type/Catalog/Pages 2 0 R>>
@@ -75,7 +74,7 @@ func DocSubject(t *testing.T) {
 		285
 		%%EOF
         `
-		pdfCompare(t, pdf.Bytes(), expect, pdfStreamsInText)
+		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 	}()
 
 } //                                                                  DocSubject

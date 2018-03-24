@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-21 01:14:03 9108C6                            [utest/draw_box.go]
+// :v: 2018-03-24 18:56:20 0D51D1                            [utest/draw_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -17,11 +17,11 @@ import "github.com/balacode/one-file-pdf"
 func DrawBox(t *testing.T) {
 	fmt.Println("utest.DrawBox")
 	var (
-		ob = pdf.NewPDF("18cm x 18cm")
-		x  = 1.0
-		y  = 1.0
+		doc = pdf.NewPDF("18cm x 18cm")
+		x   = 1.0
+		y   = 1.0
 	)
-	ob.SetCompression(false).
+	doc.SetCompression(false).
 		SetUnits("cm").
 		SetLineWidth(5).
 		SetColor("Black").DrawBox(x, y, 1, 1, true). // fill
@@ -62,7 +62,7 @@ func DrawBox(t *testing.T) {
 	478
 	%%EOF
 	`
-	pdfCompare(t, ob.Bytes(), expect, pdfStreamsInText)
+	pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 } //                                                                     DrawBox
 
 //end

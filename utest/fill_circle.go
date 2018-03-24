@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-19 23:29:32 402FFB                         [utest/fill_circle.go]
+// :v: 2018-03-24 18:56:20 F24325                         [utest/fill_circle.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -17,11 +17,11 @@ import "github.com/balacode/one-file-pdf"
 func FillCircle(t *testing.T) {
 	fmt.Println("utest.FillCircle")
 	var (
-		ob     = pdf.NewPDF("30cm x 20cm")
+		doc    = pdf.NewPDF("30cm x 20cm")
 		x, y   = 15.0, 10.0         // center of page
 		radius = (20.0 * 3 / 5) / 2 // diameter = 3/5 of height
 	)
-	ob.SetCompression(false).
+	doc.SetCompression(false).
 		SetUnits("cm").
 		SetColor("#BC002D (close to #BE0032 CrimsonGlory)").
 		FillCircle(x, y, radius)
@@ -56,7 +56,7 @@ func FillCircle(t *testing.T) {
 	487
 	%%EOF
 	`
-	pdfCompare(t, ob.Bytes(), expect, pdfStreamsInText)
+	pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 } //                                                                  FillCircle
 
 //end

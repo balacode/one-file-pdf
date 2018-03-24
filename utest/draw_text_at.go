@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 03:10:56 869A01                        [utest/draw_text_at.go]
+// :v: 2018-03-24 18:56:20 B480B1                        [utest/draw_text_at.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -14,9 +14,8 @@ import "github.com/balacode/one-file-pdf"
 // DrawTextAt(x, y float64, text string) *PDF
 func DrawTextAt(t *testing.T) {
 	fmt.Println("utest.DrawTextAt")
-	var pdf = pdf.NewPDF("A4")
-	pdf.
-		SetCompression(false).
+	var doc = pdf.NewPDF("A4")
+	doc.SetCompression(false).
 		SetUnits("cm").
 		SetColor("#36454F Charcoal").
 		SetFont("Helvetica-Bold", 20).
@@ -70,7 +69,7 @@ func DrawTextAt(t *testing.T) {
 	655
 	%%EOF
 	`
-	pdfCompare(t, pdf.Bytes(), expect, pdfStreamsInText)
+	pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 } //                                                                  DrawTextAt
 
 //end

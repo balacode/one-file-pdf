@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 03:14:56 F22B45                            [utest/to_units.go]
+// :v: 2018-03-24 18:56:20 931001                            [utest/to_units.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -16,8 +16,8 @@ func ToUnits(t *testing.T) {
 	fmt.Println("utest.ToUnits")
 
 	func() {
-		var ob pdf.PDF
-		TEqual(t, ob.ToUnits(1), 1)
+		var doc pdf.PDF
+		TEqual(t, doc.ToUnits(1), 1)
 		//TODO: add test cases for ToUnits()
 	}()
 

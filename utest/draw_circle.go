@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-21 01:14:03 EB6E5B                         [utest/draw_circle.go]
+// :v: 2018-03-24 18:56:20 B336C7                         [utest/draw_circle.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -18,10 +18,10 @@ import "github.com/balacode/one-file-pdf"
 func DrawCircle(t *testing.T) {
 	fmt.Println("utest.DrawCircle")
 	var (
-		ob   = pdf.NewPDF("20cm x 20cm")
+		doc  = pdf.NewPDF("20cm x 20cm")
 		x, y = 10.0, 10.0 // center of page
 	)
-	ob.SetCompression(false).
+	doc.SetCompression(false).
 		SetUnits("cm").
 		SetLineWidth(5).
 		SetColor("Black").DrawCircle(x, y, 0.5, true). // fill
@@ -78,7 +78,7 @@ func DrawCircle(t *testing.T) {
 	1214
 	%%EOF
 	`
-	pdfCompare(t, ob.Bytes(), expect, pdfStreamsInText)
+	pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 } //                                                                  DrawCircle
 
 //end

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 03:14:56 C86413                        [utest/doc_keywords.go]
+// :v: 2018-03-24 18:56:20 696C80                        [utest/doc_keywords.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -19,13 +19,13 @@ func DocKeywords(t *testing.T) {
 	fmt.Println("utest.DocKeywords")
 
 	func() {
-		var ob pdf.PDF // uninitialized PDF
-		TEqual(t, ob.DocKeywords(), "")
+		var doc pdf.PDF // uninitialized PDF
+		TEqual(t, doc.DocKeywords(), "")
 	}()
 
 	func() {
-		var ob = pdf.NewPDF("A4") // initialized PDF
-		TEqual(t, ob.DocKeywords(), "")
+		var doc = pdf.NewPDF("A4") // initialized PDF
+		TEqual(t, doc.DocKeywords(), "")
 	}()
 
 	// -------------------------------------------------------------------------
@@ -34,22 +34,21 @@ func DocKeywords(t *testing.T) {
 	fmt.Println("utest.SetDocKeywords")
 
 	func() {
-		var ob pdf.PDF // uninitialized PDF
-		TEqual(t, ob.SetDocKeywords("Abcdefg").DocKeywords(), "Abcdefg")
+		var doc pdf.PDF // uninitialized PDF
+		TEqual(t, doc.SetDocKeywords("Abcdefg").DocKeywords(), "Abcdefg")
 	}()
 
 	func() {
-		var ob = pdf.NewPDF("A4") // initialized PDF
-		TEqual(t, ob.SetDocKeywords("Abcdefg").DocKeywords(), "Abcdefg")
+		var doc = pdf.NewPDF("A4") // initialized PDF
+		TEqual(t, doc.SetDocKeywords("Abcdefg").DocKeywords(), "Abcdefg")
 	}()
 
 	// -------------------------------------------------------------------------
 	// Test PDF generation
 	//
 	func() {
-		var pdf = pdf.NewPDF("A4")
-		pdf.SetCompression(false).
-			SetDocKeywords("'Keywords' metadata entry")
+		var doc = pdf.NewPDF("A4") // initialized PDF
+		doc.SetCompression(false).SetDocKeywords("'Keywords' metadata entry")
 		var expect = `
 		%PDF-1.4
 		1 0 obj<</Type/Catalog/Pages 2 0 R>>
@@ -76,7 +75,7 @@ func DocKeywords(t *testing.T) {
 		287
 		%%EOF
         `
-		pdfCompare(t, pdf.Bytes(), expect, pdfStreamsInText)
+		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 	}()
 
 } //                                                                 DocKeywords

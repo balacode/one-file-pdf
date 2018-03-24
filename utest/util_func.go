@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-20 19:18:58 CB9375                           [utest/util_func.go]
+// :v: 2018-03-24 18:56:20 34A45C                           [utest/util_func.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -67,11 +67,11 @@ func pdfCompare(t *testing.T, result []byte, expect string, sfmt pdfStreamFmt) {
 } //                                                                  pdfCompare
 
 // pdfFailIfErrors raises a test failure if the supplied PDF has errors
-func pdfFailIfErrors(t *testing.T, pdf *pdf.PDF) {
-	if len(pdf.Errors()) == 0 {
+func pdfFailIfErrors(t *testing.T, doc *pdf.PDF) {
+	if len(doc.Errors()) == 0 {
 		return
 	}
-	for i, err := range pdf.Errors() {
+	for i, err := range doc.Errors() {
 		t.Errorf("ERROR %d: %s\n\n", i+1, err)
 	}
 	t.Fail()

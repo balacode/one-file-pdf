@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 03:10:56 468B87                           [utest/draw_text.go]
+// :v: 2018-03-24 18:56:20 098B2D                           [utest/draw_text.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -16,8 +16,8 @@ func DrawText(t *testing.T) {
 	fmt.Println("utest.DrawText")
 	//
 	func() {
-		var ob = pdf.NewPDF("A4")
-		ob.SetCompression(false).
+		var doc = pdf.NewPDF("A4")
+		doc.SetCompression(false).
 			SetUnits("cm").
 			SetColumnWidths(1, 4, 9).
 			SetColor("#006B3C CadmiumGreen").
@@ -62,12 +62,12 @@ func DrawText(t *testing.T) {
 		501
 		%%EOF
 		`
-		pdfCompare(t, ob.Bytes(), expect, pdfStreamsInText)
+		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 	}()
 
 	func() {
-		var ob = pdf.NewPDF("A4")
-		ob.SetCompression(false).
+		var doc = pdf.NewPDF("A4")
+		doc.SetCompression(false).
 			SetUnits("cm").
 			SetFont("Ye-Olde-Scriptte", 10).
 			SetXY(5, 5).
@@ -107,9 +107,9 @@ func DrawText(t *testing.T) {
 		466
 		%%EOF
 		`
-		pdfCompare(t, ob.Bytes(), expect, pdfStreamsInText)
-		TEqual(t, len(ob.Errors()), 1)
-		TEqual(t, ob.PullError(),
+		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
+		TEqual(t, len(doc.Errors()), 1)
+		TEqual(t, doc.PullError(),
 			fmt.Errorf(`Invalid font name: "Ye-Olde-Scriptte" @DrawText`))
 	}()
 

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 02:48:21 6EAA73                              [utest/errors.go]
+// :v: 2018-03-24 18:56:20 6E3E3C                              [utest/errors.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -15,19 +15,19 @@ func Errors(t *testing.T) {
 
 	// Errors() should be []error{} on a non-initialized PDF:
 	func() {
-		var ob pdf.PDF // uninitialized PDF
+		var doc pdf.PDF // uninitialized PDF
 		//
 		//        result            expected
-		TEqual(t, len(ob.Errors()), 0)
-		TEqual(t, ob.Errors(), []error{})
+		TEqual(t, len(doc.Errors()), 0)
+		TEqual(t, doc.Errors(), []error{})
 	}()
 
 	// same as above for a PDF properly initialized with NewPDF()
 	// (also, call Errors() without chaining)
 	func() {
-		var ob = pdf.NewPDF("A4")
-		TEqual(t, len(ob.Errors()), 0)
-		TEqual(t, ob.Errors(), []error{})
+		var doc = pdf.NewPDF("A4")
+		TEqual(t, len(doc.Errors()), 0)
+		TEqual(t, doc.Errors(), []error{})
 	}()
 
 } //                                                                      Errors

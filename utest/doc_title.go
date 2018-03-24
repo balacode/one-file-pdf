@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 03:14:56 A2795F                           [utest/doc_title.go]
+// :v: 2018-03-24 18:56:20 491B6F                           [utest/doc_title.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -19,13 +19,13 @@ func DocTitle(t *testing.T) {
 	fmt.Println("utest.DocTitle")
 
 	func() {
-		var ob pdf.PDF // uninitialized PDF
-		TEqual(t, ob.DocTitle(), "")
+		var doc pdf.PDF // uninitialized PDF
+		TEqual(t, doc.DocTitle(), "")
 	}()
 
 	func() {
-		var ob = pdf.NewPDF("A4") // initialized PDF
-		TEqual(t, ob.DocTitle(), "")
+		var doc = pdf.NewPDF("A4") // initialized PDF
+		TEqual(t, doc.DocTitle(), "")
 	}()
 
 	// -------------------------------------------------------------------------
@@ -34,22 +34,21 @@ func DocTitle(t *testing.T) {
 	fmt.Println("utest.SetDocTitle")
 
 	func() {
-		var ob pdf.PDF // uninitialized PDF
-		TEqual(t, ob.SetDocTitle("Abcdefg").DocTitle(), "Abcdefg")
+		var doc pdf.PDF // uninitialized PDF
+		TEqual(t, doc.SetDocTitle("Abcdefg").DocTitle(), "Abcdefg")
 	}()
 
 	func() {
-		var ob = pdf.NewPDF("A4") // initialized PDF
-		TEqual(t, ob.SetDocTitle("Abcdefg").DocTitle(), "Abcdefg")
+		var doc = pdf.NewPDF("A4") // initialized PDF
+		TEqual(t, doc.SetDocTitle("Abcdefg").DocTitle(), "Abcdefg")
 	}()
 
 	// -------------------------------------------------------------------------
 	// Test PDF generation
 
 	func() {
-		var pdf = pdf.NewPDF("A4")
-		pdf.SetCompression(false).
-			SetDocTitle("'Title' metadata entry")
+		var doc = pdf.NewPDF("A4")
+		doc.SetCompression(false).SetDocTitle("'Title' metadata entry")
 		var expect = `
 		%PDF-1.4
 		1 0 obj<</Type/Catalog/Pages 2 0 R>>
@@ -76,7 +75,7 @@ func DocTitle(t *testing.T) {
 		281
 		%%EOF
         `
-		pdfCompare(t, pdf.Bytes(), expect, pdfStreamsInText)
+		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 	}()
 
 } //                                                                    DocTitle

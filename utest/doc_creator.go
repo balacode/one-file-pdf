@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 03:14:56 9F627C                         [utest/doc_creator.go]
+// :v: 2018-03-24 18:56:20 BD8290                         [utest/doc_creator.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -19,13 +19,13 @@ func DocCreator(t *testing.T) {
 	fmt.Println("utest.DocCreator")
 
 	func() {
-		var ob pdf.PDF // uninitialized PDF
-		TEqual(t, ob.DocCreator(), "")
+		var doc pdf.PDF // uninitialized PDF
+		TEqual(t, doc.DocCreator(), "")
 	}()
 
 	func() {
-		var ob = pdf.NewPDF("A4") // initialized PDF
-		TEqual(t, ob.DocCreator(), "")
+		var doc = pdf.NewPDF("A4") // initialized PDF
+		TEqual(t, doc.DocCreator(), "")
 	}()
 
 	// -------------------------------------------------------------------------
@@ -34,22 +34,21 @@ func DocCreator(t *testing.T) {
 	fmt.Println("utest.SetDocCreator")
 
 	func() {
-		var ob pdf.PDF // uninitialized PDF
-		TEqual(t, ob.SetDocCreator("Abcdefg").DocCreator(), "Abcdefg")
+		var doc pdf.PDF // uninitialized PDF
+		TEqual(t, doc.SetDocCreator("Abcdefg").DocCreator(), "Abcdefg")
 	}()
 
 	func() {
-		var ob = pdf.NewPDF("A4") // initialized PDF
-		TEqual(t, ob.SetDocCreator("Abcdefg").DocCreator(), "Abcdefg")
+		var doc = pdf.NewPDF("A4") // initialized PDF
+		TEqual(t, doc.SetDocCreator("Abcdefg").DocCreator(), "Abcdefg")
 	}()
 
 	// -------------------------------------------------------------------------
 	// Test PDF generation
 	//
 	func() {
-		var pdf = pdf.NewPDF("A4")
-		pdf.SetCompression(false).
-			SetDocCreator("'Creator' metadata entry")
+		var doc = pdf.NewPDF("A4") // initialized PDF
+		doc.SetCompression(false).SetDocCreator("'Creator' metadata entry")
 		var expect = `
 		%PDF-1.4
 		1 0 obj<</Type/Catalog/Pages 2 0 R>>
@@ -76,7 +75,7 @@ func DocCreator(t *testing.T) {
 		285
 		%%EOF
         `
-		pdfCompare(t, pdf.Bytes(), expect, pdfStreamsInText)
+		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 	}()
 
 } //                                                                  DocCreator

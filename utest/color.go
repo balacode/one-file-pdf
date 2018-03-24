@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 02:55:11 72CD01                               [utest/color.go]
+// :v: 2018-03-24 18:58:45 325E43                               [utest/color.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -19,13 +19,13 @@ func Color(t *testing.T) {
 	fmt.Println("utest.Color")
 
 	func() {
-		var ob pdf.PDF // uninitialized PDF
-		TEqual(t, ob.Color(), color.RGBA{})
+		var doc pdf.PDF // uninitialized PDF
+		TEqual(t, doc.Color(), color.RGBA{})
 	}()
 
 	func() {
-		var ob = pdf.NewPDF("A4") // initialized PDF
-		TEqual(t, ob.Color(), color.RGBA{A: 255})
+		var doc = pdf.NewPDF("A4") // initialized PDF
+		TEqual(t, doc.Color(), color.RGBA{A: 255})
 	}()
 
 	// -------------------------------------------------------------------------
@@ -54,33 +54,33 @@ func Color(t *testing.T) {
 
 	// try setting a blank color name
 	func() {
-		var ob pdf.PDF // uninitialized PDF
-		TEqual(t, len(ob.Errors()), 0)
-		ob.SetColor("")
-		TEqual(t, len(ob.Errors()), 1)
+		var doc pdf.PDF // uninitialized PDF
+		TEqual(t, len(doc.Errors()), 0)
+		doc.SetColor("")
+		TEqual(t, len(doc.Errors()), 1)
 		//
-		if len(ob.Errors()) == 1 {
+		if len(doc.Errors()) == 1 {
 			TEqual(t,
-				ob.Errors()[0],
+				doc.Errors()[0],
 				fmt.Errorf(`Unknown color name "" @SetColor`))
 		}
-		TEqual(t, ob.Color(), color.RGBA{A: 255})
+		TEqual(t, doc.Color(), color.RGBA{A: 255})
 	}()
 
 	// try setting an unknown color name
 	func() {
-		var ob pdf.PDF // uninitialized PDF
-		TEqual(t, len(ob.Errors()), 0)
-		ob.SetColor("TheColourOutOfSpace")
-		TEqual(t, len(ob.Errors()), 1)
+		var doc pdf.PDF // uninitialized PDF
+		TEqual(t, len(doc.Errors()), 0)
+		doc.SetColor("TheColourOutOfSpace")
+		TEqual(t, len(doc.Errors()), 1)
 		//
-		if len(ob.Errors()) == 1 {
+		if len(doc.Errors()) == 1 {
 			TEqual(t,
-				ob.Errors()[0],
+				doc.Errors()[0],
 				fmt.Errorf(
 					`Unknown color name "TheColourOutOfSpace" @SetColor`))
 		}
-		TEqual(t, ob.Color(), color.RGBA{A: 255})
+		TEqual(t, doc.Color(), color.RGBA{A: 255})
 	}()
 
 	// -------------------------------------------------------------------------

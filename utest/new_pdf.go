@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 02:48:21 286601                             [utest/new_pdf.go]
+// :v: 2018-03-24 18:56:20 0DAD0E                             [utest/new_pdf.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -40,15 +40,15 @@ func NewPDF(t *testing.T) {
 
 	// test NewPDF() and Bytes() while calling AddPage()
 	func() {
-		var ob = pdf.NewPDF("A4")
-		var result = ob.SetCompression(false).AddPage().Bytes()
+		var doc = pdf.NewPDF("A4")
+		var result = doc.SetCompression(false).AddPage().Bytes()
 		pdfCompare(t, result, expect, pdfStreamsInText)
 	}()
 
 	// test NewPDF() and Bytes() without calling AddPage()
 	func() {
-		var ob = pdf.NewPDF("A4")
-		var result = ob.SetCompression(false).Bytes()
+		var doc = pdf.NewPDF("A4")
+		var result = doc.SetCompression(false).Bytes()
 		pdfCompare(t, result, expect, pdfStreamsInText)
 	}()
 

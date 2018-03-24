@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-19 23:29:32 18E895                            [utest/fill_box.go]
+// :v: 2018-03-24 18:56:20 6451B5                            [utest/fill_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -17,13 +17,13 @@ import "github.com/balacode/one-file-pdf"
 func FillBox(t *testing.T) {
 	fmt.Println("utest.FillBox")
 	var (
-		ob     = pdf.NewPDF("A4")
+		doc    = pdf.NewPDF("A4")
 		x      = 6.5
 		y      = 6.0
 		width  = 8.0
 		height = 18.0
 	)
-	ob.SetCompression(false).
+	doc.SetCompression(false).
 		SetUnits("cm").
 		SetColor("#1B1B1B EerieBlack").
 		FillBox(x, y, width, height)
@@ -54,7 +54,7 @@ func FillBox(t *testing.T) {
 	302
 	%%EOF
 	`
-	pdfCompare(t, ob.Bytes(), expect, pdfStreamsInText)
+	pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 } //                                                                     FillBox
 
 //end

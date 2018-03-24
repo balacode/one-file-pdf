@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 03:14:56 FD3E86                            [utest/to_color.go]
+// :v: 2018-03-24 18:56:20 4446B3                            [utest/to_color.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -17,20 +17,20 @@ func ToColor(t *testing.T) {
 	fmt.Println("utest.ToColor")
 
 	func() {
-		var ob pdf.PDF
-		var got, err = ob.ToColor("")
+		var doc pdf.PDF
+		var got, err = doc.ToColor("")
 		TEqual(t, got, color.RGBA{A: 255}) // black
 		// error is returned in `err`, but does not affect Errors()
-		TEqual(t, len(ob.Errors()), 0)
+		TEqual(t, len(doc.Errors()), 0)
 		TEqual(t, err, fmt.Errorf(`Unknown color name ""`))
 	}()
 
 	func() {
-		var ob pdf.PDF
-		var got, err = ob.ToColor("#uvwxyz")
+		var doc pdf.PDF
+		var got, err = doc.ToColor("#uvwxyz")
 		TEqual(t, got, color.RGBA{A: 255}) // black
 		// error is returned in `err`, but does not affect Errors()
-		TEqual(t, len(ob.Errors()), 0)
+		TEqual(t, len(doc.Errors()), 0)
 		TEqual(t, err, fmt.Errorf(`Bad color code "#uvwxyz"`))
 	}()
 
@@ -183,10 +183,10 @@ func ToColor(t *testing.T) {
 			"yellow":               {R: 255, G: 255, B: 000}, // #FFFF00
 			"yellowgreen":          {R: 154, G: 205, B: 50},  // #9ACD32
 		}
-		var ob pdf.PDF
+		var doc pdf.PDF
 		for key, val := range m {
 			val.A = 255 // make opaque, not transparent
-			var color, err = ob.ToColor(key)
+			var color, err = doc.ToColor(key)
 			TEqual(t, color, val)
 			TEqual(t, err, nil)
 		}

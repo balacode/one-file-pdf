@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 03:10:56 AC9290                          [utest/draw_image.go]
+// :v: 2018-03-24 18:56:20 A7D420                          [utest/draw_image.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -102,22 +102,22 @@ func DrawImage(t *testing.T) {
 
 	// generate image from an array of PNG bytes
 	func() {
-		var ob = pdf.NewPDF("20cm x 20cm")
-		ob.SetCompression(true).
+		var doc = pdf.NewPDF("20cm x 20cm")
+		doc.SetCompression(true).
 			SetUnits("cm").
 			DrawImage(x, y, height, pngData)
-		pdfFailIfErrors(t, &ob)
-		pdfCompare(t, ob.Bytes(), expectOpaque, pdfStreamsInHex)
+		pdfFailIfErrors(t, &doc)
+		pdfCompare(t, doc.Bytes(), expectOpaque, pdfStreamsInHex)
 	}()
 
 	// the same test, but reading direcly from PNG file
 	func() {
-		var ob = pdf.NewPDF("20cm x 20cm")
-		ob.SetCompression(true).
+		var doc = pdf.NewPDF("20cm x 20cm")
+		doc.SetCompression(true).
 			SetUnits("cm").
 			DrawImage(x, y, height, "./image/rgbw64.png")
-		pdfFailIfErrors(t, &ob)
-		pdfCompare(t, ob.Bytes(), expectOpaque, pdfStreamsInHex)
+		pdfFailIfErrors(t, &doc)
+		pdfCompare(t, doc.Bytes(), expectOpaque, pdfStreamsInHex)
 	}()
 
 	// PNG transparency test
@@ -277,18 +277,18 @@ func DrawImage(t *testing.T) {
 			%%EOF
 			`
 		)
-		var ob = pdf.NewPDF("20cm x 20cm")
-		ob.SetCompression(true).
+		var doc = pdf.NewPDF("20cm x 20cm")
+		doc.SetCompression(true).
 			SetUnits("cm").
 			DrawImage(x, y, height, "./image/rgbt64.png", "Yellow").
 			DrawImage(x, y+height+1, height, "./image/rgbt64.png", "Cyan")
-		pdfFailIfErrors(t, &ob)
-		pdfCompare(t, ob.Bytes(), expectTransparent, pdfStreamsInHex)
+		pdfFailIfErrors(t, &doc)
+		pdfCompare(t, doc.Bytes(), expectTransparent, pdfStreamsInHex)
 	}()
 
 	// wrong argument in fileNameOrBytes
 	func() {
-		var ob = pdf.NewPDF("20cm x 20cm")
+		var doc = pdf.NewPDF("20cm x 20cm")
 		var fileNameOrBytes = []int{0xBAD, 0xBAD, 0xBAD}
 		const expect = `
 		%PDF-1.4
@@ -314,14 +314,14 @@ func DrawImage(t *testing.T) {
 		252
 		%%EOF
 		`
-		ob.SetCompression(true).
+		doc.SetCompression(true).
 			SetUnits("cm").
 			DrawImage(x, y, height, fileNameOrBytes)
-		pdfCompare(t, ob.Bytes(), expect, pdfStreamsInHex)
+		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInHex)
 		//
-		TEqual(t, len(ob.Errors()), 1)
-		if len(ob.Errors()) > 0 {
-			TEqual(t, ob.Errors()[0], fmt.Errorf(
+		TEqual(t, len(doc.Errors()), 1)
+		if len(doc.Errors()) > 0 {
+			TEqual(t, doc.Errors()[0], fmt.Errorf(
 				`Invalid type "[]int" in fileNameOrBytes`+
 					` (value: [2989 2989 2989]) @DrawImage`))
 		}

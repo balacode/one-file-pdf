@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 02:55:11 8BF1F2                               [utest/units.go]
+// :v: 2018-03-24 18:58:45 EC2C1D                               [utest/units.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -17,13 +17,13 @@ func Units(t *testing.T) {
 	fmt.Println("utest.Units")
 
 	func() {
-		var ob pdf.PDF // uninitialized PDF
-		TEqual(t, ob.Units(), "")
+		var doc pdf.PDF // uninitialized PDF
+		TEqual(t, doc.Units(), "")
 	}()
 
 	func() {
-		var ob = pdf.NewPDF("A4")
-		TEqual(t, ob.Units(), "POINT")
+		var doc = pdf.NewPDF("A4")
+		TEqual(t, doc.Units(), "POINT")
 	}()
 
 	// (pdf *PDF) SetUnits(unitName string) *PDF
@@ -31,25 +31,25 @@ func Units(t *testing.T) {
 	fmt.Println("utest.SetUnits")
 
 	func() {
-		var ob = pdf.NewPDF("A4")
-		TEqual(t, len(ob.Errors()), 0)
-		ob.SetUnits("cm")
-		TEqual(t, len(ob.Errors()), 0)
-		TEqual(t, ob.Units(), "CM")
+		var doc = pdf.NewPDF("A4")
+		TEqual(t, len(doc.Errors()), 0)
+		doc.SetUnits("cm")
+		TEqual(t, len(doc.Errors()), 0)
+		TEqual(t, doc.Units(), "CM")
 	}()
 
 	func() {
-		var ob = pdf.NewPDF("A4")
-		TEqual(t, len(ob.Errors()), 0)
-		ob.SetUnits("fathoms")
-		TEqual(t, len(ob.Errors()), 1)
+		var doc = pdf.NewPDF("A4")
+		TEqual(t, len(doc.Errors()), 0)
+		doc.SetUnits("fathoms")
+		TEqual(t, len(doc.Errors()), 1)
 		//
-		if len(ob.Errors()) == 1 {
+		if len(doc.Errors()) == 1 {
 			TEqual(t,
-				ob.Errors()[0],
+				doc.Errors()[0],
 				fmt.Errorf(`Unknown unit name "fathoms" @SetUnits`))
 		}
-		TEqual(t, ob.Units(), "POINT")
+		TEqual(t, doc.Units(), "POINT")
 	}()
 
 } //                                                                       Units

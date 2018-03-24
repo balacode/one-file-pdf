@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 03:10:56 FE9272                    [utest/draw_text_in_box.go]
+// :v: 2018-03-24 18:56:20 CB4C89                    [utest/draw_text_in_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -28,9 +28,8 @@ func DrawTextInBox(t *testing.T) {
 		" Excepteur sint occaecat cupidatat non proident," +
 		" sunt in culpa qui officia deserunt mollit anim id est laborum."
 	//
-	var pdf = pdf.NewPDF("A4")
-	pdf.
-		SetCompression(false).
+	var doc = pdf.NewPDF("A4")
+	doc.SetCompression(false).
 		SetUnits("cm").
 		SetFont("Helvetica", 10).
 		SetColor("Light Gray").
@@ -102,7 +101,7 @@ func DrawTextInBox(t *testing.T) {
 	1634
 	%%EOF
 	`
-	pdfCompare(t, pdf.Bytes(), expect, pdfStreamsInText)
+	pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 } //                                                               DrawTextInBox
 
 //TODO: add test for Courier font
