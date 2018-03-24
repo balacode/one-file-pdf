@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 03:14:56 715989                               [public_test.go]
+// :v: 2018-03-24 22:56:46 DD03C1                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -39,6 +39,8 @@ func TestPublicAPI(t *testing.T) {
 		// # Read-Only Properties (pdf *PDF)
 
 		utest.CurrentPage, // CurrentPage() int
+		utest.PageHeight,  // PageHeight() float64
+		utest.PageWidth,   // PageWidth() float64
 
 		// ---------------------------------------------------------------------
 		// # Properties
@@ -47,6 +49,8 @@ func TestPublicAPI(t *testing.T) {
 		// SetColor(nameOrHTMLColor string) *PDF
 		// SetColorRGB(red, green, blue int) *PDF
 		utest.Color,
+
+		utest.Compression, // Compression() bool
 
 		// DocAuthor() string
 		// SetDocAuthor(s string) *PDF
@@ -67,6 +71,10 @@ func TestPublicAPI(t *testing.T) {
 		// DocTitle() string
 		// SetDocTitle(s string) *PDF
 		utest.DocTitle,
+
+		// FontName() string
+		// SetFontName(name string) *PDF
+		utest.FontName,
 
 		// Units() string
 		// SetUnits(unitName string) *PDF
