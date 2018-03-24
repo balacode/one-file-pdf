@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-22 03:02:01 00D0CB                              [one_file_pdf.go]
+// :v: 2018-03-24 22:12:32 8E859D                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -150,32 +150,32 @@ import _ "image/png"   // standard   init image decoders
 
 // PDF is the main structure representing a PDF document.
 type PDF struct {
-	docAuthor         string        // 'author' metadata entry
-	docCreator        string        // 'creator' metadata entry
-	docKeywords       string        // 'keywords' metadata entry
-	docSubject        string        // 'subject' metadata entry
-	docTitle          string        // 'title' metadata entry
-	paperSize         pdfPaperSize  // paper size used in this PDF
-	pageNo            int           // current page number
-	ppage             *pdfPage      // pointer to the current page
-	pages             []pdfPage     // all the pages added to this PDF
-	fonts             []pdfFont     // all the fonts used in this PDF
-	images            []pdfImage    // all the images used in this PDF
-	columnWidths      []float64     // user-set column widths (like tab stops)
-	columnNo          int           // index of the current column
-	unitName          string        // name of active measurement unit
-	ptPerUnit         float64       // number of points per measurement unit
-	color             color.RGBA    // current drawing color
-	lineWidth         float64       // current line width (in points)
-	fontName          string        // current font's name
-	fontSizePt        float64       // current font's size (in points)
-	horizontalScaling uint16        // horizontal scaling factor (in %)
-	compression       bool          // enable stream compression?
-	content           bytes.Buffer  // content buffer where PDF is written
-	pbuf              *bytes.Buffer // pointer to PDF/current page's buffer
-	objOffsets        []int         // used by Bytes() and write..()
-	objNo             int           // used by Bytes() and write..()
-	errors            []error       // errors that occurred during method calls
+	docAuthor    string        // 'author' metadata entry
+	docCreator   string        // 'creator' metadata entry
+	docKeywords  string        // 'keywords' metadata entry
+	docSubject   string        // 'subject' metadata entry
+	docTitle     string        // 'title' metadata entry
+	paperSize    pdfPaperSize  // paper size used in this PDF
+	pageNo       int           // current page number
+	ppage        *pdfPage      // pointer to the current page
+	pages        []pdfPage     // all the pages added to this PDF
+	fonts        []pdfFont     // all the fonts used in this PDF
+	images       []pdfImage    // all the images used in this PDF
+	columnWidths []float64     // user-set column widths (like tab stops)
+	columnNo     int           // index of the current column
+	unitName     string        // name of active measurement unit
+	ptPerUnit    float64       // number of points per measurement unit
+	color        color.RGBA    // current drawing color
+	lineWidth    float64       // current line width (in points)
+	fontName     string        // current font's name
+	fontSizePt   float64       // current font's size (in points)
+	hScaling     uint16        // horizontal scaling factor (in %)
+	compression  bool          // enable stream compression?
+	content      bytes.Buffer  // content buffer where PDF is written
+	pbuf         *bytes.Buffer // pointer to PDF/current page's buffer
+	objOffsets   []int         // used by Bytes() and write..()
+	objNo        int           // used by Bytes() and write..()
+	errors       []error       // errors that occurred during method calls
 	//
 	// Function that handles error logging: it is set to fmt.Println
 	// by default (by NewPDF). You can redefine it as needed or
@@ -208,17 +208,17 @@ type pdfImage struct {
 
 // pdfPage holds references, state and the stream buffer for each page
 type pdfPage struct {
-	fontIDs           []int // references to fonts and images
-	imageNos          []int
-	x                 float64 // current drawing state
-	y                 float64
-	lineWidth         float64
-	fontSizePt        float64
-	fontID            int
-	strokeColor       color.RGBA
-	nonStrokeColor    color.RGBA
-	horizontalScaling uint16
-	content           bytes.Buffer // write..() calls send output here
+	fontIDs        []int // references to fonts and images
+	imageNos       []int
+	x              float64 // current drawing state
+	y              float64
+	lineWidth      float64
+	fontSizePt     float64
+	fontID         int
+	strokeColor    color.RGBA
+	nonStrokeColor color.RGBA
+	hScaling       uint16
+	content        bytes.Buffer // write..() calls send output here
 } //                                                                     pdfPage
 
 // pdfPaperSize represents a page size name and its dimensions in points
@@ -237,7 +237,7 @@ type pdfPaperSize struct {
 // You can also specify custom paper sizes using "width unit x height unit",
 // for example "20 cm x 20 cm" or even "15cm x 10inch", etc.
 func NewPDF(paperSize string) PDF {
-	var pdf = PDF{color: pdfBlack, pageNo: 0, horizontalScaling: 100,
+	var pdf = PDF{color: pdfBlack, pageNo: 0, hScaling: 100,
 		compression: true}
 	var size, err = pdf.getPaperSize(paperSize)
 	if err != nil {
@@ -300,7 +300,7 @@ func (pdf *PDF) FontName() string { return pdf.fontName }
 func (pdf *PDF) FontSize() float64 { return pdf.fontSizePt }
 
 // HorizontalScaling returns the current horizontal scaling in percent.
-func (pdf *PDF) HorizontalScaling() uint16 { return pdf.horizontalScaling }
+func (pdf *PDF) HorizontalScaling() uint16 { return pdf.hScaling }
 
 // LineWidth returns the current line width in points.
 func (pdf *PDF) LineWidth() float64 { return pdf.lineWidth }
@@ -407,7 +407,7 @@ func (pdf *PDF) SetFontSize(points float64) *PDF {
 // SetHorizontalScaling changes the horizontal scaling in percent.
 // For example, 200 will stretch text to double its normal width.
 func (pdf *PDF) SetHorizontalScaling(percent uint16) *PDF {
-	pdf.horizontalScaling = percent
+	pdf.hScaling = percent
 	return pdf
 } //                                                        SetHorizontalScaling
 
@@ -455,7 +455,7 @@ func (pdf *PDF) AddPage() *PDF {
 	var COLOR = color.RGBA{1, 0, 1, 0x01} // unlikely default color
 	pdf.pages = append(pdf.pages, pdfPage{
 		x: -1, y: -1, strokeColor: COLOR, nonStrokeColor: COLOR,
-		horizontalScaling: 100,
+		hScaling: 100,
 	})
 	pdf.pageNo = len(pdf.pages) - 1
 	pdf.ppage = &pdf.pages[pdf.pageNo]
@@ -1004,9 +1004,9 @@ func (pdf *PDF) drawTextLine(s string) *PDF {
 	if err := pdf.applyFont(); err != nil {
 		pdf.putError(err)
 	}
-	if pg.horizontalScaling != pdf.horizontalScaling {
-		pg.horizontalScaling = pdf.horizontalScaling
-		pdf.write("BT %d Tz ET\n", pg.horizontalScaling)
+	if pg.hScaling != pdf.hScaling {
+		pg.hScaling = pdf.hScaling
+		pdf.write("BT %d Tz ET\n", pg.hScaling)
 		// BT: begin text   n0 Tz: set horiz. text scaling to n0%   ET: end text
 	}
 	pdf.writeMode(true) // fill/nonStroke
@@ -1168,7 +1168,7 @@ func (pdf *PDF) textWidthPt1000(s string) float64 {
 		w += float64(pdfFontWidths[r][0])
 		// TODO: [0] is not considering the current font!
 	}
-	return w * pdf.fontSizePt / 1000 * float64(pdf.horizontalScaling) / 100
+	return w * pdf.fontSizePt / 1000 * float64(pdf.hScaling) / 100
 } //                                                             textWidthPt1000
 
 // -----------------------------------------------------------------------------
@@ -1211,20 +1211,20 @@ func (pdf *PDF) writeMode(fill ...bool) (mode string) {
 	mode = "S" // S: stroke path (for lines)
 	if len(fill) > 0 && fill[0] {
 		mode = "b" // b: fill / text
-		if p := &pdf.ppage.nonStrokeColor; *p != pdf.color {
-			*p = pdf.color
+		if pv := &pdf.ppage.nonStrokeColor; *pv != pdf.color {
+			*pv = pdf.color
 			pdf.write(" %.3f %.3f %.3f rg\n", // rg: set non-stroking/text color
-				float64(p.R)/255, float64(p.G)/255, float64(p.B)/255)
+				float64(pv.R)/255, float64(pv.G)/255, float64(pv.B)/255)
 		}
 	}
-	if p := &pdf.ppage.strokeColor; *p != pdf.color {
-		*p = pdf.color
+	if pv := &pdf.ppage.strokeColor; *pv != pdf.color {
+		*pv = pdf.color
 		pdf.write("%.3f %.3f %.3f RG\n", // RG: set stroke (line) color
-			float64(p.R)/255, float64(p.G)/255, float64(p.B)/255)
+			float64(pv.R)/255, float64(pv.G)/255, float64(pv.B)/255)
 	}
-	if p := &pdf.ppage.lineWidth; int(*p*100) != int(pdf.lineWidth*100) {
-		*p = pdf.lineWidth
-		pdf.write("%.3f w\n", float64(*p)) // n0 w: set line width to n0
+	if pv := &pdf.ppage.lineWidth; int(*pv*100) != int(pdf.lineWidth*100) {
+		*pv = pdf.lineWidth
+		pdf.write("%.3f w\n", float64(*pv)) // n0 w: set line width to n0
 	}
 	return mode
 } //                                                                   writeMode
@@ -1318,14 +1318,14 @@ func (*PDF) escape(s string) []byte {
 	if !has(s, "(") && !has(s, ")") && !has(s, "\\") {
 		return []byte(s)
 	}
-	var wr = bytes.NewBuffer(make([]byte, 0, len(s)))
+	var buf = bytes.NewBuffer(make([]byte, 0, len(s)))
 	for _, r := range s {
 		if r == '(' || r == ')' || r == '\\' {
-			wr.WriteRune('\\')
+			buf.WriteRune('\\')
 		}
-		wr.WriteRune(r)
+		buf.WriteRune(r)
 	}
-	return wr.Bytes()
+	return buf.Bytes()
 } //                                                                      escape
 
 // isWhiteSpace returns true if all the chars. in 's' are white-spaces
@@ -1685,24 +1685,24 @@ var pdfFontWidths = [][]int{
 	{667, 722, 722, 667, 722, 722, 667, 611, 722, 692},         // 065 A
 	{667, 722, 722, 667, 667, 667, 667, 611, 667, 786},         // 066 B
 	{722, 722, 722, 722, 722, 722, 667, 667, 667, 788},         // 067 C
-	{722, 722, 722, 722, 612, 722, 722, 722, 722, 788},         // 068 d
+	{722, 722, 722, 722, 612, 722, 722, 722, 722, 788},         // 068 D
 	{667, 667, 667, 667, 611, 667, 667, 611, 611, 790},         // 069 E
 	{611, 611, 611, 611, 763, 611, 667, 611, 556, 793},         // 070 F
 	{778, 778, 778, 778, 603, 778, 722, 722, 722, 794},         // 071 G
-	{722, 722, 722, 722, 722, 778, 778, 722, 722, 816},         // 072 h
-	{278, 278, 278, 278, 333, 389, 389, 333, 333, 823},         // 073 i
+	{722, 722, 722, 722, 722, 778, 778, 722, 722, 816},         // 072 H
+	{278, 278, 278, 278, 333, 389, 389, 333, 333, 823},         // 073 I
 	{500, 556, 556, 500, 631, 500, 500, 444, 389, 789},         // 074 J
 	{667, 722, 722, 667, 722, 778, 667, 667, 722, 841},         // 075 K
 	{556, 611, 611, 556, 686, 667, 611, 556, 611, 823},         // 076 L
 	{833, 833, 833, 833, 889, 944, 889, 833, 889, 833},         // 077 M
 	{722, 722, 722, 722, 722, 722, 722, 667, 722, 816},         // 078 N
 	{778, 778, 778, 778, 722, 778, 722, 722, 722, 831},         // 079 O
-	{667, 667, 667, 667, 768, 611, 611, 611, 556, 923},         // 080 p
+	{667, 667, 667, 667, 768, 611, 611, 611, 556, 923},         // 080 P
 	{778, 778, 778, 778, 741, 778, 722, 722, 722, 744},         // 081 Q
 	{722, 722, 722, 722, 556, 722, 667, 611, 667, 723},         // 082 R
 	{667, 667, 667, 667, 592, 556, 556, 500, 556, 749},         // 083 S
 	{611, 611, 611, 611, 611, 667, 611, 556, 611, 790},         // 084 T
-	{722, 722, 722, 722, 690, 722, 722, 722, 722, 792},         // 085 u
+	{722, 722, 722, 722, 690, 722, 722, 722, 722, 792},         // 085 U
 	{667, 667, 667, 667, 439, 722, 667, 611, 722, 695},         // 086 V
 	{944, 944, 944, 944, 768, 1000, 889, 833, 944, 776},        // 087 W
 	{667, 667, 667, 667, 645, 722, 667, 611, 722, 768},         // 088 X
