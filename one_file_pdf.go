@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 22:54:21 C7761B                              [one_file_pdf.go]
+// :v: 2018-03-24 23:20:15 F4283E                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -246,7 +246,7 @@ func NewPDF(paperSize string) PDF {
 		pdf.paperSize, _ = pdf.getPaperSize("A4")
 	}
 	pdf.paperSize = size
-	return *pdf.SetUnits("point") // set default: or ptPerUnit, x & y will be 0
+	return pdf
 } //                                                                      NewPDF
 
 // -----------------------------------------------------------------------------
@@ -1083,7 +1083,7 @@ func (pdf *PDF) init() *PDF {
 	if pdf.isInit {
 		return pdf
 	}
-	pdf.unitName = "CM"
+	pdf.unitName = "POINT"
 	pdf.paperSize, _ = pdf.getPaperSize("A4")
 	pdf.ptPerUnit, _ = pdf.getPointsPerUnit(pdf.unitName)
 	pdf.color, pdf.lineWidth = pdfBlack, 1 // point
