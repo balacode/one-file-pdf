@@ -230,6 +230,24 @@ type pdfPaperSize struct {
 	heightPt float64 // height in points
 } //                                                                pdfPaperSize
 
+// ErrUnknownColor is a custom error for unknown colors
+type ErrUnknownColor struct {
+	Color string
+}
+
+func (e ErrUnknownColor) Error() string {
+	return fmt.Sprintf("Unknown color name %q", e.Color)
+}
+
+// ErrBadColorCode is a custom error for bad hex colors
+type ErrBadColorCode struct {
+	Code string
+}
+
+func (e ErrBadColorCode) Error() string {
+	return fmt.Sprintf("Bad color code %q", e.Code)
+}
+
 // -----------------------------------------------------------------------------
 // # Constructor
 
@@ -789,8 +807,7 @@ func (pdf *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error) {
 			case r >= 'A' && r <= 'F':
 				hex[i] = uint8(r - 'A' + 10)
 			default:
-				var err = fmt.Errorf("Bad color code %q", nameOrHTMLColor)
-				return pdfBlack, err
+				return pdfBlack, ErrBadColorCode{Code: nameOrHTMLColor}
 			}
 		}
 		return color.RGBA{
@@ -803,7 +820,7 @@ func (pdf *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error) {
 	if found {
 		return color.RGBA{c.R, c.G, c.B, 255}, nil
 	}
-	return pdfBlack, fmt.Errorf("Unknown color name %q", nameOrHTMLColor)
+	return pdfBlack, ErrUnknownColor{Color: nameOrHTMLColor}
 } //                                                                     ToColor
 
 // ToPoints converts a string composed of a number and unit to points.
