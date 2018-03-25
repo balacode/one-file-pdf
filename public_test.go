@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-25 01:42:23 66659C                               [public_test.go]
+// :v: 2018-03-25 02:09:53 D4A085                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -161,7 +161,8 @@ func TestPublicAPI(t *testing.T) {
 		//TODO: TextWidth(s string) float64
 
 		// ToColor(nameOrHTMLColor string) (color.RGBA, error)
-		utest.ToColor,
+		utest.ToColorT1,
+		utest.ToColorT2,
 
 		// ---------------------------------------------------------------------
 		// # Metrics Methods (pdf *PDF)

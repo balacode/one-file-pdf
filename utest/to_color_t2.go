@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) markaum@gmail.com                                            License: MIT
-// :v: 2018-03-23 17:07:40                                   [utest/to_color.go]
+// :v: 2018-03-25 02:16:40 E391F9                         [utest/to_color_t2.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -13,9 +13,9 @@ import (
 	pdf "github.com/balacode/one-file-pdf"
 )
 
-// ToColor is the unit test for PDF.ToColor()
-func ToColor(t *testing.T) {
-	fmt.Println("utest.ToColor")
+// ToColorT2 is the second unit test for PDF.ToColor()
+func ToColorT2(t *testing.T) {
+	fmt.Println("utest.ToColorT2")
 
 	testCases := []struct {
 		description string
@@ -37,7 +37,7 @@ func ToColor(t *testing.T) {
 			description: "invalid hex",
 			input:       "#wrongcolor",
 			color:       color.RGBA{A: 255},
-			err:         pdf.ErrBadColorCode{Code: "#wrongcolor"},
+			err:         pdf.TMPErrBadColorCode{Code: "#wrongcolor"},
 		},
 
 		// X is not a valid hex char. Only valid values are: 0-9 and A-F
@@ -45,7 +45,7 @@ func ToColor(t *testing.T) {
 			description: "hex with an invalid character",
 			input:       "#845X76",
 			color:       color.RGBA{A: 255},
-			err:         pdf.ErrBadColorCode{Code: "#845X76"},
+			err:         pdf.TMPErrBadColorCode{Code: "#845X76"},
 		},
 		{
 			description: "valid color name",
@@ -61,7 +61,7 @@ func ToColor(t *testing.T) {
 			description: "unknown color name",
 			input:       "picasso",
 			color:       color.RGBA{A: 255},
-			err:         pdf.ErrUnknownColor{Color: "picasso"},
+			err:         pdf.TMPErrUnknownColor{Color: "picasso"},
 		},
 	}
 
@@ -81,6 +81,6 @@ func ToColor(t *testing.T) {
 		})
 	}
 
-} //                                                                      ToColor
+} //                                                                   ToColorT2
 
 //end

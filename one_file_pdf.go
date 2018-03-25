@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 23:20:15 F4283E                              [one_file_pdf.go]
+// :v: 2018-03-25 02:21:16 3CA646                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -230,21 +230,26 @@ type pdfPaperSize struct {
 	heightPt float64 // height in points
 } //                                                                pdfPaperSize
 
-// ErrUnknownColor is a custom error for unknown colors
-type ErrUnknownColor struct {
+// -----------------------------------------------------------------------------
+// # Temporary Error Types (will be changed soon)
+
+// TMPErrUnknownColor is a custom error for unknown colors
+type TMPErrUnknownColor struct {
 	Color string
 }
 
-func (e ErrUnknownColor) Error() string {
+// Error __
+func (e TMPErrUnknownColor) Error() string {
 	return fmt.Sprintf("Unknown color name %q", e.Color)
 }
 
-// ErrBadColorCode is a custom error for bad hex colors
-type ErrBadColorCode struct {
+// TMPErrBadColorCode is a custom error for bad hex colors
+type TMPErrBadColorCode struct {
 	Code string
 }
 
-func (e ErrBadColorCode) Error() string {
+// Error __
+func (e TMPErrBadColorCode) Error() string {
 	return fmt.Sprintf("Bad color code %q", e.Code)
 }
 
@@ -322,7 +327,7 @@ func (pdf *PDF) FontSize() float64 { pdf.init(); return pdf.fontSizePt }
 func (pdf *PDF) HorizontalScaling() uint16 {
 	pdf.init()
 	return pdf.horzScaling
-}
+} //                                                           HorizontalScaling
 
 // LineWidth returns the current line width in points.
 func (pdf *PDF) LineWidth() float64 { pdf.init(); return pdf.lineWidth }
@@ -410,7 +415,7 @@ func (pdf *PDF) SetDocTitle(s string) *PDF {
 // For the font name, use one of the standard font names, e.g. 'Helvetica'.
 // This font will be used for subsequent text drawing.
 func (pdf *PDF) SetFont(name string, points float64) *PDF {
-	return pdf.init().SetFontName(name).SetFontSize(points)
+	return pdf.SetFontName(name).SetFontSize(points)
 } //                                                                     SetFont
 
 // SetFontName changes the current font, while using the
@@ -807,7 +812,7 @@ func (pdf *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error) {
 			case r >= 'A' && r <= 'F':
 				hex[i] = uint8(r - 'A' + 10)
 			default:
-				return pdfBlack, ErrBadColorCode{Code: nameOrHTMLColor}
+				return pdfBlack, TMPErrBadColorCode{Code: nameOrHTMLColor}
 			}
 		}
 		return color.RGBA{
@@ -820,7 +825,7 @@ func (pdf *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error) {
 	if found {
 		return color.RGBA{c.R, c.G, c.B, 255}, nil
 	}
-	return pdfBlack, ErrUnknownColor{Color: nameOrHTMLColor}
+	return pdfBlack, TMPErrUnknownColor{Color: nameOrHTMLColor}
 } //                                                                     ToColor
 
 // ToPoints converts a string composed of a number and unit to points.
