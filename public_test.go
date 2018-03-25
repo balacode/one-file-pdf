@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 22:56:46 DD03C1                               [public_test.go]
+// :v: 2018-03-25 01:42:23 66659C                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -50,7 +50,9 @@ func TestPublicAPI(t *testing.T) {
 		// SetColorRGB(red, green, blue int) *PDF
 		utest.Color,
 
-		utest.Compression, // Compression() bool
+		// Compression() bool
+		// SetCompression(compress bool) *PDF
+		utest.Compression,
 
 		// DocAuthor() string
 		// SetDocAuthor(s string) *PDF
@@ -76,12 +78,34 @@ func TestPublicAPI(t *testing.T) {
 		// SetFontName(name string) *PDF
 		utest.FontName,
 
+		//TODO: SetFont(name string, points float64) *PDF
+
+		//TODO: FontSize() float64
+		//TODO: SetFontSize(points float64) *PDF
+
+		//TODO: HorizontalScaling() uint16
+		//TODO: SetHorizontalScaling(percent uint16) *PDF
+
+		//TODO: LineWidth() float64
+		//TODO: SetLineWidth(points float64) *PDF
+
+		//TODO: SetX(x float64) *PDF
+		//TODO: SetXY(x, y float64) *PDF
+		//TODO: SetY(y float64) *PDF
+
 		// Units() string
 		// SetUnits(unitName string) *PDF
 		utest.Units,
 
+		//TODO: X() float64
+		//TODO: Y() float64
+
 		// ---------------------------------------------------------------------
 		// # Methods (pdf *PDF)
+
+		//TODO: AddPage() *PDF
+
+		//TODO: Bytes() []byte
 
 		// DrawBox(x, y, width, height float64, fill ...bool) *PDF
 		utest.DrawBox,
@@ -89,12 +113,19 @@ func TestPublicAPI(t *testing.T) {
 		// DrawCircle(x, y, radius float64, fill ...bool) *PDF
 		utest.DrawCircle,
 
+		//TODO: DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF
+
 		// DrawImage(x, y, height float64, fileNameOrBytes interface{},
 		//     backColor ...string) *PDF
 		utest.DrawImage,
 
+		//TODO: DrawLine(x1, y1, x2, y2 float64) *PDF
+
 		// DrawText(s string) *PDF
 		utest.DrawText,
+
+		//TODO: DrawTextAlignedToBox(
+		//          x, y, width, height float64, align, text string) *PDF
 
 		// DrawTextAt(x, y float64, text string) *PDF
 		utest.DrawTextAt,
@@ -112,8 +143,22 @@ func TestPublicAPI(t *testing.T) {
 		// FillCircle(x, y, radius float64) *PDF
 		utest.FillCircle,
 
+		//TODO: FillEllipse(x, y, xRadius, yRadius float64) *PDF
+
+		//TODO: NextLine() *PDF
+
+		//TODO: Reset() *PDF
+
+		//TODO: SaveFile(filename string) error
+
+		//TODO: SetColumnWidths(widths ...float64) *PDF
+
+		//TODO: SetErrorLogger(fn func(a ...interface{}) (int, error)) *PDF
+
 		// ---------------------------------------------------------------------
 		// # Metrics Methods (pdf *PDF)
+
+		//TODO: TextWidth(s string) float64
 
 		// ToColor(nameOrHTMLColor string) (color.RGBA, error)
 		utest.ToColor,
@@ -126,6 +171,8 @@ func TestPublicAPI(t *testing.T) {
 
 		// ToUnits(points float64) float64
 		utest.ToUnits,
+
+		//TODO: WrapTextLines(width float64, text string) (ret []string)
 
 		// ---------------------------------------------------------------------
 		// # Error Handling Methods (pdf *PDF)
