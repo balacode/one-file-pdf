@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 19:12:50 97E319                              [one_file_pdf.go]
+// :v: 2018-03-26 19:19:03 9D4E06                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -160,11 +160,13 @@ var PL = fmt.Println
 // PDF is the main structure representing a PDF document.
 type PDF struct {
 	paperSize    pdfPaperSize  // paper size used in this PDF
+	pageNo       int           // current page number
 	ppage        *pdfPage      // pointer to the current page
 	pages        []pdfPage     // all the pages added to this PDF
 	fonts        []pdfFont     // all the fonts used in this PDF
 	images       []pdfImage    // all the images used in this PDF
 	columnWidths []float64     // user-set column widths (like tab stops)
+	columnNo     int           // index of the current column
 	unitName     string        // name of active measurement unit
 	ptPerUnit    float64       // number of points per measurement unit
 	color        color.RGBA    // current drawing color
@@ -176,11 +178,9 @@ type PDF struct {
 	content      bytes.Buffer  // content buffer where PDF is written
 	pbuf         *bytes.Buffer // pointer to PDF/current page's buffer
 	objOffsets   []int         // used by Bytes() and write..()
+	objNo        int           // used by Bytes() and write..()
 	errors       []error       // errors that occurred during method calls
 	isInit       bool          // has the PDF been initialized?
-	//
-	// indexes of the current column, object, page number
-	columnNo, objNo, pageNo int
 	//
 	// document metadata fields
 	docAuthor, docCreator, docKeywords, docSubject, docTitle string
