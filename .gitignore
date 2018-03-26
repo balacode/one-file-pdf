@@ -10,10 +10,14 @@ demo/demo
 # output of the go coverage tool
 *.out
 
-# drafts, etc.
+# drafts, logfiles, etc.
 *.repl
 *`*
 __*
+
+# logfiles and batch files
+*.log
+*.bat
 
 # ignore generated PDF files
 # (reference samples are in demo/sample)
