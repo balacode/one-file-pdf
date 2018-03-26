@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 12:06:03 36C2D2                               [public_test.go]
+// :v: 2018-03-26 13:11:08 2D013E                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -147,7 +147,8 @@ func TestPublicAPI(t *testing.T) {
 
 		//TODO: NextLine() *PDF
 
-		//TODO: Reset() *PDF
+		// Reset() *PDF
+		utest.Reset,
 
 		//TODO: SaveFile(filename string) error
 
