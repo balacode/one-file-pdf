@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 12:41:51 7B1B9E                              [one_file_pdf.go]
+// :v: 2018-03-26 19:10:31 872D9D                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -159,19 +159,12 @@ var PL = fmt.Println
 
 // PDF is the main structure representing a PDF document.
 type PDF struct {
-	docAuthor    string        // 'author' metadata entry
-	docCreator   string        // 'creator' metadata entry
-	docKeywords  string        // 'keywords' metadata entry
-	docSubject   string        // 'subject' metadata entry
-	docTitle     string        // 'title' metadata entry
 	paperSize    pdfPaperSize  // paper size used in this PDF
-	pageNo       int           // current page number
 	ppage        *pdfPage      // pointer to the current page
 	pages        []pdfPage     // all the pages added to this PDF
 	fonts        []pdfFont     // all the fonts used in this PDF
 	images       []pdfImage    // all the images used in this PDF
 	columnWidths []float64     // user-set column widths (like tab stops)
-	columnNo     int           // index of the current column
 	unitName     string        // name of active measurement unit
 	ptPerUnit    float64       // number of points per measurement unit
 	color        color.RGBA    // current drawing color
@@ -183,9 +176,14 @@ type PDF struct {
 	content      bytes.Buffer  // content buffer where PDF is written
 	pbuf         *bytes.Buffer // pointer to PDF/current page's buffer
 	objOffsets   []int         // used by Bytes() and write..()
-	objNo        int           // used by Bytes() and write..()
 	errors       []error       // errors that occurred during method calls
 	isInit       bool          // has the PDF been initialized?
+	//
+	// indexes of the current column, object, page number
+	columnNo, objNo, pageNo int
+	//
+	// document metadata fields
+	docAuthor, docCreator, docKeywords, docSubject, docTitle string
 } //                                                                         PDF
 
 // NewPDF creates and initializes a new PDF object. Specify paperSize as:
@@ -208,9 +206,7 @@ func NewPDF(paperSize string) PDF {
 // # Read-Only Properties (pdf *PDF)
 
 // CurrentPage returns the current page's number, 1 being the first page.
-func (pdf *PDF) CurrentPage() int {
-	return pdf.pageNo + 1
-} //                                                                 CurrentPage
+func (pdf *PDF) CurrentPage() int { return pdf.pageNo + 1 }
 
 // PageHeight returns the height of the current page in selected units.
 func (pdf *PDF) PageHeight() float64 {
@@ -269,9 +265,7 @@ func (pdf *PDF) LineWidth() float64 { pdf.init(); return pdf.lineWidth }
 func (pdf *PDF) Units() string { pdf.init(); return pdf.unitName }
 
 // X returns the X-coordinate of the current drawing position.
-func (pdf *PDF) X() float64 {
-	return pdf.reservePage().ToUnits(pdf.ppage.x)
-} //                                                                           X
+func (pdf *PDF) X() float64 { return pdf.reservePage().ToUnits(pdf.ppage.x) }
 
 // Y returns the Y-coordinate of the current drawing position.
 func (pdf *PDF) Y() float64 {
@@ -297,7 +291,7 @@ func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 
 // SetColorRGB sets the current color using red, green and blue values.
 // The current color is used for subsequent text/line drawing and fills.
-func (pdf *PDF) SetColorRGB(r, g, b uint8) *PDF {
+func (pdf *PDF) SetColorRGB(r, g, b byte) *PDF {
 	pdf.init()
 	pdf.color = color.RGBA{r, g, b, 255}
 	return pdf
@@ -314,16 +308,10 @@ func (pdf *PDF) SetCompression(val bool) *PDF {
 } //                                                              SetCompression
 
 // SetDocAuthor sets the optional 'document author' metadata entry.
-func (pdf *PDF) SetDocAuthor(s string) *PDF {
-	pdf.docAuthor = s
-	return pdf
-} //                                                                SetDocAuthor
+func (pdf *PDF) SetDocAuthor(s string) *PDF { pdf.docAuthor = s; return pdf }
 
 // SetDocCreator sets the optional 'document creator' metadata entry.
-func (pdf *PDF) SetDocCreator(s string) *PDF {
-	pdf.docCreator = s
-	return pdf
-} //                                                               SetDocCreator
+func (pdf *PDF) SetDocCreator(s string) *PDF { pdf.docCreator = s; return pdf }
 
 // SetDocKeywords sets the optional 'document keywords' metadata entry.
 func (pdf *PDF) SetDocKeywords(s string) *PDF {
@@ -332,16 +320,10 @@ func (pdf *PDF) SetDocKeywords(s string) *PDF {
 } //                                                              SetDocKeywords
 
 // SetDocSubject sets the optional 'document subject' metadata entry.
-func (pdf *PDF) SetDocSubject(s string) *PDF {
-	pdf.docSubject = s
-	return pdf
-} //                                                               SetDocSubject
+func (pdf *PDF) SetDocSubject(s string) *PDF { pdf.docSubject = s; return pdf }
 
 // SetDocTitle sets the optional 'document title' metadata entry.
-func (pdf *PDF) SetDocTitle(s string) *PDF {
-	pdf.docTitle = s
-	return pdf
-} //                                                                 SetDocTitle
+func (pdf *PDF) SetDocTitle(s string) *PDF { pdf.docTitle = s; return pdf }
 
 // SetFont changes the current font name and size in points.
 // For the font name, use one of the standard font names, e.g. 'Helvetica'.
@@ -724,16 +706,16 @@ func (pdf *PDF) TextWidth(s string) float64 {
 // If the name or code is unknown or invalid, returns zero value (black).
 func (pdf *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error) {
 	//
-	// if name starts with '#' treat it as HTML color (#RRGGBB)
+	// if name starts with '#' treat it as HTML color code (#RRGGBB)
 	var s = pdf.toUpperLettersDigits(nameOrHTMLColor, "#")
 	if len(s) >= 7 && s[0] == '#' {
-		var hex [6]uint8
+		var hex [6]byte
 		for i, r := range s[1:7] {
 			switch {
 			case r >= '0' && r <= '9':
-				hex[i] = uint8(r - '0')
+				hex[i] = byte(r - '0')
 			case r >= 'A' && r <= 'F':
-				hex[i] = uint8(r - 'A' + 10)
+				hex[i] = byte(r - 'A' + 10)
 			default:
 				return pdfBlack, pdfError{id: 0xEED50B, src: "ToColor",
 					msg: "Bad color code", val: nameOrHTMLColor}
@@ -819,11 +801,10 @@ func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
 	// split text into lines. then break lines based on text width
 	for _, iter := range pdf.splitLines(text) {
 		for pdf.TextWidth(iter) > width {
-			// reduce, then increase, then reduce n, to get best fit
-			var n = fit(iter, 1, len(iter), width)
-			n = fit(iter, 2, n, width)
-			n = fit(iter, 3, n, width)
-			//
+			var n = len(iter) // reduce, increase, then reduce n to get best fit
+			for i := 1; i <= 3; i++ {
+				n = fit(iter, i, n, width)
+			}
 			// move to the last word (if white-space is found)
 			var found, max = false, n
 			for n > 0 {
@@ -851,10 +832,7 @@ func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
 // # Error Handling Methods (pdf *PDF)
 
 // Clean clears all accumulated errors.
-func (pdf *PDF) Clean() *PDF {
-	pdf.errors = nil
-	return pdf
-} //                                                                       Clean
+func (pdf *PDF) Clean() *PDF { pdf.errors = nil; return pdf }
 
 // ErrorInfo extracts and returns additional error details from PDF errors
 func (*PDF) ErrorInfo(err error) (ret struct {
@@ -868,9 +846,7 @@ func (*PDF) ErrorInfo(err error) (ret struct {
 } //                                                                   ErrorInfo
 
 // Errors returns a slice of all accumulated errors.
-func (pdf *PDF) Errors() []error {
-	return pdf.errors
-} //                                                                      Errors
+func (pdf *PDF) Errors() []error { return pdf.errors }
 
 // PullError removes and returns the first error from the errors collection.
 func (pdf *PDF) PullError() error {
@@ -909,35 +885,28 @@ type pdfFont struct {
 
 // pdfImage represents an image
 type pdfImage struct {
-	filename  string     // name of file from which image was read
-	widthPx   int        // width in pixels
-	heightPx  int        // height in pixels
-	data      []byte     // data
-	hash      [64]byte   // hash of data: determines if two images are the same
-	backColor color.RGBA // background color: determines if two images are same
-	isGray    bool       // image is grayscale? (otherwise a color image)
+	filename          string     // name of file from which image was read
+	widthPx, heightPx int        // width and height in pixels
+	data              []byte     // image data
+	hash              [64]byte   // hash of data (used to compare images)
+	backColor         color.RGBA // background color (used to compare images)
+	isGray            bool       // image is grayscale? (if false, color image)
 } //                                                                    pdfImage
 
 // pdfPage holds references, state and the stream buffer for each page
 type pdfPage struct {
-	fontIDs        []int // references to fonts and images
-	imageNos       []int
-	x              float64 // current drawing state
-	y              float64
-	lineWidth      float64
-	fontSizePt     float64
-	fontID         int
-	strokeColor    color.RGBA
-	nonStrokeColor color.RGBA
-	horzScaling    uint16
-	content        bytes.Buffer // write..() calls send output here
+	fontIDs, imageNos           []int        // references to fonts and images
+	x, y, lineWidth, fontSizePt float64      // current drawing state
+	strokeColor, nonStrokeColor color.RGBA   // "
+	fontID                      int          // "
+	horzScaling                 uint16       // "
+	content                     bytes.Buffer // write..() calls send output here
 } //                                                                     pdfPage
 
 // pdfPaperSize represents a page size name and its dimensions in points
 type pdfPaperSize struct {
-	name     string  // paper size: e.g. 'Letter', 'A4', etc.
-	widthPt  float64 // width in points
-	heightPt float64 // height in points
+	name              string  // paper size: e.g. 'Letter', 'A4', etc.
+	widthPt, heightPt float64 // width and height in points
 } //                                                                pdfPaperSize
 
 // -----------------------------------------------------------------------------
@@ -1161,11 +1130,9 @@ func makeImage(source image.Image, back color.RGBA,
 ) (widthPx, heightPx int, isGray bool, ar []byte) {
 	//
 	// blends color into the background 'back', using opacity (alpha) value
-	var blend = func(color, alpha uint32, back uint8) uint8 {
-		var c = float64(color) // range 0-65535
-		var a = 65535 - float64(alpha)
-		var n = float64(back)*255 - c
-		return uint8((c + n/65536*a) / 65536 * 255)
+	var blend = func(color, alpha uint32, back byte) byte {
+		var c, a = float64(color), 65535 - float64(alpha) // range 0-65535
+		return byte((c + (float64(back)*255-c)/65536*a) / 65536 * 255)
 	}
 	widthPx, heightPx = source.Bounds().Max.X, source.Bounds().Max.Y
 	var model = source.ColorModel()
