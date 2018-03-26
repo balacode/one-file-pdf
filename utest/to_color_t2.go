@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) markaum@gmail.com                                            License: MIT
-// :v: 2018-03-25 02:16:40 E391F9                         [utest/to_color_t2.go]
+// :v: 2018-03-26 12:23:48 002F1A                         [utest/to_color_t2.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -16,7 +16,6 @@ import (
 // ToColorT2 is the second unit test for PDF.ToColor()
 func ToColorT2(t *testing.T) {
 	fmt.Println("utest.ToColorT2")
-
 	testCases := []struct {
 		description string
 		input       string
@@ -39,7 +38,6 @@ func ToColorT2(t *testing.T) {
 			color:       color.RGBA{A: 255},
 			err:         pdf.TMPErrBadColorCode{Code: "#wrongcolor"},
 		},
-
 		// X is not a valid hex char. Only valid values are: 0-9 and A-F
 		{
 			description: "hex with an invalid character",
@@ -64,7 +62,6 @@ func ToColorT2(t *testing.T) {
 			err:         pdf.TMPErrUnknownColor{Color: "picasso"},
 		},
 	}
-
 	for _, test := range testCases {
 		var ob pdf.PDF
 
@@ -74,13 +71,11 @@ func ToColorT2(t *testing.T) {
 			if err != test.err {
 				t.Fatalf("expected err %v got %v", test.err, err)
 			}
-
 			if test.color != color {
 				t.Fatalf("expected color %v got %v", test.color, color)
 			}
 		})
 	}
-
 } //                                                                   ToColorT2
 
 //end

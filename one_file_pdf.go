@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 12:15:44 30D3CC                              [one_file_pdf.go]
+// :v: 2018-03-26 12:23:48 10E711                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -146,7 +146,7 @@ import _ "image/jpeg"  // standard
 import _ "image/png"   // standard   init image decoders
 
 // -----------------------------------------------------------------------------
-// # Main Structure
+// # Main Structure and Constructor
 
 // PDF is the main structure representing a PDF document.
 type PDF struct {
@@ -888,11 +888,9 @@ func (pdf *PDF) PullError() error {
 
 // pdfFont represents a font name and its appearance
 type pdfFont struct {
-	fontID    int
-	fontName  string
-	isBuiltIn bool
-	isBold    bool
-	isItalic  bool
+	fontID                      int
+	fontName                    string
+	isBuiltIn, isBold, isItalic bool
 } //                                                                     pdfFont
 
 // pdfImage represents an image

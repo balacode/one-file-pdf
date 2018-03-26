@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 18:56:20 90D1FF                        [utest/current_page.go]
+// :v: 2018-03-26 12:23:48 4726B1                        [utest/current_page.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,6 +10,7 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
+// CurrentPage tests PDF.CurrentPage()
 func CurrentPage(t *testing.T) {
 	fmt.Println("utest.CurrentPage")
 

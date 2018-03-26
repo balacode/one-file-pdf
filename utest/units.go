@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 23:20:15 B8A1A9                               [utest/units.go]
+// :v: 2018-03-26 12:23:48 8C3256                               [utest/units.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,12 +10,12 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
+// Units tests PDF.Units() and SetUnits()
 func Units(t *testing.T) {
+	fmt.Println("utest.Units")
 
 	// (pdf *PDF) Units() string
 	//
-	fmt.Println("utest.Units")
-
 	func() {
 		var doc pdf.PDF // uninitialized PDF
 		TEqual(t, doc.Units(), "POINT")

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 18:56:20 6E3E3C                              [utest/errors.go]
+// :v: 2018-03-26 12:23:48 B5E099                              [utest/errors.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,6 +10,7 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
+// Errors tests PDF.Errors()
 func Errors(t *testing.T) {
 	fmt.Println("utest.Errors")
 

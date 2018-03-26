@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 22:56:46 9F00FC                          [utest/page_width.go]
+// :v: 2018-03-26 12:23:48 087D54                          [utest/page_width.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,6 +10,7 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
+// PageWidth tests PDF.PageWidth()
 func PageWidth(t *testing.T) {
 	fmt.Println("utest.PageWidth")
 

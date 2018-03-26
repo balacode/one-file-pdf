@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 22:56:46 6AF046                         [utest/compression.go]
+// :v: 2018-03-26 12:23:48 DDF46F                         [utest/compression.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,6 +10,7 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
+// Compression tests PDF.Compression() and SetCompression()
 func Compression(t *testing.T) {
 	fmt.Println("utest.Compression")
 
