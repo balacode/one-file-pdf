@@ -128,3 +128,7 @@ Click on a sample to see the PDF in more detail.
 - Removed PDFNoPage constant
 - Created basic unit tests and test helper functions
 - Various internal changes, reducing file length by about 60 lines
+
+**2018-MAR-26**
+- Removed SetErrorLogger()
+- **Other slight API changes. I'm reviewing the changes.**

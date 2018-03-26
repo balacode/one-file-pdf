@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-25 02:09:53 D4A085                               [public_test.go]
+// :v: 2018-03-26 12:06:03 36C2D2                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -152,8 +152,6 @@ func TestPublicAPI(t *testing.T) {
 		//TODO: SaveFile(filename string) error
 
 		//TODO: SetColumnWidths(widths ...float64) *PDF
-
-		//TODO: SetErrorLogger(fn func(a ...interface{}) (int, error)) *PDF
 
 		// ---------------------------------------------------------------------
 		// # Metrics Methods (pdf *PDF)

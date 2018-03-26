@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-25 02:21:16 3CA646                              [one_file_pdf.go]
+// :v: 2018-03-26 12:06:03 174352                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -73,7 +73,6 @@ package pdf
 //   Reset() *PDF
 //   SaveFile(filename string) error
 //   SetColumnWidths(widths ...float64) *PDF
-//   SetErrorLogger(fn func(a ...interface{}) (int, error)) *PDF
 //
 // # Metrics Methods (pdf *PDF)
 //   TextWidth(s string) float64
@@ -178,11 +177,6 @@ type PDF struct {
 	objNo        int           // used by Bytes() and write..()
 	errors       []error       // errors that occurred during method calls
 	isInit       bool          // has the PDF been initialized?
-	//
-	// Function that handles error logging: it is set to fmt.Println
-	// by default (by NewPDF). You can redefine it as needed or
-	// set to nil to mute error messages per each PDF instance.
-	errorLogger func(a ...interface{}) (n int, err error)
 } //                                                                         PDF
 
 // -----------------------------------------------------------------------------
@@ -778,15 +772,6 @@ func (pdf *PDF) SetColumnWidths(widths ...float64) *PDF {
 	pdf.columnWidths = widths
 	return pdf
 } //                                                             SetColumnWidths
-
-// SetErrorLogger sets the handler function for error logging.
-// By default it is nil. You can set it to a custom
-// function with the same signature as fmt.Println.
-func (pdf *PDF) SetErrorLogger(fn func(a ...interface{}) (int, error)) *PDF {
-	pdf.init()
-	pdf.errorLogger = fn
-	return pdf
-} //                                                              SetErrorLogger
 
 // -----------------------------------------------------------------------------
 // # Metrics Methods (pdf *PDF)
@@ -1469,11 +1454,8 @@ func (pdf *PDF) getPointsPerUnit(unitName string) (ret float64, err error) {
 	return ret, err
 } //                                                            getPointsPerUnit
 
-// putError calls errorLogger (set to fmt.Println by default) to log an error
+// putError appends an error to the errors collection
 func (pdf *PDF) putError(a ...interface{}) *PDF {
-	if pdf.errorLogger != nil {
-		pdf.errorLogger(a...)
-	}
 	var fn string
 	for i := 0; i < 10; i++ {
 		var programCounter, _, _, _ = runtime.Caller(i)
