@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 18:56:20 A7D420                          [utest/draw_image.go]
+// :v: 2018-03-26 12:39:11 8AD73C                          [utest/draw_image.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -322,8 +322,8 @@ func DrawImage(t *testing.T) {
 		TEqual(t, len(doc.Errors()), 1)
 		if len(doc.Errors()) > 0 {
 			TEqual(t, doc.Errors()[0], fmt.Errorf(
-				`Invalid type "[]int" in fileNameOrBytes`+
-					` (value: [2989 2989 2989]) @DrawImage`))
+				`Invalid type in fileNameOrBytes`+
+					` "[]int = [2989 2989 2989]" @DrawImage`))
 		}
 	}()
 

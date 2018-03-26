@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-25 02:21:16 E0E032                         [utest/to_color_t1.go]
+// :v: 2018-03-26 12:39:11 84DCAE                         [utest/to_color_t1.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -22,7 +22,8 @@ func ToColorT1(t *testing.T) {
 		TEqual(t, got, color.RGBA{A: 255}) // black
 		// error is returned in `err`, but does not affect Errors()
 		TEqual(t, len(doc.Errors()), 0)
-		TEqual(t, err.Error(), fmt.Errorf(`Unknown color name ""`).Error())
+		TEqual(t, err.Error(),
+			fmt.Errorf(`Unknown color name "" @ToColor`).Error())
 	}()
 
 	func() {
@@ -31,7 +32,8 @@ func ToColorT1(t *testing.T) {
 		TEqual(t, got, color.RGBA{A: 255}) // black
 		// error is returned in `err`, but does not affect Errors()
 		TEqual(t, len(doc.Errors()), 0)
-		TEqual(t, err.Error(), fmt.Errorf(`Bad color code "#uvwxyz"`).Error())
+		TEqual(t, err.Error(),
+			fmt.Errorf(`Bad color code "#uvwxyz" @ToColor`).Error())
 	}()
 
 	func() {

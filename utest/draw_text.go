@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 18:56:20 098B2D                           [utest/draw_text.go]
+// :v: 2018-03-26 12:39:11 D778A4                           [utest/draw_text.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -110,7 +110,7 @@ func DrawText(t *testing.T) {
 		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 		TEqual(t, len(doc.Errors()), 1)
 		TEqual(t, doc.PullError(),
-			fmt.Errorf(`Invalid font name: "Ye-Olde-Scriptte" @DrawText`))
+			fmt.Errorf(`Invalid font "Ye-Olde-Scriptte" @DrawText`))
 	}()
 
 } //                                                                    DrawText

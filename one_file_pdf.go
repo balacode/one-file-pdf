@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 12:23:48 10E711                              [one_file_pdf.go]
+// :v: 2018-03-26 12:41:51 7B1B9E                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -77,9 +77,15 @@ package pdf
 //   Clean() *PDF
 //   Errors() []error
 //   PullError() error
+//   (*PDF) ErrorInfo(err error) (ret struct {
+//       ID            int
+//       Msg, Src, Val string
+//   })
 //
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // # Internal Structures
+//   pdfError struct
+//       (err pdfError) Error() string
 //   pdfFont struct
 //   pdfImage struct
 //   pdfPage struct
@@ -117,7 +123,7 @@ package pdf
 //   (pdf *PDF):
 //   getPaperSize(name string) (pdfPaperSize, error)
 //   getPointsPerUnit(unitName string) (ret float64, err error)
-//   putError(a ...interface{}) *PDF
+//   putError(id int, msg, val string) *PDF
 //
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // # Constants
@@ -144,6 +150,9 @@ import "unicode"       // standard   only uses IsDigit(), IsLetter(), IsSpace()
 import _ "image/gif"   // standard
 import _ "image/jpeg"  // standard
 import _ "image/png"   // standard   init image decoders
+
+// PL is an alias of fmt.Println() used only for debugging
+var PL = fmt.Println
 
 // -----------------------------------------------------------------------------
 // # Main Structure and Constructor
@@ -187,36 +196,13 @@ type PDF struct {
 func NewPDF(paperSize string) PDF {
 	var pdf PDF
 	var size, err = pdf.init().getPaperSize(paperSize)
-	if err != nil {
-		pdf.putError(err)
+	if err, isT := err.(pdfError); isT {
+		pdf.putError(0xE52F92, err.msg, paperSize)
 		pdf.paperSize, _ = pdf.getPaperSize("A4")
 	}
 	pdf.paperSize = size
 	return pdf
 } //                                                                      NewPDF
-
-// -----------------------------------------------------------------------------
-// # Temporary Error Types (will be changed soon)
-
-// TMPErrUnknownColor is a custom error for unknown colors
-type TMPErrUnknownColor struct {
-	Color string
-}
-
-// Error __
-func (e TMPErrUnknownColor) Error() string {
-	return fmt.Sprintf("Unknown color name %q", e.Color)
-}
-
-// TMPErrBadColorCode is a custom error for bad hex colors
-type TMPErrBadColorCode struct {
-	Code string
-}
-
-// Error __
-func (e TMPErrBadColorCode) Error() string {
-	return fmt.Sprintf("Bad color code %q", e.Code)
-}
 
 // -----------------------------------------------------------------------------
 // # Read-Only Properties (pdf *PDF)
@@ -302,8 +288,8 @@ func (pdf *PDF) Y() float64 {
 // If the name is unknown or valid, sets the current color to black.
 func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
 	var color, err = pdf.init().ToColor(nameOrHTMLColor)
-	if err != nil {
-		pdf.putError(err)
+	if err, isT := err.(pdfError); isT {
+		pdf.putError(0xE5B3A5, err.msg, nameOrHTMLColor)
 	}
 	pdf.color = color
 	return pdf
@@ -400,8 +386,8 @@ func (pdf *PDF) SetLineWidth(points float64) *PDF {
 // mm cm " in inch inches tw twip twips pt point points (can be in any case)
 func (pdf *PDF) SetUnits(unitName string) *PDF {
 	var ppu, err = pdf.init().getPointsPerUnit(unitName)
-	if err != nil {
-		return pdf.putError(err)
+	if err, isT := err.(pdfError); isT {
+		return pdf.putError(0xEB4AAA, err.msg, unitName)
 	}
 	pdf.ptPerUnit, pdf.unitName = ppu, pdf.toUpperLettersDigits(unitName, "")
 	return pdf
@@ -571,8 +557,8 @@ func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 	pdf.reservePage()
 	var pg = pdf.ppage
 	var img, idx, err = pdf.loadImage(fileNameOrBytes, back)
-	if err != nil {
-		return pdf.putError(err)
+	if err, isT := err.(pdfError); isT {
+		return pdf.putError(0xE8F375, err.msg, err.val)
 	}
 	var found bool
 	for _, iter := range pg.imageNos {
@@ -711,7 +697,7 @@ func (pdf *PDF) Reset() *PDF {
 func (pdf *PDF) SaveFile(filename string) error {
 	var err = ioutil.WriteFile(filename, pdf.Bytes(), 0644)
 	if err != nil {
-		pdf.putError("Failed writing to file "+filename+":", err)
+		pdf.putError(0xED3F6D, "Failed writing file", err.Error())
 		return err
 	}
 	return nil
@@ -749,7 +735,8 @@ func (pdf *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error) {
 			case r >= 'A' && r <= 'F':
 				hex[i] = uint8(r - 'A' + 10)
 			default:
-				return pdfBlack, TMPErrBadColorCode{Code: nameOrHTMLColor}
+				return pdfBlack, pdfError{id: 0xEED50B, src: "ToColor",
+					msg: "Bad color code", val: nameOrHTMLColor}
 			}
 		}
 		return color.RGBA{
@@ -762,7 +749,8 @@ func (pdf *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error) {
 	if found {
 		return color.RGBA{c.R, c.G, c.B, 255}, nil
 	}
-	return pdfBlack, TMPErrUnknownColor{Color: nameOrHTMLColor}
+	return pdfBlack, pdfError{id: 0xE00982, src: "ToColor",
+		msg: "Unknown color name", val: nameOrHTMLColor}
 } //                                                                     ToColor
 
 // ToPoints converts a string composed of a number and unit to points.
@@ -782,7 +770,7 @@ func (pdf *PDF) ToPoints(numberAndUnit string) (float64, error) {
 	if unit != "" {
 		var err error
 		ppu, err = pdf.getPointsPerUnit(unit)
-		if err != nil {
+		if err, isT := err.(pdfError); isT {
 			return 0, err
 		}
 	}
@@ -868,6 +856,17 @@ func (pdf *PDF) Clean() *PDF {
 	return pdf
 } //                                                                       Clean
 
+// ErrorInfo extracts and returns additional error details from PDF errors
+func (*PDF) ErrorInfo(err error) (ret struct {
+	ID            int
+	Msg, Src, Val string
+}) {
+	if err, isT := err.(pdfError); isT {
+		ret.ID, ret.Msg, ret.Src, ret.Val = err.id, err.msg, err.src, err.val
+	}
+	return ret
+} //                                                                   ErrorInfo
+
 // Errors returns a slice of all accumulated errors.
 func (pdf *PDF) Errors() []error {
 	return pdf.errors
@@ -885,6 +884,21 @@ func (pdf *PDF) PullError() error {
 
 // -----------------------------------------------------------------------------
 // # Internal Structures
+
+// pdfError stores extended error details for errors in this package.
+type pdfError struct {
+	id            int    // unique ID of the error (only within package)
+	msg, src, val string // the error message, source method and invalid value
+} //                                                                    pdfError
+
+// Error creates and returns an error message from pdfError details
+func (err pdfError) Error() string {
+	var ret = fmt.Sprintf("%s %q", err.msg, err.val)
+	if err.src != "" {
+		ret += " @" + err.src
+	}
+	return ret
+} //                                                                       Error
 
 // pdfFont represents a font name and its appearance
 type pdfFont struct {
@@ -968,8 +982,10 @@ func (pdf *PDF) applyFont() (err error) {
 	}
 	// if there is no selected font or it's invalid, use Helvetica
 	if !valid {
-		err = fmt.Errorf("Invalid font name: %q", pdf.fontName)
-		font = pdfFont{fontName: "Helvetica", isBuiltIn: true}
+		err = pdfError{id: 0xE86819, msg: "Invalid font", val: pdf.fontName}
+		pdf.fontName = "Helvetica"
+		pdf.applyFont()
+		return err
 	}
 	// has the font been added to the global list? if not, add it:
 	for _, iter := range pdf.fonts {
@@ -1014,8 +1030,9 @@ func (pdf *PDF) drawTextLine(s string) *PDF {
 	}
 	// draw the text
 	var pg = pdf.ppage
-	if err := pdf.applyFont(); err != nil {
-		pdf.putError(err)
+	err := pdf.applyFont()
+	if err, isT := err.(pdfError); isT {
+		pdf.putError(0xEAEAC4, err.msg, err.val)
 	}
 	if pg.horzScaling != pdf.horzScaling {
 		pg.horzScaling = pdf.horzScaling
@@ -1109,8 +1126,8 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 		img.filename = val
 		var data, err = ioutil.ReadFile(val)
 		if err != nil {
-			pdf.putError("File "+val+":", err)
-			return pdfImage{}, -1, err
+			return pdfImage{}, -1, pdfError{id: 0xE9F387,
+				msg: "Failed reading file", val: err.Error()}
 		}
 		buf = bytes.NewBuffer(data)
 		img.hash = sha512.Sum512(data)
@@ -1118,9 +1135,10 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 		buf = bytes.NewBuffer(val)
 		img.hash = sha512.Sum512(val)
 	default:
-		return pdfImage{}, -1, fmt.Errorf(
-			"Invalid type %q in fileNameOrBytes (value: %v)",
-			reflect.TypeOf(fileNameOrBytes), fileNameOrBytes)
+		return pdfImage{}, -1,
+			pdfError{id: 0xEE3E42, msg: "Invalid type in fileNameOrBytes",
+				val: fmt.Sprintf("%s = %v",
+					reflect.TypeOf(fileNameOrBytes), fileNameOrBytes)}
 	}
 	for i, iter := range pdf.images {
 		if bytes.Equal(iter.hash[:], img.hash[:]) && iter.backColor == back {
@@ -1129,9 +1147,8 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 	}
 	var decoded, _, err2 = image.Decode(buf)
 	if err2 != nil {
-		var msg = fmt.Sprint("Image not decoded:", err2)
-		pdf.putError(msg)
-		return pdfImage{}, -1, fmt.Errorf(msg)
+		return pdfImage{}, -1,
+			pdfError{id: 0xE64335, msg: "Image not decoded", val: err2.Error()}
 	}
 	img.backColor = back
 	img.widthPx, img.heightPx, img.isGray, img.data = makeImage(decoded, back)
@@ -1190,7 +1207,8 @@ func (pdf *PDF) textWidthPt1000(s string) float64 {
 	var w = 0.0
 	for i, r := range s {
 		if r < 0 || r > 255 {
-			pdf.putError("Rune out of range at", i, "('"+string(r)+"')")
+			pdf.putError(0xE31046, "Rune out of range",
+				fmt.Sprintf("at %d = '%s'", i, string(r)))
 			break
 		}
 		w += float64(pdfFontWidths[r][0])
@@ -1265,7 +1283,8 @@ func (pdf *PDF) writeObj(objType string) *PDF {
 	} else if objType[0] == '/' {
 		return pdf.write("%d 0 obj<</Type%s", n, objType)
 	}
-	return pdf.putError("objType should begin with '/' or be a blank string")
+	return pdf.putError(0xE7621C,
+		"objType should begin with '/' or be a blank string", objType)
 } //                                                                    writeObj
 
 // writePages writes all PDF pages
@@ -1327,7 +1346,7 @@ func (pdf *PDF) writeStreamData(ar []byte) *PDF {
 		var wr = zlib.NewWriter(&buf)
 		var _, err = wr.Write([]byte(ar))
 		if err != nil {
-			return pdf.putError("Failed compressing:", err)
+			return pdf.putError(0xE782A2, "Failed compressing", err.Error())
 		}
 		wr.Close() // don't defer, close before reading Bytes()
 		ar = buf.Bytes()
@@ -1401,12 +1420,12 @@ func (pdf *PDF) getPaperSize(name string) (pdfPaperSize, error) {
 	if strings.Contains(s, " X ") {
 		var wh = strings.Split(s, " X ")
 		var w, err = pdf.ToPoints(wh[0])
-		if err != nil {
+		if err, isT := err.(pdfError); isT {
 			return pdfPaperSize{}, err
 		}
 		var h float64
 		h, err = pdf.ToPoints(wh[1])
-		if err != nil {
+		if err, isT := err.(pdfError); isT {
 			return pdfPaperSize{}, err
 		}
 		return pdfPaperSize{s, w, h}, nil
@@ -1419,7 +1438,8 @@ func (pdf *PDF) getPaperSize(name string) (pdfPaperSize, error) {
 	}
 	var wh, found = pdfStandardPaperSizes[s]
 	if !found {
-		return pdfPaperSize{}, fmt.Errorf("Unknown paper size %q", name)
+		return pdfPaperSize{},
+			pdfError{id: 0xEE42FB, msg: "Unknown paper size", val: name}
 	}
 	// convert mm to points: div by 25.4mm/inch; mul by 72 points/inch
 	var w, h = float64(wh[0]) / 25.4 * 72, float64(wh[1]) / 25.4 * 72
@@ -1443,14 +1463,14 @@ func (pdf *PDF) getPointsPerUnit(unitName string) (ret float64, err error) {
 	case "TW", "TWIP", "TWIPS":
 		ret = 0.05 //                               1 point / 20 twips per point
 	default:
-		err = fmt.Errorf("Unknown unit name %q", unitName)
+		err = pdfError{id: 0xEE34DA, msg: "Unknown unit name", val: unitName}
 	}
 	return ret, err
 } //                                                            getPointsPerUnit
 
 // putError appends an error to the errors collection
-func (pdf *PDF) putError(a ...interface{}) *PDF {
-	var fn string
+func (pdf *PDF) putError(id int, msg, val string) *PDF {
+	var fn string //                                  get the public method name
 	for i := 0; i < 10; i++ {
 		var programCounter, _, _, _ = runtime.Caller(i)
 		fn = runtime.FuncForPC(programCounter).Name()
@@ -1460,7 +1480,8 @@ func (pdf *PDF) putError(a ...interface{}) *PDF {
 		}
 		break
 	}
-	pdf.errors = append(pdf.errors, fmt.Errorf(fmt.Sprint(a...)+" @"+fn))
+	pdf.errors = append(pdf.errors,
+		pdfError{id: id, src: fn, msg: msg, val: val})
 	return pdf
 } //                                                                    putError
 
