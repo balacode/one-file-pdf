@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 22:04:39 007CFE                        [utest/util_t_equal.go]
+// :v: 2018-03-26 12:27:27 5754C0                        [utest/util_t_equal.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -46,6 +46,8 @@ func TEqual(t *testing.T, result interface{}, expect interface{}) bool {
 				}
 			}
 			return s
+		case error:
+			return val.Error()
 		case string:
 			return val
 		case time.Time: // use date part without time and time zone
