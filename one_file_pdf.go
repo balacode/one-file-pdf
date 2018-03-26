@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 19:10:31 872D9D                              [one_file_pdf.go]
+// :v: 2018-03-26 19:12:50 97E319                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -758,7 +758,7 @@ func (pdf *PDF) ToPoints(numberAndUnit string) (float64, error) {
 	}
 	var n, err = strconv.ParseFloat(num, 64)
 	if err != nil {
-		return 0, err
+		return 0, pdfError{id: 0xE154AC, msg: "Invalid number", val: num}
 	}
 	return n * ppu, nil
 } //                                                                    ToPoints
