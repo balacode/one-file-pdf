@@ -1,20 +1,12 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 12:06:03 174352                              [one_file_pdf.go]
+// :v: 2018-03-26 12:15:44 30D3CC                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
 
-// # Main Structure
+// # Main Structure and Constructor
 //   PDF struct
-//
-// # Internal Structures
-//   pdfFont struct
-//   pdfImage struct
-//   pdfPage struct
-//   pdfPaperSize struct
-//
-// # Constructor
 //   NewPDF(paperSize string) PDF
 //
 // # Read-Only Properties (pdf *PDF)
@@ -57,7 +49,7 @@ package pdf
 //   DrawCircle(x, y, radius float64, fill ...bool) *PDF
 //   DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF
 //   DrawImage(x, y, height float64, fileNameOrBytes interface{},
-//	     backColor ...string) *PDF
+//       backColor ...string) *PDF
 //   DrawLine(x1, y1, x2, y2 float64) *PDF
 //   DrawText(s string) *PDF
 //   DrawTextAlignedToBox(
@@ -86,7 +78,14 @@ package pdf
 //   Errors() []error
 //   PullError() error
 //
-// # Private Methods (pdf *PDF)
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// # Internal Structures
+//   pdfFont struct
+//   pdfImage struct
+//   pdfPage struct
+//   pdfPaperSize struct
+//
+// # Internal Methods (pdf *PDF)
 //   applyFont() (err error)
 //   drawTextLine(s string) *PDF
 //   drawTextBox(x, y, width, height float64,
@@ -99,7 +98,7 @@ package pdf
 //   reservePage() *PDF
 //   textWidthPt1000(s string) float64
 //
-// # Private Generation Methods (pdf *PDF)
+// # Internal Generation Methods (pdf *PDF)
 //   nextObj() int
 //   write(format string, args ...interface{}) *PDF
 //   writeCurve(x1, y1, x2, y2, x3, y3 float64) *PDF
@@ -110,7 +109,7 @@ package pdf
 //   writeStream(content []byte) *PDF
 //   writeStreamData(content []byte) *PDF
 //
-// # Private Functions (*PDF) - just attached to PDF, but not using its data
+// # Internal Functions (*PDF) - just attached to PDF, but not using its data
 //   escape(s string) []byte
 //   isWhiteSpace(s string) bool
 //   splitLines(s string) []string
@@ -120,6 +119,7 @@ package pdf
 //   getPointsPerUnit(unitName string) (ret float64, err error)
 //   putError(a ...interface{}) *PDF
 //
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // # Constants
 //   PDFColorNames = map[string]color.RGBA
 //
@@ -179,50 +179,21 @@ type PDF struct {
 	isInit       bool          // has the PDF been initialized?
 } //                                                                         PDF
 
-// -----------------------------------------------------------------------------
-// # Internal Structures
-
-// pdfFont represents a font name and its appearance
-type pdfFont struct {
-	fontID    int
-	fontName  string
-	isBuiltIn bool
-	isBold    bool
-	isItalic  bool
-} //                                                                     pdfFont
-
-// pdfImage represents an image
-type pdfImage struct {
-	filename  string     // name of file from which image was read
-	widthPx   int        // width in pixels
-	heightPx  int        // height in pixels
-	data      []byte     // data
-	hash      [64]byte   // hash of data: determines if two images are the same
-	backColor color.RGBA // background color: determines if two images are same
-	isGray    bool       // image is grayscale? (otherwise a color image)
-} //                                                                    pdfImage
-
-// pdfPage holds references, state and the stream buffer for each page
-type pdfPage struct {
-	fontIDs        []int // references to fonts and images
-	imageNos       []int
-	x              float64 // current drawing state
-	y              float64
-	lineWidth      float64
-	fontSizePt     float64
-	fontID         int
-	strokeColor    color.RGBA
-	nonStrokeColor color.RGBA
-	horzScaling    uint16
-	content        bytes.Buffer // write..() calls send output here
-} //                                                                     pdfPage
-
-// pdfPaperSize represents a page size name and its dimensions in points
-type pdfPaperSize struct {
-	name     string  // paper size: e.g. 'Letter', 'A4', etc.
-	widthPt  float64 // width in points
-	heightPt float64 // height in points
-} //                                                                pdfPaperSize
+// NewPDF creates and initializes a new PDF object. Specify paperSize as:
+// A, B, C series (e.g. "A4") or "LEGAL", "TABLOID", "LETTER", or "LEDGER".
+// To specify a landscape orientation, add "-L" suffix e.g. "A4-L".
+// You can also specify custom paper sizes using "width unit x height unit",
+// for example "20 cm x 20 cm" or even "15cm x 10inch", etc.
+func NewPDF(paperSize string) PDF {
+	var pdf PDF
+	var size, err = pdf.init().getPaperSize(paperSize)
+	if err != nil {
+		pdf.putError(err)
+		pdf.paperSize, _ = pdf.getPaperSize("A4")
+	}
+	pdf.paperSize = size
+	return pdf
+} //                                                                      NewPDF
 
 // -----------------------------------------------------------------------------
 // # Temporary Error Types (will be changed soon)
@@ -246,25 +217,6 @@ type TMPErrBadColorCode struct {
 func (e TMPErrBadColorCode) Error() string {
 	return fmt.Sprintf("Bad color code %q", e.Code)
 }
-
-// -----------------------------------------------------------------------------
-// # Constructor
-
-// NewPDF creates and initializes a new PDF object. Specify paperSize as:
-// A, B, C series (e.g. "A4") or "LEGAL", "TABLOID", "LETTER", or "LEDGER".
-// To specify a landscape orientation, add "-L" suffix e.g. "A4-L".
-// You can also specify custom paper sizes using "width unit x height unit",
-// for example "20 cm x 20 cm" or even "15cm x 10inch", etc.
-func NewPDF(paperSize string) PDF {
-	var pdf PDF
-	var size, err = pdf.init().getPaperSize(paperSize)
-	if err != nil {
-		pdf.putError(err)
-		pdf.paperSize, _ = pdf.getPaperSize("A4")
-	}
-	pdf.paperSize = size
-	return pdf
-} //                                                                      NewPDF
 
 // -----------------------------------------------------------------------------
 // # Read-Only Properties (pdf *PDF)
@@ -855,24 +807,23 @@ func (pdf *PDF) ToUnits(points float64) float64 {
 // You can find out the number of lines needed to wrap some
 // text by checking the length of the returned array.
 func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
-	//
 	var fit = func(s string, step, n int, width float64) int {
 		for max := len(s); n > 0 && n <= max; {
 			var w = pdf.TextWidth(s[:n])
 			switch step {
-			case 1, 3: // keep halving (or - 1) until n chars fit in width
+			case 1, 3: //       keep halving (or - 1) until n chars fit in width
 				if w <= width {
 					return n
 				}
-				n -= 1
+				n--
 				if step == 1 {
 					n /= 2
 				}
-			case 2: // increase n until n chars won't fit in width
+			case 2: //               increase n until n chars won't fit in width
 				if w > width {
 					return n
 				}
-				n = int((float64(n) * 1.2)) // increase n by 20%
+				n = int((float64(n) * 1.2)) //                 increase n by 20%
 			}
 		}
 		return 0
@@ -933,7 +884,52 @@ func (pdf *PDF) PullError() error {
 } //                                                                   PullError
 
 // -----------------------------------------------------------------------------
-// # Private Methods (pdf *PDF)
+// # Internal Structures
+
+// pdfFont represents a font name and its appearance
+type pdfFont struct {
+	fontID    int
+	fontName  string
+	isBuiltIn bool
+	isBold    bool
+	isItalic  bool
+} //                                                                     pdfFont
+
+// pdfImage represents an image
+type pdfImage struct {
+	filename  string     // name of file from which image was read
+	widthPx   int        // width in pixels
+	heightPx  int        // height in pixels
+	data      []byte     // data
+	hash      [64]byte   // hash of data: determines if two images are the same
+	backColor color.RGBA // background color: determines if two images are same
+	isGray    bool       // image is grayscale? (otherwise a color image)
+} //                                                                    pdfImage
+
+// pdfPage holds references, state and the stream buffer for each page
+type pdfPage struct {
+	fontIDs        []int // references to fonts and images
+	imageNos       []int
+	x              float64 // current drawing state
+	y              float64
+	lineWidth      float64
+	fontSizePt     float64
+	fontID         int
+	strokeColor    color.RGBA
+	nonStrokeColor color.RGBA
+	horzScaling    uint16
+	content        bytes.Buffer // write..() calls send output here
+} //                                                                     pdfPage
+
+// pdfPaperSize represents a page size name and its dimensions in points
+type pdfPaperSize struct {
+	name     string  // paper size: e.g. 'Letter', 'A4', etc.
+	widthPt  float64 // width in points
+	heightPt float64 // height in points
+} //                                                                pdfPaperSize
+
+// -----------------------------------------------------------------------------
+// # Internal Methods (pdf *PDF)
 
 // applyFont writes a font change command, provided the font has
 // been changed since the last operation that uses fonts.
@@ -1206,7 +1202,7 @@ func (pdf *PDF) textWidthPt1000(s string) float64 {
 } //                                                             textWidthPt1000
 
 // -----------------------------------------------------------------------------
-// # Private Generation Methods (pdf *PDF)
+// # Internal Generation Methods (pdf *PDF)
 
 // nextObj increases the object serial no. and stores its offset in array
 func (pdf *PDF) nextObj() int {
@@ -1343,7 +1339,7 @@ func (pdf *PDF) writeStreamData(ar []byte) *PDF {
 } //                                                             writeStreamData
 
 // -----------------------------------------------------------------------------
-// # Private Functions (just attached to PDF, but not using it)
+// # Internal Functions (just attached to PDF, but not using it)
 
 // escape escapes special characters '(', '(' and '\' in strings
 // in order to avoid them interfering with PDF commands
