@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 18:56:20 BD8290                         [utest/doc_creator.go]
+// :v: 2018-03-27 22:10:13 1736CD                         [utest/doc_creator.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -14,7 +14,7 @@ import "github.com/balacode/one-file-pdf"
 func DocCreator(t *testing.T) {
 
 	// -------------------------------------------------------------------------
-	// (pdf *PDF) DocCreator() string
+	// (ob *PDF) DocCreator() string
 	//
 	fmt.Println("utest.DocCreator")
 
@@ -29,7 +29,7 @@ func DocCreator(t *testing.T) {
 	}()
 
 	// -------------------------------------------------------------------------
-	// (pdf *PDF) SetDocCreator(s string) *PDF
+	// (ob *PDF) SetDocCreator(s string) *PDF
 	//
 	fmt.Println("utest.SetDocCreator")
 

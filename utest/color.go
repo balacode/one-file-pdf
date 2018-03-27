@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 12:23:48 40CCF6                               [utest/color.go]
+// :v: 2018-03-27 22:10:13 FB0CFA                               [utest/color.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -15,7 +15,7 @@ import "github.com/balacode/one-file-pdf"
 func Color(t *testing.T) {
 
 	// -------------------------------------------------------------------------
-	// (pdf *PDF) Color() color.RGBA
+	// (ob *PDF) Color() color.RGBA
 	//
 	fmt.Println("utest.Color")
 
@@ -30,7 +30,7 @@ func Color(t *testing.T) {
 	}()
 
 	// -------------------------------------------------------------------------
-	// (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF
+	// (ob *PDF) SetColor(nameOrHTMLColor string) *PDF
 	//
 	// TODO: test various named colors
 	// TODO: test setting HTML color codes

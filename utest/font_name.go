@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 22:56:46 191B53                           [utest/font_name.go]
+// :v: 2018-03-27 22:10:13 AAB4F8                           [utest/font_name.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -14,7 +14,7 @@ import "github.com/balacode/one-file-pdf"
 func FontName(t *testing.T) {
 
 	// -------------------------------------------------------------------------
-	// (pdf *PDF) FontName() string
+	// (ob *PDF) FontName() string
 	//
 	fmt.Println("utest.FontName")
 
@@ -29,7 +29,7 @@ func FontName(t *testing.T) {
 	}()
 
 	// -------------------------------------------------------------------------
-	// (pdf *PDF) SetFontName(name string) *PDF
+	// (ob *PDF) SetFontName(name string) *PDF
 	//
 	fmt.Println("utest.SetFontName")
 

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 13:11:08 2D013E                               [public_test.go]
+// :v: 2018-03-27 22:10:13 C842AF                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -36,7 +36,7 @@ func TestPublicAPI(t *testing.T) {
 		utest.NewPDF, // NewPDF(paperSize string) PDF
 
 		// ---------------------------------------------------------------------
-		// # Read-Only Properties (pdf *PDF)
+		// # Read-Only Properties (ob *PDF)
 
 		utest.CurrentPage, // CurrentPage() int
 		utest.PageHeight,  // PageHeight() float64
@@ -101,7 +101,7 @@ func TestPublicAPI(t *testing.T) {
 		//TODO: Y() float64
 
 		// ---------------------------------------------------------------------
-		// # Methods (pdf *PDF)
+		// # Methods (ob *PDF)
 
 		//TODO: AddPage() *PDF
 
@@ -155,7 +155,7 @@ func TestPublicAPI(t *testing.T) {
 		//TODO: SetColumnWidths(widths ...float64) *PDF
 
 		// ---------------------------------------------------------------------
-		// # Metrics Methods (pdf *PDF)
+		// # Metrics Methods (ob *PDF)
 
 		//TODO: TextWidth(s string) float64
 
@@ -164,7 +164,7 @@ func TestPublicAPI(t *testing.T) {
 		utest.ToColorT2,
 
 		// ---------------------------------------------------------------------
-		// # Metrics Methods (pdf *PDF)
+		// # Metrics Methods (ob *PDF)
 
 		// ToPoints(numberAndUnit string) (float64, error)
 		utest.ToPoints,
@@ -175,7 +175,7 @@ func TestPublicAPI(t *testing.T) {
 		//TODO: WrapTextLines(width float64, text string) (ret []string)
 
 		// ---------------------------------------------------------------------
-		// # Error Handling Methods (pdf *PDF)
+		// # Error Handling Methods (ob *PDF)
 
 		// Clean() *PDF
 		utest.Clean,

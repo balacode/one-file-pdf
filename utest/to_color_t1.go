@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 12:39:11 84DCAE                         [utest/to_color_t1.go]
+// :v: 2018-03-27 22:10:13 FF5F73                         [utest/to_color_t1.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -12,7 +12,7 @@ import "testing"     // standard
 import "github.com/balacode/one-file-pdf"
 
 // ToColorT1 is the unit test for
-// (pdf *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error)
+// (ob *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error)
 func ToColorT1(t *testing.T) {
 	fmt.Println("utest.ToColorT1")
 

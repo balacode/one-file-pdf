@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 18:56:20 491B6F                           [utest/doc_title.go]
+// :v: 2018-03-27 22:10:13 A0F63B                           [utest/doc_title.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -14,7 +14,7 @@ import "github.com/balacode/one-file-pdf"
 func DocTitle(t *testing.T) {
 
 	// -------------------------------------------------------------------------
-	// (pdf *PDF) DocTitle() string
+	// (ob *PDF) DocTitle() string
 	//
 	fmt.Println("utest.DocTitle")
 
@@ -29,7 +29,7 @@ func DocTitle(t *testing.T) {
 	}()
 
 	// -------------------------------------------------------------------------
-	// (pdf *PDF) SetDocTitle(s string) *PDF
+	// (ob *PDF) SetDocTitle(s string) *PDF
 	//
 	fmt.Println("utest.SetDocTitle")
 

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 18:56:20 3FF045                          [utest/doc_author.go]
+// :v: 2018-03-27 22:10:13 15C29F                          [utest/doc_author.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -14,7 +14,7 @@ import "github.com/balacode/one-file-pdf"
 func DocAuthor(t *testing.T) {
 
 	// -------------------------------------------------------------------------
-	// (pdf *PDF) DocAuthor() string
+	// (ob *PDF) DocAuthor() string
 	//
 	fmt.Println("utest.DocAuthor")
 
@@ -29,7 +29,7 @@ func DocAuthor(t *testing.T) {
 	}()
 
 	// -------------------------------------------------------------------------
-	// (pdf *PDF) SetDocAuthor(s string) *PDF
+	// (ob *PDF) SetDocAuthor(s string) *PDF
 	//
 	fmt.Println("utest.SetDocAuthor")
 

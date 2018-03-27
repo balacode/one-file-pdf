@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 18:56:20 696C80                        [utest/doc_keywords.go]
+// :v: 2018-03-27 22:10:13 CC42AD                        [utest/doc_keywords.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -14,7 +14,7 @@ import "github.com/balacode/one-file-pdf"
 func DocKeywords(t *testing.T) {
 
 	// -------------------------------------------------------------------------
-	// (pdf *PDF) DocKeywords() string
+	// (ob *PDF) DocKeywords() string
 	//
 	fmt.Println("utest.DocKeywords")
 
@@ -29,7 +29,7 @@ func DocKeywords(t *testing.T) {
 	}()
 
 	// -------------------------------------------------------------------------
-	// (pdf *PDF) SetDocKeywords(s string) *PDF
+	// (ob *PDF) SetDocKeywords(s string) *PDF
 	//
 	fmt.Println("utest.SetDocKeywords")
 

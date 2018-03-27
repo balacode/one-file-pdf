@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 18:56:20 C24B13                         [utest/doc_subject.go]
+// :v: 2018-03-27 22:10:13 165CED                         [utest/doc_subject.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -14,7 +14,7 @@ import "github.com/balacode/one-file-pdf"
 func DocSubject(t *testing.T) {
 
 	// -------------------------------------------------------------------------
-	// (pdf *PDF) DocSubject() string
+	// (ob *PDF) DocSubject() string
 	//
 	fmt.Println("utest.DocSubject")
 
@@ -29,7 +29,7 @@ func DocSubject(t *testing.T) {
 	}()
 
 	// -------------------------------------------------------------------------
-	// (pdf *PDF) SetDocSubject(s string) *PDF
+	// (ob *PDF) SetDocSubject(s string) *PDF
 	//
 	fmt.Println("utest.SetDocSubject")
 
