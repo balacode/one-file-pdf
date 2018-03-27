@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 19:19:03 9D4E06                              [one_file_pdf.go]
+// :v: 2018-03-27 20:13:50 ABA8E8                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -9,12 +9,12 @@ package pdf
 //   PDF struct
 //   NewPDF(paperSize string) PDF
 //
-// # Read-Only Properties (pdf *PDF)
+// # Read-Only Properties (ob *PDF)
 //   CurrentPage() int
 //   PageHeight() float64
 //   PageWidth() float64
 //
-// # Property Getters (pdf *PDF)
+// # Property Getters (ob *PDF)
 //   Color() color.RGBA             FontName() string
 //   Compression() bool             FontSize() float64
 //   DocAuthor() string             HorizontalScaling() uint16
@@ -23,7 +23,7 @@ package pdf
 //   DocSubject() string            X() float64
 //   DocTitle() string              Y() float64
 //
-// # Property Setters (pdf *PDF)
+// # Property Setters (ob *PDF)
 //   SetColor(nameOrHTMLColor string) *PDF
 //   SetColorRGB(red, green, blue int) *PDF
 //   SetCompression(val bool) *PDF
@@ -42,7 +42,7 @@ package pdf
 //   SetXY(x, y float64) *PDF
 //   SetY(y float64) *PDF
 //
-// # Methods (pdf *PDF)
+// # Methods (ob *PDF)
 //   AddPage() *PDF
 //   Bytes() []byte
 //   DrawBox(x, y, width, height float64, fill ...bool) *PDF
@@ -66,14 +66,14 @@ package pdf
 //   SaveFile(filename string) error
 //   SetColumnWidths(widths ...float64) *PDF
 //
-// # Metrics Methods (pdf *PDF)
+// # Metrics Methods (ob *PDF)
 //   TextWidth(s string) float64
 //   ToColor(nameOrHTMLColor string) (color.RGBA, error)
 //   ToPoints(numberAndUnit string) (float64, error)
 //   ToUnits(points float64) float64
 //   WrapTextLines(width float64, text string) (ret []string)
 //
-// # Error Handling Methods (pdf *PDF)
+// # Error Handling Methods (ob *PDF)
 //   Clean() *PDF
 //   Errors() []error
 //   PullError() error
@@ -91,7 +91,7 @@ package pdf
 //   pdfPage struct
 //   pdfPaperSize struct
 //
-// # Internal Methods (pdf *PDF)
+// # Internal Methods (ob *PDF)
 //   applyFont() (err error)
 //   drawTextLine(s string) *PDF
 //   drawTextBox(x, y, width, height float64,
@@ -104,7 +104,7 @@ package pdf
 //   reservePage() *PDF
 //   textWidthPt1000(s string) float64
 //
-// # Internal Generation Methods (pdf *PDF)
+// # Internal Generation Methods (ob *PDF)
 //   nextObj() int
 //   write(format string, args ...interface{}) *PDF
 //   writeCurve(x1, y1, x2, y2, x3, y3 float64) *PDF
@@ -120,7 +120,7 @@ package pdf
 //   isWhiteSpace(s string) bool
 //   splitLines(s string) []string
 //   toUpperLettersDigits(s, extras string) string
-//   (pdf *PDF):
+//   (ob *PDF):
 //   getPaperSize(name string) (pdfPaperSize, error)
 //   getPointsPerUnit(unitName string) (ret float64, err error)
 //   putError(id int, msg, val string) *PDF
@@ -192,330 +192,318 @@ type PDF struct {
 // You can also specify custom paper sizes using "width unit x height unit",
 // for example "20 cm x 20 cm" or even "15cm x 10inch", etc.
 func NewPDF(paperSize string) PDF {
-	var pdf PDF
-	var size, err = pdf.init().getPaperSize(paperSize)
+	var ob PDF
+	var size, err = ob.init().getPaperSize(paperSize)
 	if err, isT := err.(pdfError); isT {
-		pdf.putError(0xE52F92, err.msg, paperSize)
-		pdf.paperSize, _ = pdf.getPaperSize("A4")
+		ob.putError(0xE52F92, err.msg, paperSize)
+		ob.paperSize, _ = ob.getPaperSize("A4")
 	}
-	pdf.paperSize = size
-	return pdf
+	ob.paperSize = size
+	return ob
 } //                                                                      NewPDF
 
 // -----------------------------------------------------------------------------
-// # Read-Only Properties (pdf *PDF)
+// # Read-Only Properties (ob *PDF)
 
 // CurrentPage returns the current page's number, 1 being the first page.
-func (pdf *PDF) CurrentPage() int { return pdf.pageNo + 1 }
+func (ob *PDF) CurrentPage() int { return ob.pageNo + 1 }
 
 // PageHeight returns the height of the current page in selected units.
-func (pdf *PDF) PageHeight() float64 {
-	return pdf.ToUnits(pdf.paperSize.heightPt)
-} //                                                                  PageHeight
+func (ob *PDF) PageHeight() float64 { return ob.ToUnits(ob.paperSize.heightPt) }
 
 // PageWidth returns the width of the current page in selected units.
-func (pdf *PDF) PageWidth() float64 {
-	return pdf.ToUnits(pdf.paperSize.widthPt)
-} //                                                                   PageWidth
+func (ob *PDF) PageWidth() float64 { return ob.ToUnits(ob.paperSize.widthPt) }
 
 // -----------------------------------------------------------------------------
-// # Property Getters (pdf *PDF)
+// # Property Getters (ob *PDF)
 
 // Color returns the current color, which is used for text, lines and fills.
-func (pdf *PDF) Color() color.RGBA { pdf.init(); return pdf.color }
+func (ob *PDF) Color() color.RGBA { ob.init(); return ob.color }
 
 // Compression returns the current compression mode. If it is true,
 // all PDF content will be compressed when the PDF is generated. If
 // false, most PDF content (excluding images) will be in plain text,
 // which is useful for debugging or to study PDF commands.
-func (pdf *PDF) Compression() bool { pdf.init(); return pdf.compression }
+func (ob *PDF) Compression() bool { ob.init(); return ob.compression }
 
 // DocAuthor returns the optional 'document author' metadata entry.
-func (pdf *PDF) DocAuthor() string { pdf.init(); return pdf.docAuthor }
+func (ob *PDF) DocAuthor() string { ob.init(); return ob.docAuthor }
 
 // DocCreator returns the optional 'document creator' metadata entry.
-func (pdf *PDF) DocCreator() string { pdf.init(); return pdf.docCreator }
+func (ob *PDF) DocCreator() string { ob.init(); return ob.docCreator }
 
 // DocKeywords returns the optional 'document keywords' metadata entry.
-func (pdf *PDF) DocKeywords() string { pdf.init(); return pdf.docKeywords }
+func (ob *PDF) DocKeywords() string { ob.init(); return ob.docKeywords }
 
 // DocSubject returns the optional 'document subject' metadata entry.
-func (pdf *PDF) DocSubject() string { pdf.init(); return pdf.docSubject }
+func (ob *PDF) DocSubject() string { ob.init(); return ob.docSubject }
 
 // DocTitle returns the optional 'document subject' metadata entry.
-func (pdf *PDF) DocTitle() string { pdf.init(); return pdf.docTitle }
+func (ob *PDF) DocTitle() string { ob.init(); return ob.docTitle }
 
 // FontName returns the name of the currently-active typeface.
-func (pdf *PDF) FontName() string { pdf.init(); return pdf.fontName }
+func (ob *PDF) FontName() string { ob.init(); return ob.fontName }
 
 // FontSize returns the current font size in points.
-func (pdf *PDF) FontSize() float64 { pdf.init(); return pdf.fontSizePt }
+func (ob *PDF) FontSize() float64 { ob.init(); return ob.fontSizePt }
 
 // HorizontalScaling returns the current horizontal scaling in percent.
-func (pdf *PDF) HorizontalScaling() uint16 {
-	pdf.init()
-	return pdf.horzScaling
-} //                                                           HorizontalScaling
+func (ob *PDF) HorizontalScaling() uint16 { ob.init(); return ob.horzScaling }
 
 // LineWidth returns the current line width in points.
-func (pdf *PDF) LineWidth() float64 { pdf.init(); return pdf.lineWidth }
+func (ob *PDF) LineWidth() float64 { ob.init(); return ob.lineWidth }
 
 // Units returns the currently selected measurement units.
 // E.g.: mm cm " in inch inches tw twip twips pt point points
-func (pdf *PDF) Units() string { pdf.init(); return pdf.unitName }
+func (ob *PDF) Units() string { ob.init(); return ob.unitName }
 
 // X returns the X-coordinate of the current drawing position.
-func (pdf *PDF) X() float64 { return pdf.reservePage().ToUnits(pdf.ppage.x) }
+func (ob *PDF) X() float64 { return ob.reservePage().ToUnits(ob.ppage.x) }
 
 // Y returns the Y-coordinate of the current drawing position.
-func (pdf *PDF) Y() float64 {
-	return pdf.reservePage().ToUnits(pdf.paperSize.heightPt - pdf.ppage.y)
+func (ob *PDF) Y() float64 {
+	return ob.reservePage().ToUnits(ob.paperSize.heightPt - ob.ppage.y)
 } //                                                                           Y
 
 // -----------------------------------------------------------------------------
-// # Property Setters (pdf *PDF)
+// # Property Setters (ob *PDF)
 
 // SetColor sets the current color using a web/X11 color name
 // (e.g. "HoneyDew") or HTML color value such as "#191970"
 // for midnight blue (#RRGGBB). The current color is used
 // for subsequent text and line drawing and fills.
 // If the name is unknown or valid, sets the current color to black.
-func (pdf *PDF) SetColor(nameOrHTMLColor string) *PDF {
-	var color, err = pdf.init().ToColor(nameOrHTMLColor)
+func (ob *PDF) SetColor(nameOrHTMLColor string) *PDF {
+	var color, err = ob.init().ToColor(nameOrHTMLColor)
 	if err, isT := err.(pdfError); isT {
-		pdf.putError(0xE5B3A5, err.msg, nameOrHTMLColor)
+		ob.putError(0xE5B3A5, err.msg, nameOrHTMLColor)
 	}
-	pdf.color = color
-	return pdf
+	ob.color = color
+	return ob
 } //                                                                    SetColor
 
 // SetColorRGB sets the current color using red, green and blue values.
 // The current color is used for subsequent text/line drawing and fills.
-func (pdf *PDF) SetColorRGB(r, g, b byte) *PDF {
-	pdf.init()
-	pdf.color = color.RGBA{r, g, b, 255}
-	return pdf
+func (ob *PDF) SetColorRGB(r, g, b byte) *PDF {
+	ob.init()
+	ob.color = color.RGBA{r, g, b, 255}
+	return ob
 } //                                                                 SetColorRGB
 
 // SetCompression sets the compression mode used to generate the PDF.
 // If set to true, all PDF steams will be compressed when the PDF is
 // generated. If false, most content (excluding images) will be in
 // plain text, which is useful for debugging or to study PDF commands.
-func (pdf *PDF) SetCompression(val bool) *PDF {
-	pdf.init()
-	pdf.compression = val
-	return pdf
+func (ob *PDF) SetCompression(val bool) *PDF {
+	ob.init()
+	ob.compression = val
+	return ob
 } //                                                              SetCompression
 
 // SetDocAuthor sets the optional 'document author' metadata entry.
-func (pdf *PDF) SetDocAuthor(s string) *PDF { pdf.docAuthor = s; return pdf }
+func (ob *PDF) SetDocAuthor(s string) *PDF { ob.docAuthor = s; return ob }
 
 // SetDocCreator sets the optional 'document creator' metadata entry.
-func (pdf *PDF) SetDocCreator(s string) *PDF { pdf.docCreator = s; return pdf }
+func (ob *PDF) SetDocCreator(s string) *PDF { ob.docCreator = s; return ob }
 
 // SetDocKeywords sets the optional 'document keywords' metadata entry.
-func (pdf *PDF) SetDocKeywords(s string) *PDF {
-	pdf.docKeywords = s
-	return pdf
-} //                                                              SetDocKeywords
+func (ob *PDF) SetDocKeywords(s string) *PDF { ob.docKeywords = s; return ob }
 
 // SetDocSubject sets the optional 'document subject' metadata entry.
-func (pdf *PDF) SetDocSubject(s string) *PDF { pdf.docSubject = s; return pdf }
+func (ob *PDF) SetDocSubject(s string) *PDF { ob.docSubject = s; return ob }
 
 // SetDocTitle sets the optional 'document title' metadata entry.
-func (pdf *PDF) SetDocTitle(s string) *PDF { pdf.docTitle = s; return pdf }
+func (ob *PDF) SetDocTitle(s string) *PDF { ob.docTitle = s; return ob }
 
 // SetFont changes the current font name and size in points.
 // For the font name, use one of the standard font names, e.g. 'Helvetica'.
 // This font will be used for subsequent text drawing.
-func (pdf *PDF) SetFont(name string, points float64) *PDF {
-	return pdf.SetFontName(name).SetFontSize(points)
+func (ob *PDF) SetFont(name string, points float64) *PDF {
+	return ob.SetFontName(name).SetFontSize(points)
 } //                                                                     SetFont
 
 // SetFontName changes the current font, while using the
 // same font size as the previous font. Use one of the
 // standard font names, such as 'Helvetica'.
-func (pdf *PDF) SetFontName(name string) *PDF {
-	pdf.init()
-	pdf.fontName = name
-	return pdf
+func (ob *PDF) SetFontName(name string) *PDF {
+	ob.init()
+	ob.fontName = name
+	return ob
 } //                                                                 SetFontName
 
 // SetFontSize changes the current font size in points,
 // without changing the currently-selected font typeface.
-func (pdf *PDF) SetFontSize(points float64) *PDF {
-	pdf.init()
-	pdf.fontSizePt = points
-	return pdf
+func (ob *PDF) SetFontSize(points float64) *PDF {
+	ob.init()
+	ob.fontSizePt = points
+	return ob
 } //                                                                 SetFontSize
 
 // SetHorizontalScaling changes the horizontal scaling in percent.
 // For example, 200 will stretch text to double its normal width.
-func (pdf *PDF) SetHorizontalScaling(percent uint16) *PDF {
-	pdf.init()
-	pdf.horzScaling = percent
-	return pdf
+func (ob *PDF) SetHorizontalScaling(percent uint16) *PDF {
+	ob.init()
+	ob.horzScaling = percent
+	return ob
 } //                                                        SetHorizontalScaling
 
 // SetLineWidth changes the line width in points.
-func (pdf *PDF) SetLineWidth(points float64) *PDF {
-	pdf.init()
-	pdf.lineWidth = points
-	return pdf
+func (ob *PDF) SetLineWidth(points float64) *PDF {
+	ob.init()
+	ob.lineWidth = points
+	return ob
 } //                                                                SetLineWidth
 
 // SetUnits changes the current measurement units:
 // mm cm " in inch inches tw twip twips pt point points (can be in any case)
-func (pdf *PDF) SetUnits(unitName string) *PDF {
-	var ppu, err = pdf.init().getPointsPerUnit(unitName)
+func (ob *PDF) SetUnits(unitName string) *PDF {
+	var ppu, err = ob.init().getPointsPerUnit(unitName)
 	if err, isT := err.(pdfError); isT {
-		return pdf.putError(0xEB4AAA, err.msg, unitName)
+		return ob.putError(0xEB4AAA, err.msg, unitName)
 	}
-	pdf.ptPerUnit, pdf.unitName = ppu, pdf.toUpperLettersDigits(unitName, "")
-	return pdf
+	ob.ptPerUnit, ob.unitName = ppu, ob.toUpperLettersDigits(unitName, "")
+	return ob
 } //                                                                    SetUnits
 
 // SetX changes the X-coordinate of the current drawing position.
-func (pdf *PDF) SetX(x float64) *PDF {
-	pdf.init().reservePage()
-	pdf.ppage.x = x * pdf.ptPerUnit
-	return pdf
+func (ob *PDF) SetX(x float64) *PDF {
+	ob.init().reservePage()
+	ob.ppage.x = x * ob.ptPerUnit
+	return ob
 } //                                                                        SetX
 
 // SetXY changes both X- and Y-coordinates of the current drawing position.
-func (pdf *PDF) SetXY(x, y float64) *PDF {
-	return pdf.SetX(x).SetY(y)
-} //                                                                       SetXY
+func (ob *PDF) SetXY(x, y float64) *PDF { return ob.SetX(x).SetY(y) }
 
 // SetY changes the Y-coordinate of the current drawing position.
-func (pdf *PDF) SetY(y float64) *PDF {
-	pdf.init().reservePage()
-	pdf.ppage.y = pdf.paperSize.heightPt - y*pdf.ptPerUnit
-	return pdf
+func (ob *PDF) SetY(y float64) *PDF {
+	ob.init().reservePage()
+	ob.ppage.y = ob.paperSize.heightPt - y*ob.ptPerUnit
+	return ob
 } //                                                                        SetY
 
 // -----------------------------------------------------------------------------
-// # Methods (pdf *PDF)
+// # Methods (ob *PDF)
 
 // AddPage appends a new blank page to the PDF and makes it the current page.
-func (pdf *PDF) AddPage() *PDF {
+func (ob *PDF) AddPage() *PDF {
 	var COLOR = color.RGBA{1, 0, 1, 0x01} // unlikely default color
-	pdf.pages = append(pdf.pages, pdfPage{
+	ob.pages = append(ob.pages, pdfPage{
 		x: -1, y: -1, lineWidth: 1, strokeColor: COLOR, nonStrokeColor: COLOR,
 		fontSizePt: 10, horzScaling: 100,
 	})
-	pdf.pageNo = len(pdf.pages) - 1
-	pdf.ppage = &pdf.pages[pdf.pageNo]
-	pdf.pbuf = &pdf.ppage.content
-	return pdf
+	ob.pageNo = len(ob.pages) - 1
+	ob.ppage = &ob.pages[ob.pageNo]
+	ob.pbuf = &ob.ppage.content
+	return ob
 } //                                                                     AddPage
 
 // Bytes generates the PDF document from various page and
 // auxiliary objects and returns it in an array of bytes,
 // identical to the content of a PDF file. This method is where
 // you'll find the core structure of a PDF document.
-func (pdf *PDF) Bytes() []byte {
+func (ob *PDF) Bytes() []byte {
 	// free any existing generated content and write PDF header
-	pdf.reservePage()
-	var fontsIndex = pdfPagesIndex + len(pdf.pages)*2
-	var imagesIndex = fontsIndex + len(pdf.fonts)
+	ob.reservePage()
+	var fontsIndex = pdfPagesIndex + len(ob.pages)*2
+	var imagesIndex = fontsIndex + len(ob.fonts)
 	var infoIndex int // set when metadata found
-	var prevBuf = pdf.pbuf
-	pdf.content.Reset()
-	pdf.pbuf = &pdf.content
-	pdf.objOffsets = []int{}
-	pdf.objNo = 0
-	pdf.write("%%PDF-1.4\n").
+	var prevBuf = ob.pbuf
+	ob.content.Reset()
+	ob.pbuf = &ob.content
+	ob.objOffsets = []int{}
+	ob.objNo = 0
+	ob.write("%%PDF-1.4\n").
 		writeObj("/Catalog").write("/Pages 2 0 R").writeEndobj()
 	//
 	//  write /Pages object (2 0 obj), page count, page size and the pages
-	pdf.writePages(fontsIndex, imagesIndex)
+	ob.writePages(fontsIndex, imagesIndex)
 	//
 	// write fonts
-	for _, iter := range pdf.fonts {
-		pdf.writeObj("/Font")
+	for _, iter := range ob.fonts {
+		ob.writeObj("/Font")
 		if iter.isBuiltIn {
-			pdf.write("/Subtype/Type1/Name/F%d/BaseFont/%s"+
+			ob.write("/Subtype/Type1/Name/F%d/BaseFont/%s"+
 				"/Encoding/WinAnsiEncoding", iter.fontID, iter.fontName)
 		}
-		pdf.writeEndobj()
+		ob.writeEndobj()
 	}
 	// write images
-	for _, iter := range pdf.images {
+	for _, iter := range ob.images {
 		var colorSpace = "DeviceRGB"
 		if iter.isGray {
 			colorSpace = "DeviceGray"
 		}
-		pdf.writeObj("/XObject").
+		ob.writeObj("/XObject").
 			write("/Subtype/Image/Width %d/Height %d/ColorSpace/%s"+
 				"/BitsPerComponent 8", iter.widthPx, iter.heightPx, colorSpace).
 			writeStreamData(iter.data).write("\nendobj\n")
 	}
 	// write info object
-	if pdf.docTitle != "" || pdf.docSubject != "" ||
-		pdf.docKeywords != "" || pdf.docAuthor != "" || pdf.docCreator != "" {
+	if ob.docTitle != "" || ob.docSubject != "" ||
+		ob.docKeywords != "" || ob.docAuthor != "" || ob.docCreator != "" {
 		//
-		infoIndex = imagesIndex + len(pdf.images)
-		pdf.writeObj("/Info")
+		infoIndex = imagesIndex + len(ob.images)
+		ob.writeObj("/Info")
 		for _, iter := range []struct {
 			label string
 			field string
 		}{
-			{"/Title ", pdf.docTitle}, {"/Subject ", pdf.docSubject},
-			{"/Keywords ", pdf.docKeywords}, {"/Author ", pdf.docAuthor},
-			{"/Creator ", pdf.docCreator},
+			{"/Title ", ob.docTitle}, {"/Subject ", ob.docSubject},
+			{"/Keywords ", ob.docKeywords}, {"/Author ", ob.docAuthor},
+			{"/Creator ", ob.docCreator},
 		} {
 			if iter.field != "" {
-				pdf.write(iter.label).
-					write("(").write(string(pdf.escape(iter.field))).write(")")
+				ob.write(iter.label).
+					write("(").write(string(ob.escape(iter.field))).write(")")
 			}
 		}
-		pdf.writeEndobj()
+		ob.writeEndobj()
 	}
 	// write cross-reference table at end of document
-	var startXref = pdf.content.Len()
-	pdf.write("xref\n0 %d\n0000000000 65535 f \n", len(pdf.objOffsets))
-	for _, offset := range pdf.objOffsets[1:] {
-		pdf.write("%010d 00000 n \n", offset)
+	var startXref = ob.content.Len()
+	ob.write("xref\n0 %d\n0000000000 65535 f \n", len(ob.objOffsets))
+	for _, offset := range ob.objOffsets[1:] {
+		ob.write("%010d 00000 n \n", offset)
 	}
 	// write the trailer
-	pdf.write("trailer\n<</Size %d/Root 1 0 R", len(pdf.objOffsets))
+	ob.write("trailer\n<</Size %d/Root 1 0 R", len(ob.objOffsets))
 	if infoIndex > 0 {
-		pdf.write("/Info %d 0 R", infoIndex) // optional reference to info
+		ob.write("/Info %d 0 R", infoIndex) // optional reference to info
 	}
-	pdf.write(">>\nstartxref\n%d\n", startXref).write("%%%%EOF\n")
-	pdf.pbuf = prevBuf
-	return pdf.content.Bytes()
+	ob.write(">>\nstartxref\n%d\n", startXref).write("%%%%EOF\n")
+	ob.pbuf = prevBuf
+	return ob.content.Bytes()
 } //                                                                       Bytes
 
 // DrawBox draws a rectangle.
-func (pdf *PDF) DrawBox(x, y, width, height float64, fill ...bool) *PDF {
-	width, height = width*pdf.ptPerUnit, height*pdf.ptPerUnit
-	x *= pdf.ptPerUnit
-	y = pdf.paperSize.heightPt - y*pdf.ptPerUnit - height
-	var mode = pdf.writeMode(fill...)
-	return pdf.write("%.3f %.3f %.3f %.3f re %s\n", x, y, width, height, mode)
+func (ob *PDF) DrawBox(x, y, width, height float64, fill ...bool) *PDF {
+	width, height = width*ob.ptPerUnit, height*ob.ptPerUnit
+	x *= ob.ptPerUnit
+	y = ob.paperSize.heightPt - y*ob.ptPerUnit - height
+	var mode = ob.writeMode(fill...)
+	return ob.write("%.3f %.3f %.3f %.3f re %s\n", x, y, width, height, mode)
 	// re: construct a rectangular path
 } //                                                                     DrawBox
 
 // DrawCircle draws a circle of radius r centered on (x, y),
 // by drawing 4 Bézier curves (PDF has no circle primitive)
-func (pdf *PDF) DrawCircle(x, y, radius float64, fill ...bool) *PDF {
-	return pdf.DrawEllipse(x, y, radius, radius, fill...)
+func (ob *PDF) DrawCircle(x, y, radius float64, fill ...bool) *PDF {
+	return ob.DrawEllipse(x, y, radius, radius, fill...)
 } //                                                                  DrawCircle
 
 // DrawEllipse draws an ellipse centered on (x, y),
 // with horizontal radius xRadius and vertical radius yRadius
 // by drawing 4 Bézier curves (PDF has no ellipse primitive)
-func (pdf *PDF) DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF {
-	x, y = x*pdf.ptPerUnit, pdf.paperSize.heightPt-y*pdf.ptPerUnit
-	const ratio = 0.552284749830794   // (4/3) * tan(PI/8)
-	var r = xRadius * pdf.ptPerUnit   // horizontal radius
-	var v = yRadius * pdf.ptPerUnit   // vertical radius
-	var m, n = r * ratio, v * ratio   // ratios for control points
-	var mode = pdf.writeMode(fill...) // prepare colors/line width
+func (ob *PDF) DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF {
+	x, y = x*ob.ptPerUnit, ob.paperSize.heightPt-y*ob.ptPerUnit
+	const ratio = 0.552284749830794  // (4/3) * tan(PI/8)
+	var r = xRadius * ob.ptPerUnit   // horizontal radius
+	var v = yRadius * ob.ptPerUnit   // vertical radius
+	var m, n = r * ratio, v * ratio  // ratios for control points
+	var mode = ob.writeMode(fill...) // prepare colors/line width
 	//
-	return pdf.write(" %.3f %.3f m", x-r, y). // x0 y0 m: move to point (x0, y0)
+	return ob.write(" %.3f %.3f m", x-r, y). // x0 y0 m: move to point (x0, y0)
 		//         control-1 control-2 endpoint
 		writeCurve(x-r, y+n, x-m, y+v, x+0, y+v). // top left arc
 		writeCurve(x+m, y+v, x+r, y+n, x+r, y+0). // top right
@@ -528,19 +516,19 @@ func (pdf *PDF) DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF {
 // of the image. Width is scaled to match the image's aspect ratio.
 // fileNameOrBytes is either a string specifying a file name,
 // or a byte slice with PNG image data.
-func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
+func (ob *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 	backColor ...string) *PDF {
 	//
 	var back = color.RGBA{R: 255, G: 255, B: 255, A: 255} // white by default
 	if len(backColor) > 0 {
-		back, _ = pdf.ToColor(backColor[0])
+		back, _ = ob.ToColor(backColor[0])
 	}
 	// add the image to the current page, if not already referenced
-	pdf.reservePage()
-	var pg = pdf.ppage
-	var img, idx, err = pdf.loadImage(fileNameOrBytes, back)
+	ob.reservePage()
+	var pg = ob.ppage
+	var img, idx, err = ob.loadImage(fileNameOrBytes, back)
 	if err, isT := err.(pdfError); isT {
-		return pdf.putError(0xE8F375, err.msg, err.val)
+		return ob.putError(0xE8F375, err.msg, err.val)
 	}
 	var found bool
 	for _, iter := range pg.imageNos {
@@ -553,11 +541,11 @@ func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 		pg.imageNos = append(pg.imageNos, idx)
 	}
 	// draw the image
-	x *= pdf.ptPerUnit
-	var h = height * pdf.ptPerUnit
+	x *= ob.ptPerUnit
+	var h = height * ob.ptPerUnit
 	var w = float64(img.widthPx) / float64(img.heightPx) * h
-	y = pdf.paperSize.heightPt - y*pdf.ptPerUnit - h
-	return pdf.write("q\n %f 0 0 %f %f %f cm\n/IMG%d Do\nQ\n", w, h, x, y, idx)
+	y = ob.paperSize.heightPt - y*ob.ptPerUnit - h
+	return ob.write("q\n %f 0 0 %f %f %f cm\n/IMG%d Do\nQ\n", w, h, x, y, idx)
 	//                     w      h  x  y
 	//                q: save graphics state
 	//               cm: concatenate matrix to current transform matrix
@@ -566,29 +554,29 @@ func (pdf *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 } //                                                                   DrawImage
 
 // DrawLine draws a straight line from point (x1, y1) to point (x2, y2).
-func (pdf *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF {
-	x1, y1 = x1*pdf.ptPerUnit, pdf.paperSize.heightPt-y1*pdf.ptPerUnit
-	x2, y2 = x2*pdf.ptPerUnit, pdf.paperSize.heightPt-y2*pdf.ptPerUnit
-	pdf.writeMode(true) // prepare color/line width
-	return pdf.write("%.3f %.3f m %.3f %.3f l S\n", x1, y1, x2, y2)
+func (ob *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF {
+	x1, y1 = x1*ob.ptPerUnit, ob.paperSize.heightPt-y1*ob.ptPerUnit
+	x2, y2 = x2*ob.ptPerUnit, ob.paperSize.heightPt-y2*ob.ptPerUnit
+	ob.writeMode(true) // prepare color/line width
+	return ob.write("%.3f %.3f m %.3f %.3f l S\n", x1, y1, x2, y2)
 	// m: move  S: stroke path (for lines)
 } //                                                                    DrawLine
 
 // DrawText draws a text string at the current position (X, Y).
-func (pdf *PDF) DrawText(s string) *PDF {
-	if len(pdf.columnWidths) == 0 {
-		return pdf.drawTextLine(s)
+func (ob *PDF) DrawText(s string) *PDF {
+	if len(ob.columnWidths) == 0 {
+		return ob.drawTextLine(s)
 	}
 	var x = 0.0
-	for i := 0; i < pdf.columnNo; i++ {
-		x += pdf.columnWidths[i]
+	for i := 0; i < ob.columnNo; i++ {
+		x += ob.columnWidths[i]
 	}
-	pdf.SetX(x).drawTextLine(s)
-	if pdf.columnNo < len(pdf.columnWidths)-1 {
-		pdf.columnNo++
-		return pdf
+	ob.SetX(x).drawTextLine(s)
+	if ob.columnNo < len(ob.columnWidths)-1 {
+		ob.columnNo++
+		return ob
 	}
-	return pdf.NextLine()
+	return ob.NextLine()
 } //                                                                    DrawText
 
 // DrawTextAlignedToBox draws 'text' within a rectangle specified
@@ -596,14 +584,14 @@ func (pdf *PDF) DrawText(s string) *PDF {
 // text is center-aligned both vertically and horizontally.
 // Specify 'L' or 'R' to align the text left or right, and 'T' or
 // 'B' to align the text to the top or bottom of the box.
-func (pdf *PDF) DrawTextAlignedToBox(
+func (ob *PDF) DrawTextAlignedToBox(
 	x, y, width, height float64, align, text string) *PDF {
-	return pdf.drawTextBox(x, y, width, height, false, align, text)
+	return ob.drawTextBox(x, y, width, height, false, align, text)
 } //                                                        DrawTextAlignedToBox
 
 // DrawTextAt draws text at the specified point (x, y).
-func (pdf *PDF) DrawTextAt(x, y float64, text string) *PDF {
-	return pdf.SetXY(x, y).DrawText(text)
+func (ob *PDF) DrawTextAt(x, y float64, text string) *PDF {
+	return ob.SetXY(x, y).DrawText(text)
 } //                                                                  DrawTextAt
 
 // DrawTextInBox draws word-wrapped text within a rectangle
@@ -611,75 +599,75 @@ func (pdf *PDF) DrawTextAt(x, y float64, text string) *PDF {
 // the text is center-aligned both vertically and horizontally.
 // Specify 'L' or 'R' to align the text left or right, and 'T' or
 // 'B' to align the text to the top or bottom of the box.
-func (pdf *PDF) DrawTextInBox(
+func (ob *PDF) DrawTextInBox(
 	x, y, width, height float64, align, text string) *PDF {
-	return pdf.drawTextBox(x, y, width, height, true, align, text)
+	return ob.drawTextBox(x, y, width, height, true, align, text)
 } //                                                               DrawTextInBox
 
 // DrawUnitGrid draws a light-gray grid demarcated in the
 // current measurement unit. The grid fills the entire page.
 // It helps with item positioning.
-func (pdf *PDF) DrawUnitGrid() *PDF {
-	var pw, ph = pdf.PageWidth(), pdf.PageHeight()
-	pdf.SetLineWidth(0.1).SetFont("Helvetica", 8)
+func (ob *PDF) DrawUnitGrid() *PDF {
+	var pw, ph = ob.PageWidth(), ob.PageHeight()
+	ob.SetLineWidth(0.1).SetFont("Helvetica", 8)
 	for i, x := 0, 0.0; x < pw; x++ { //                        vertical lines |
-		pdf.SetColorRGB(200, 200, 200).DrawLine(x, 0, x, ph).
+		ob.SetColorRGB(200, 200, 200).DrawLine(x, 0, x, ph).
 			SetColor("Indigo").SetXY(x+0.1, 0.3).DrawText(strconv.Itoa(i))
 		i++
 	}
 	for i, y := 0, 0.0; y < ph; y++ { //                      horizontal lines -
-		pdf.SetColorRGB(200, 200, 200).DrawLine(0, y, pw, y).
+		ob.SetColorRGB(200, 200, 200).DrawLine(0, y, pw, y).
 			SetColor("Indigo").SetXY(0.1, y+0.3).DrawText(strconv.Itoa(i))
 		i++
 	}
-	return pdf
+	return ob
 } //                                                                DrawUnitGrid
 
 // FillBox fills a rectangle with the current color.
-func (pdf *PDF) FillBox(x, y, width, height float64) *PDF {
-	return pdf.DrawBox(x, y, width, height, true)
+func (ob *PDF) FillBox(x, y, width, height float64) *PDF {
+	return ob.DrawBox(x, y, width, height, true)
 } //                                                                     FillBox
 
 // FillCircle fills a circle of radius r centered on (x, y),
 // by drawing 4 Bézier curves (PDF has no circle primitive)
-func (pdf *PDF) FillCircle(x, y, radius float64) *PDF {
-	return pdf.DrawEllipse(x, y, radius, radius, true)
+func (ob *PDF) FillCircle(x, y, radius float64) *PDF {
+	return ob.DrawEllipse(x, y, radius, radius, true)
 } //                                                                  FillCircle
 
 // FillEllipse fills a Ellipse of radius r centered on (x, y),
 // by drawing 4 Bézier curves (PDF has no ellipse primitive)
-func (pdf *PDF) FillEllipse(x, y, xRadius, yRadius float64) *PDF {
-	return pdf.DrawEllipse(x, y, xRadius, yRadius, true)
+func (ob *PDF) FillEllipse(x, y, xRadius, yRadius float64) *PDF {
+	return ob.DrawEllipse(x, y, xRadius, yRadius, true)
 } //                                                                 FillEllipse
 
 // NextLine advances the text writing position to the next line.
 // I.e. the Y increases by the height of the font and
 // the X-coordinate is reset to zero.
-func (pdf *PDF) NextLine() *PDF {
-	var x, y = 0.0, pdf.Y() + pdf.FontSize()*pdf.ptPerUnit
-	if len(pdf.columnWidths) > 0 {
-		x = pdf.columnWidths[0]
+func (ob *PDF) NextLine() *PDF {
+	var x, y = 0.0, ob.Y() + ob.FontSize()*ob.ptPerUnit
+	if len(ob.columnWidths) > 0 {
+		x = ob.columnWidths[0]
 	}
-	if y > pdf.paperSize.heightPt*pdf.ptPerUnit {
-		pdf.AddPage()
+	if y > ob.paperSize.heightPt*ob.ptPerUnit {
+		ob.AddPage()
 		y = 0
 	}
-	pdf.columnNo = 0
-	return pdf.SetXY(x, y)
+	ob.columnNo = 0
+	return ob.SetXY(x, y)
 } //                                                                    NextLine
 
 // Reset releases all resources and resets all variables, except paper size.
-func (pdf *PDF) Reset() *PDF {
-	pdf.ppage, pdf.pbuf = nil, nil
-	*pdf = NewPDF(pdf.paperSize.name)
-	return pdf
+func (ob *PDF) Reset() *PDF {
+	ob.ppage, ob.pbuf = nil, nil
+	*ob = NewPDF(ob.paperSize.name)
+	return ob
 } //                                                                       Reset
 
 // SaveFile generates and saves the PDF document to a file.
-func (pdf *PDF) SaveFile(filename string) error {
-	var err = ioutil.WriteFile(filename, pdf.Bytes(), 0644)
+func (ob *PDF) SaveFile(filename string) error {
+	var err = ioutil.WriteFile(filename, ob.Bytes(), 0644)
 	if err != nil {
-		pdf.putError(0xED3F6D, "Failed writing file", err.Error())
+		ob.putError(0xED3F6D, "Failed writing file", err.Error())
 		return err
 	}
 	return nil
@@ -687,27 +675,27 @@ func (pdf *PDF) SaveFile(filename string) error {
 
 // SetColumnWidths creates column positions (tab stops) along the X-axis.
 // To remove all column positions, call this method without any argument.
-func (pdf *PDF) SetColumnWidths(widths ...float64) *PDF {
-	pdf.init()
-	pdf.columnWidths = widths
-	return pdf
+func (ob *PDF) SetColumnWidths(widths ...float64) *PDF {
+	ob.init()
+	ob.columnWidths = widths
+	return ob
 } //                                                             SetColumnWidths
 
 // -----------------------------------------------------------------------------
-// # Metrics Methods (pdf *PDF)
+// # Metrics Methods (ob *PDF)
 
 // TextWidth returns the width of the text in current units.
-func (pdf *PDF) TextWidth(s string) float64 {
-	return pdf.ToUnits(pdf.textWidthPt1000(s))
+func (ob *PDF) TextWidth(s string) float64 {
+	return ob.ToUnits(ob.textWidthPt1000(s))
 } //                                                                   TextWidth
 
 // ToColor returns an RGBA color value from a web/X11 color name
 // (e.g. "HoneyDew") or HTML color value such as "#191970"
 // If the name or code is unknown or invalid, returns zero value (black).
-func (pdf *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error) {
+func (ob *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error) {
 	//
 	// if name starts with '#' treat it as HTML color code (#RRGGBB)
-	var s = pdf.toUpperLettersDigits(nameOrHTMLColor, "#")
+	var s = ob.toUpperLettersDigits(nameOrHTMLColor, "#")
 	if len(s) >= 7 && s[0] == '#' {
 		var hex [6]byte
 		for i, r := range s[1:7] {
@@ -738,7 +726,7 @@ func (pdf *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error) {
 // ToPoints converts a string composed of a number and unit to points.
 // For example '1 cm' or '1cm' becomes 28.346 points.
 // Recognised units: mm cm " in inch inches tw twip twips pt point points
-func (pdf *PDF) ToPoints(numberAndUnit string) (float64, error) {
+func (ob *PDF) ToPoints(numberAndUnit string) (float64, error) {
 	var num, unit string //                              extract number and unit
 	for _, r := range numberAndUnit {
 		switch {
@@ -751,7 +739,7 @@ func (pdf *PDF) ToPoints(numberAndUnit string) (float64, error) {
 	var ppu = 1.0
 	if unit != "" {
 		var err error
-		ppu, err = pdf.getPointsPerUnit(unit)
+		ppu, err = ob.getPointsPerUnit(unit)
 		if err, isT := err.(pdfError); isT {
 			return 0, err
 		}
@@ -764,11 +752,11 @@ func (pdf *PDF) ToPoints(numberAndUnit string) (float64, error) {
 } //                                                                    ToPoints
 
 // ToUnits converts points to the currently selected unit of measurement.
-func (pdf *PDF) ToUnits(points float64) float64 {
-	if int(pdf.ptPerUnit*100) == 0 {
+func (ob *PDF) ToUnits(points float64) float64 {
+	if int(ob.ptPerUnit*100) == 0 {
 		return points
 	}
-	return points / pdf.ptPerUnit
+	return points / ob.ptPerUnit
 } //                                                                     ToUnits
 
 // WrapTextLines splits a string into multiple lines so that the text
@@ -776,10 +764,10 @@ func (pdf *PDF) ToUnits(points float64) float64 {
 // Newline characters (CR and "\n") also cause text to be split.
 // You can find out the number of lines needed to wrap some
 // text by checking the length of the returned array.
-func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
+func (ob *PDF) WrapTextLines(width float64, text string) (ret []string) {
 	var fit = func(s string, step, n int, width float64) int {
 		for max := len(s); n > 0 && n <= max; {
-			var w = pdf.TextWidth(s[:n])
+			var w = ob.TextWidth(s[:n])
 			switch step {
 			case 1, 3: //       keep halving (or - 1) until n chars fit in width
 				if w <= width {
@@ -799,8 +787,8 @@ func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
 		return 0
 	}
 	// split text into lines. then break lines based on text width
-	for _, iter := range pdf.splitLines(text) {
-		for pdf.TextWidth(iter) > width {
+	for _, iter := range ob.splitLines(text) {
+		for ob.TextWidth(iter) > width {
 			var n = len(iter) // reduce, increase, then reduce n to get best fit
 			for i := 1; i <= 3; i++ {
 				n = fit(iter, i, n, width)
@@ -808,7 +796,7 @@ func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
 			// move to the last word (if white-space is found)
 			var found, max = false, n
 			for n > 0 {
-				if pdf.isWhiteSpace(iter[n-1 : n]) {
+				if ob.isWhiteSpace(iter[n-1 : n]) {
 					found = true
 					break
 				}
@@ -829,10 +817,10 @@ func (pdf *PDF) WrapTextLines(width float64, text string) (ret []string) {
 } //                                                               WrapTextLines
 
 // -----------------------------------------------------------------------------
-// # Error Handling Methods (pdf *PDF)
+// # Error Handling Methods (ob *PDF)
 
 // Clean clears all accumulated errors.
-func (pdf *PDF) Clean() *PDF { pdf.errors = nil; return pdf }
+func (ob *PDF) Clean() *PDF { ob.errors = nil; return ob }
 
 // ErrorInfo extracts and returns additional error details from PDF errors
 func (*PDF) ErrorInfo(err error) (ret struct {
@@ -846,15 +834,15 @@ func (*PDF) ErrorInfo(err error) (ret struct {
 } //                                                                   ErrorInfo
 
 // Errors returns a slice of all accumulated errors.
-func (pdf *PDF) Errors() []error { return pdf.errors }
+func (ob *PDF) Errors() []error { return ob.errors }
 
 // PullError removes and returns the first error from the errors collection.
-func (pdf *PDF) PullError() error {
-	if len(pdf.errors) == 0 {
+func (ob *PDF) PullError() error {
+	if len(ob.errors) == 0 {
 		return nil
 	}
-	var ret = pdf.errors[0]
-	pdf.errors = pdf.errors[1:]
+	var ret = ob.errors[0]
+	ob.errors = ob.errors[1:]
 	return ret
 } //                                                                   PullError
 
@@ -910,7 +898,7 @@ type pdfPaperSize struct {
 } //                                                                pdfPaperSize
 
 // -----------------------------------------------------------------------------
-// # Internal Methods (pdf *PDF)
+// # Internal Methods (ob *PDF)
 
 // applyFont writes a font change command, provided the font has
 // been changed since the last operation that uses fonts.
@@ -920,21 +908,21 @@ type pdfPaperSize struct {
 // never used to draw text, no font selection command is output.
 //
 // Before calling this method, the font name must be already
-// set by SetFontName(), which is stored in pdf.font.fontName
+// set by SetFontName(), which is stored in ob.font.fontName
 //
 // What this method does:
 // - Validates the current font name and determines if it is a
 //   standard (built-in) font like Helvetica or a TrueType font.
-// - Fills the document-wide list of fonts (pdf.fonts).
+// - Fills the document-wide list of fonts (ob.fonts).
 // - Adds items to the list of font ID's used on the current page.
-func (pdf *PDF) applyFont() (err error) {
+func (ob *PDF) applyFont() (err error) {
 	var font pdfFont
-	var name = pdf.toUpperLettersDigits(pdf.fontName, "")
+	var name = ob.toUpperLettersDigits(ob.fontName, "")
 	var valid = name != ""
 	if valid {
 		valid = false
 		for i, iter := range pdfFontNames {
-			iter = pdf.toUpperLettersDigits(iter, "")
+			iter = ob.toUpperLettersDigits(iter, "")
 			if iter != name {
 				continue
 			}
@@ -951,25 +939,25 @@ func (pdf *PDF) applyFont() (err error) {
 	}
 	// if there is no selected font or it's invalid, use Helvetica
 	if !valid {
-		err = pdfError{id: 0xE86819, msg: "Invalid font", val: pdf.fontName}
-		pdf.fontName = "Helvetica"
-		pdf.applyFont()
+		err = pdfError{id: 0xE86819, msg: "Invalid font", val: ob.fontName}
+		ob.fontName = "Helvetica"
+		ob.applyFont()
 		return err
 	}
 	// has the font been added to the global list? if not, add it:
-	for _, iter := range pdf.fonts {
+	for _, iter := range ob.fonts {
 		if font.fontName == iter.fontName {
 			font.fontID = iter.fontID
 			break
 		}
 	}
 	if font.fontID == 0 {
-		font.fontID = 1 + len(pdf.fonts)
-		pdf.fonts = append(pdf.fonts, font)
+		font.fontID = 1 + len(ob.fonts)
+		ob.fonts = append(ob.fonts, font)
 	}
-	var pg = pdf.ppage
+	var pg = ob.ppage
 	if pg.fontID == font.fontID &&
-		int(pg.fontSizePt*100) == int(pdf.fontSizePt)*100 {
+		int(pg.fontSizePt*100) == int(ob.fontSizePt)*100 {
 		return err
 	}
 	// add the font ID to the current page, if not already referenced
@@ -985,109 +973,109 @@ func (pdf *PDF) applyFont() (err error) {
 		pg.fontIDs[len(pg.fontIDs)-1] = font.fontID
 	}
 	pg.fontID = font.fontID
-	pg.fontSizePt = pdf.fontSizePt
-	pdf.write("BT /FNT%d %d Tf ET\n", pg.fontID, int(pg.fontSizePt))
+	pg.fontSizePt = ob.fontSizePt
+	ob.write("BT /FNT%d %d Tf ET\n", pg.fontID, int(pg.fontSizePt))
 	// BT: begin text   /FNT0 i0 Tf: set font to FNT0 index i0   ET: end text
 	return err
 } //                                                                   applyFont
 
 // drawTextLine writes a line of text at the current coordinates to the
 // current page's content stream, using a sequence of raw PDF commands
-func (pdf *PDF) drawTextLine(s string) *PDF {
+func (ob *PDF) drawTextLine(s string) *PDF {
 	if s == "" {
-		return pdf
+		return ob
 	}
 	// draw the text
-	var pg = pdf.ppage
-	err := pdf.applyFont()
+	var pg = ob.ppage
+	err := ob.applyFont()
 	if err, isT := err.(pdfError); isT {
-		pdf.putError(0xEAEAC4, err.msg, err.val)
+		ob.putError(0xEAEAC4, err.msg, err.val)
 	}
-	if pg.horzScaling != pdf.horzScaling {
-		pg.horzScaling = pdf.horzScaling
-		pdf.write("BT %d Tz ET\n", pg.horzScaling)
+	if pg.horzScaling != ob.horzScaling {
+		pg.horzScaling = ob.horzScaling
+		ob.write("BT %d Tz ET\n", pg.horzScaling)
 		// BT: begin text   n0 Tz: set horiz. text scaling to n0%   ET: end text
 	}
-	pdf.writeMode(true) // fill/nonStroke
+	ob.writeMode(true) // fill/nonStroke
 	if pg.x < 0 || pg.y < 0 {
-		pdf.SetXY(0, 0)
+		ob.SetXY(0, 0)
 	}
 	// BT: begin text   Td: move text position   Tj: show text   ET: end text
-	pdf.write("BT %d %d Td (%s) Tj ET\n", int(pg.x), int(pg.y), pdf.escape(s))
-	pg.x += pdf.textWidthPt1000(s)
-	return pdf
+	ob.write("BT %d %d Td (%s) Tj ET\n", int(pg.x), int(pg.y), ob.escape(s))
+	pg.x += ob.textWidthPt1000(s)
+	return ob
 } //                                                                drawTextLine
 
 // drawTextBox draws a line of text, or a word-wrapped block of text.
 // align: specify up to 2 flags: L R T B to align left, right, top or bottom
 // the default (blank) is C center, both vertically and horizontally
-func (pdf *PDF) drawTextBox(x, y, width, height float64,
+func (ob *PDF) drawTextBox(x, y, width, height float64,
 	wrapText bool, align, text string,
 ) *PDF {
 	if text == "" {
-		return pdf
+		return ob
 	}
-	pdf.reservePage()
+	ob.reservePage()
 	var lines []string
 	if wrapText {
-		lines = pdf.WrapTextLines(width, text)
+		lines = ob.WrapTextLines(width, text)
 	} else {
 		lines = []string{text}
 	}
 	align = strings.ToUpper(align)
-	var lineHeight = pdf.FontSize()
+	var lineHeight = ob.FontSize()
 	var allLinesHeight = lineHeight * float64(len(lines))
 	//
 	// calculate aligned y-axis position of text (top, bottom, center)
-	y, height = y*pdf.ptPerUnit+pdf.fontSizePt, height*pdf.ptPerUnit
+	y, height = y*ob.ptPerUnit+ob.fontSizePt, height*ob.ptPerUnit
 	if strings.Contains(align, "B") { // bottom
 		y += height - allLinesHeight - 4 //                           4pt margin
 	} else if !strings.Contains(align, "T") {
-		y += height/2 - allLinesHeight/2 - pdf.fontSizePt*0.15 //         center
+		y += height/2 - allLinesHeight/2 - ob.fontSizePt*0.15 //         center
 	}
-	y = pdf.paperSize.heightPt - y
+	y = ob.paperSize.heightPt - y
 	//
 	// calculate x-axis position of text (left, right, center)
-	x, width = x*pdf.ptPerUnit, width*pdf.ptPerUnit
+	x, width = x*ob.ptPerUnit, width*ob.ptPerUnit
 	for _, line := range lines {
 		var off = 0.0 //                                x-offset to align in box
 		if strings.Contains(align, "L") {
-			off = pdf.fontSizePt / 6 //                              left margin
+			off = ob.fontSizePt / 6 //                              left margin
 		} else if strings.Contains(align, "R") {
-			off = width - pdf.textWidthPt1000(line) - pdf.fontSizePt/6
+			off = width - ob.textWidthPt1000(line) - ob.fontSizePt/6
 		} else {
-			off = width/2 - pdf.textWidthPt1000(line)/2 //                center
+			off = width/2 - ob.textWidthPt1000(line)/2 //                center
 		}
-		pdf.ppage.x, pdf.ppage.y = x+off, y
-		pdf.drawTextLine(line)
+		ob.ppage.x, ob.ppage.y = x+off, y
+		ob.drawTextLine(line)
 		y -= lineHeight
 	}
-	return pdf
+	return ob
 } //                                                                 drawTextBox
 
 // init initializes the PDF object, if not initialized already
-func (pdf *PDF) init() *PDF {
-	if pdf.isInit {
-		return pdf
+func (ob *PDF) init() *PDF {
+	if ob.isInit {
+		return ob
 	}
-	pdf.unitName = "POINT"
-	pdf.paperSize, _ = pdf.getPaperSize("A4")
-	pdf.ptPerUnit, _ = pdf.getPointsPerUnit(pdf.unitName)
-	pdf.color, pdf.lineWidth = pdfBlack, 1 // point
-	pdf.fontName, pdf.fontSizePt = "Helvetica", 10
-	pdf.horzScaling, pdf.compression = 100, true
-	pdf.isInit = true
-	return pdf
+	ob.unitName = "POINT"
+	ob.paperSize, _ = ob.getPaperSize("A4")
+	ob.ptPerUnit, _ = ob.getPointsPerUnit(ob.unitName)
+	ob.color, ob.lineWidth = pdfBlack, 1 // point
+	ob.fontName, ob.fontSizePt = "Helvetica", 10
+	ob.horzScaling, ob.compression = 100, true
+	ob.isInit = true
+	return ob
 } //                                                                        init
 
 // loadImage reads an image from a file or byte array, stores its data in
 // the PDF's images array, and returns a pdfImage and its reference index
-func (pdf *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
+func (ob *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 ) (img pdfImage, idx int, err error) {
 	var buf *bytes.Buffer
 	switch val := fileNameOrBytes.(type) {
 	case string:
-		for i, iter := range pdf.images {
+		for i, iter := range ob.images {
 			if iter.filename == val && iter.backColor == back {
 				return iter, i, nil
 			}
@@ -1109,7 +1097,7 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 				val: fmt.Sprintf("%s = %v",
 					reflect.TypeOf(fileNameOrBytes), fileNameOrBytes)}
 	}
-	for i, iter := range pdf.images {
+	for i, iter := range ob.images {
 		if bytes.Equal(iter.hash[:], img.hash[:]) && iter.backColor == back {
 			return iter, i, nil
 		}
@@ -1121,8 +1109,8 @@ func (pdf *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 	}
 	img.backColor = back
 	img.widthPx, img.heightPx, img.isGray, img.data = makeImage(decoded, back)
-	pdf.images = append(pdf.images, img)
-	return img, len(pdf.images) - 1, nil
+	ob.images = append(ob.images, img)
+	return img, len(ob.images) - 1, nil
 } //                                                                   loadImage
 
 // makeImage encodes the source image in a PDF image data stream
@@ -1159,167 +1147,167 @@ func makeImage(source image.Image, back color.RGBA,
 } //                                                                   makeImage
 
 // reservePage ensures there is at least one page in the PDF
-func (pdf *PDF) reservePage() *PDF {
-	if len(pdf.pages) == 0 {
-		pdf.AddPage()
+func (ob *PDF) reservePage() *PDF {
+	if len(ob.pages) == 0 {
+		ob.AddPage()
 	}
-	return pdf
+	return ob
 } //                                                                  reservePage
 
 // textWidthPt1000 returns the width of text in thousandths of a point
-func (pdf *PDF) textWidthPt1000(s string) float64 {
+func (ob *PDF) textWidthPt1000(s string) float64 {
 	if s == "" {
 		return 0
 	}
 	var w = 0.0
 	for i, r := range s {
 		if r < 0 || r > 255 {
-			pdf.putError(0xE31046, "Rune out of range",
+			ob.putError(0xE31046, "Rune out of range",
 				fmt.Sprintf("at %d = '%s'", i, string(r)))
 			break
 		}
 		w += float64(pdfFontWidths[r][0])
 		// TODO: [0] is not considering the current font!
 	}
-	return w * pdf.fontSizePt / 1000 * float64(pdf.horzScaling) / 100
+	return w * ob.fontSizePt / 1000 * float64(ob.horzScaling) / 100
 } //                                                             textWidthPt1000
 
 // -----------------------------------------------------------------------------
-// # Internal Generation Methods (pdf *PDF)
+// # Internal Generation Methods (ob *PDF)
 
 // nextObj increases the object serial no. and stores its offset in array
-func (pdf *PDF) nextObj() int {
-	pdf.objNo++
-	for len(pdf.objOffsets) <= pdf.objNo {
-		pdf.objOffsets = append(pdf.objOffsets, pdf.content.Len())
+func (ob *PDF) nextObj() int {
+	ob.objNo++
+	for len(ob.objOffsets) <= ob.objNo {
+		ob.objOffsets = append(ob.objOffsets, ob.content.Len())
 	}
-	return pdf.objNo
+	return ob.objNo
 } //                                                                     nextObj
 
 // write writes formatted strings (like fmt.Sprintf) to the current page's
 // content stream or to the final generated PDF, if there is no active page
-func (pdf *PDF) write(format string, args ...interface{}) *PDF {
-	pdf.reservePage()
-	pdf.pbuf.Write([]byte(fmt.Sprintf(format, args...)))
-	return pdf
+func (ob *PDF) write(format string, args ...interface{}) *PDF {
+	ob.reservePage()
+	ob.pbuf.Write([]byte(fmt.Sprintf(format, args...)))
+	return ob
 } //                                                                       write
 
 // writeCurve writes a Bézier curve using the 'c' PDF primitive.
 // The starting point is the current (x, y) position.
 // (x1, y1) and (x2, y2) are the two control points, (x3, y3) the end point.
-func (pdf *PDF) writeCurve(x1, y1, x2, y2, x3, y3 float64) *PDF {
-	return pdf.write(" %.3f %.3f %.3f %.3f %.3f %.3f c", x1, y1, x2, y2, x3, y3)
+func (ob *PDF) writeCurve(x1, y1, x2, y2, x3, y3 float64) *PDF {
+	return ob.write(" %.3f %.3f %.3f %.3f %.3f %.3f c", x1, y1, x2, y2, x3, y3)
 	// x1 y1 x2 y2 x3 y3 c: append cubic Bézier curve to the current path
 } //                                                                  writeCurve
 
 // writeEndobj writes 'endobj' (PDF object end marker)
-func (pdf *PDF) writeEndobj() *PDF {
-	return pdf.write(">>\nendobj\n")
+func (ob *PDF) writeEndobj() *PDF {
+	return ob.write(">>\nendobj\n")
 } //                                                                 writeEndobj
 
 // writeMode sets the stroking or non-stroking color and line width.
 // 'fill' arg specifies non-stroking (true) or stroking mode (none/false)
-func (pdf *PDF) writeMode(fill ...bool) (mode string) {
-	pdf.reservePage()
+func (ob *PDF) writeMode(fill ...bool) (mode string) {
+	ob.reservePage()
 	mode = "S" // S: stroke path (for lines)
 	if len(fill) > 0 && fill[0] {
 		mode = "b" // b: fill / text
-		if pv := &pdf.ppage.nonStrokeColor; *pv != pdf.color {
-			*pv = pdf.color
-			pdf.write(" %.3f %.3f %.3f rg\n", // rg: set non-stroking/text color
+		if pv := &ob.ppage.nonStrokeColor; *pv != ob.color {
+			*pv = ob.color
+			ob.write(" %.3f %.3f %.3f rg\n", // rg: set non-stroking/text color
 				float64(pv.R)/255, float64(pv.G)/255, float64(pv.B)/255)
 		}
 	}
-	if pv := &pdf.ppage.strokeColor; *pv != pdf.color {
-		*pv = pdf.color
-		pdf.write("%.3f %.3f %.3f RG\n", // RG: set stroke (line) color
+	if pv := &ob.ppage.strokeColor; *pv != ob.color {
+		*pv = ob.color
+		ob.write("%.3f %.3f %.3f RG\n", // RG: set stroke (line) color
 			float64(pv.R)/255, float64(pv.G)/255, float64(pv.B)/255)
 	}
-	if pv := &pdf.ppage.lineWidth; int(*pv*100) != int(pdf.lineWidth*100) {
-		*pv = pdf.lineWidth
-		pdf.write("%.3f w\n", float64(*pv)) // n0 w: set line width to n0
+	if pv := &ob.ppage.lineWidth; int(*pv*100) != int(ob.lineWidth*100) {
+		*pv = ob.lineWidth
+		ob.write("%.3f w\n", float64(*pv)) // n0 w: set line width to n0
 	}
 	return mode
 } //                                                                   writeMode
 
 // writeObj outputs an object header
-func (pdf *PDF) writeObj(objType string) *PDF {
-	var n = pdf.nextObj()
+func (ob *PDF) writeObj(objType string) *PDF {
+	var n = ob.nextObj()
 	if objType == "" {
-		return pdf.write("%d 0 obj<<", n)
+		return ob.write("%d 0 obj<<", n)
 	} else if objType[0] == '/' {
-		return pdf.write("%d 0 obj<</Type%s", n, objType)
+		return ob.write("%d 0 obj<</Type%s", n, objType)
 	}
-	return pdf.putError(0xE7621C,
+	return ob.putError(0xE7621C,
 		"objType should begin with '/' or be a blank string", objType)
 } //                                                                    writeObj
 
 // writePages writes all PDF pages
-func (pdf *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
-	pdf.writeObj("/Pages").write("/Count %d/MediaBox[0 0 %d %d]",
-		len(pdf.pages), int(pdf.paperSize.widthPt), int(pdf.paperSize.heightPt))
+func (ob *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
+	ob.writeObj("/Pages").write("/Count %d/MediaBox[0 0 %d %d]",
+		len(ob.pages), int(ob.paperSize.widthPt), int(ob.paperSize.heightPt))
 	//                                                        write page numbers
-	if len(pdf.pages) > 0 {
+	if len(ob.pages) > 0 {
 		var pageObjNo = pdfPagesIndex
-		pdf.write("/Kids[")
-		for i := range pdf.pages {
+		ob.write("/Kids[")
+		for i := range ob.pages {
 			if i > 0 {
-				pdf.write(" ")
+				ob.write(" ")
 			}
-			pdf.write("%d 0 R", pageObjNo)
+			ob.write("%d 0 R", pageObjNo)
 			pageObjNo += 2 //                           1 for page, 1 for stream
 		}
-		pdf.write("]")
+		ob.write("]")
 	}
-	pdf.writeEndobj()
-	for _, pg := range pdf.pages { //                            write each page
-		pdf.writeObj("/Page").
-			write("/Parent 2 0 R/Contents %d 0 R", pdf.objNo+1)
+	ob.writeEndobj()
+	for _, pg := range ob.pages { //                            write each page
+		ob.writeObj("/Page").
+			write("/Parent 2 0 R/Contents %d 0 R", ob.objNo+1)
 		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
-			pdf.write("/Resources<<")
+			ob.write("/Resources<<")
 		}
 		if len(pg.fontIDs) > 0 {
-			pdf.write("/Font <<")
-			for fontNo := range pdf.fonts {
-				pdf.write("/FNT%d %d 0 R", fontNo+1, fontsIndex+fontNo)
+			ob.write("/Font <<")
+			for fontNo := range ob.fonts {
+				ob.write("/FNT%d %d 0 R", fontNo+1, fontsIndex+fontNo)
 			}
-			pdf.write(">>")
+			ob.write(">>")
 		}
 		if len(pg.imageNos) > 0 {
-			pdf.write("/XObject<<")
+			ob.write("/XObject<<")
 			for imageNo := range pg.imageNos {
-				pdf.write("/IMG%d %d 0 R", imageNo, imagesIndex+imageNo)
+				ob.write("/IMG%d %d 0 R", imageNo, imagesIndex+imageNo)
 			}
-			pdf.write(">>")
+			ob.write(">>")
 		}
 		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
-			pdf.write(">>")
+			ob.write(">>")
 		}
-		pdf.writeEndobj().writeStream([]byte(pg.content.String()))
+		ob.writeEndobj().writeStream([]byte(pg.content.String()))
 	}
-	return pdf
+	return ob
 } //                                                                  writePages
 
 // writeStream outputs a stream object to the document's main buffer
-func (pdf *PDF) writeStream(content []byte) *PDF {
-	return pdf.write("%d 0 obj <<", pdf.nextObj()).writeStreamData(content)
+func (ob *PDF) writeStream(content []byte) *PDF {
+	return ob.write("%d 0 obj <<", ob.nextObj()).writeStreamData(content)
 } //                                                                 writeStream
 
 // writeStreamData writes a stream or image stream
-func (pdf *PDF) writeStreamData(ar []byte) *PDF {
+func (ob *PDF) writeStreamData(ar []byte) *PDF {
 	var s string // filter
-	if pdf.compression {
+	if ob.compression {
 		var buf bytes.Buffer
 		var wr = zlib.NewWriter(&buf)
 		var _, err = wr.Write([]byte(ar))
 		if err != nil {
-			return pdf.putError(0xE782A2, "Failed compressing", err.Error())
+			return ob.putError(0xE782A2, "Failed compressing", err.Error())
 		}
 		wr.Close() // don't defer, close before reading Bytes()
 		ar = buf.Bytes()
 		s = "/Filter/FlateDecode"
 	}
-	return pdf.write("%s/Length %d>>stream\n%s\nendstream\n", s, len(ar), ar)
+	return ob.write("%s/Length %d>>stream\n%s\nendstream\n", s, len(ar), ar)
 } //                                                             writeStreamData
 
 // -----------------------------------------------------------------------------
@@ -1382,24 +1370,24 @@ func (*PDF) toUpperLettersDigits(s, extras string) string {
 // getPaperSize returns a pdfPaperSize based on the specified paper name.
 // Specify custom paper sizes using "width x height", e.g. "9cm x 20cm"
 // If the paper size is not found, returns a zero-initialized structure
-func (pdf *PDF) getPaperSize(name string) (pdfPaperSize, error) {
+func (ob *PDF) getPaperSize(name string) (pdfPaperSize, error) {
 	var s = strings.ToUpper(name)
 	if strings.Contains(s, " X ") {
 		var wh = strings.Split(s, " X ")
-		var w, err = pdf.ToPoints(wh[0])
+		var w, err = ob.ToPoints(wh[0])
 		if err, isT := err.(pdfError); isT {
 			return pdfPaperSize{}, err
 		}
 		var h float64
-		h, err = pdf.ToPoints(wh[1])
+		h, err = ob.ToPoints(wh[1])
 		if err, isT := err.(pdfError); isT {
 			return pdfPaperSize{}, err
 		}
 		return pdfPaperSize{s, w, h}, nil
 	}
-	s = pdf.toUpperLettersDigits(s, "-")
+	s = ob.toUpperLettersDigits(s, "-")
 	var landscape = strings.HasSuffix(s, "-L")
-	s = pdf.toUpperLettersDigits(s, "")
+	s = ob.toUpperLettersDigits(s, "")
 	if landscape {
 		s = s[:len(s)-1] // "-" is already removed above. now remove the "L"
 	}
@@ -1417,8 +1405,8 @@ func (pdf *PDF) getPaperSize(name string) (pdfPaperSize, error) {
 } //                                                                getPaperSize
 
 // getPointsPerUnit returns number of points per named measurement unit
-func (pdf *PDF) getPointsPerUnit(unitName string) (ret float64, err error) {
-	switch pdf.toUpperLettersDigits(unitName, `"`) {
+func (ob *PDF) getPointsPerUnit(unitName string) (ret float64, err error) {
+	switch ob.toUpperLettersDigits(unitName, `"`) {
 	case "CM":
 		ret = 28.3464566929134 //          " / 2.54cm per " * 72 points per inch
 	case "IN", "INCH", "INCHES", `"`:
@@ -1436,7 +1424,7 @@ func (pdf *PDF) getPointsPerUnit(unitName string) (ret float64, err error) {
 } //                                                            getPointsPerUnit
 
 // putError appends an error to the errors collection
-func (pdf *PDF) putError(id int, msg, val string) *PDF {
+func (ob *PDF) putError(id int, msg, val string) *PDF {
 	var fn string //                                  get the public method name
 	for i := 0; i < 10; i++ {
 		var programCounter, _, _, _ = runtime.Caller(i)
@@ -1447,9 +1435,9 @@ func (pdf *PDF) putError(id int, msg, val string) *PDF {
 		}
 		break
 	}
-	pdf.errors = append(pdf.errors,
+	ob.errors = append(ob.errors,
 		pdfError{id: id, src: fn, msg: msg, val: val})
-	return pdf
+	return ob
 } //                                                                    putError
 
 // -----------------------------------------------------------------------------
