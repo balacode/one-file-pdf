@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-27 20:13:50 ABA8E8                              [one_file_pdf.go]
+// :v: 2018-03-28 02:54:15 BEF08F                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -1230,16 +1230,9 @@ func (ob *PDF) writeMode(fill ...bool) (mode string) {
 	return mode
 } //                                                                   writeMode
 
-// writeObj outputs an object header
+// writeObj writes an object header. objType must start with '/', e.g. /Catalog
 func (ob *PDF) writeObj(objType string) *PDF {
-	var n = ob.nextObj()
-	if objType == "" {
-		return ob.write("%d 0 obj<<", n)
-	} else if objType[0] == '/' {
-		return ob.write("%d 0 obj<</Type%s", n, objType)
-	}
-	return ob.putError(0xE7621C,
-		"objType should begin with '/' or be a blank string", objType)
+	return ob.write("%d 0 obj<</Type%s", ob.nextObj(), objType)
 } //                                                                    writeObj
 
 // writePages writes all PDF pages
