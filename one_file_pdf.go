@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-28 02:54:15 BEF08F                              [one_file_pdf.go]
+// :v: 2018-03-28 02:55:44 29A99D                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -997,11 +997,8 @@ func (ob *PDF) drawTextLine(s string) *PDF {
 		// BT: begin text   n0 Tz: set horiz. text scaling to n0%   ET: end text
 	}
 	ob.writeMode(true) // fill/nonStroke
-	if pg.x < 0 || pg.y < 0 {
-		ob.SetXY(0, 0)
-	}
-	// BT: begin text   Td: move text position   Tj: show text   ET: end text
 	ob.write("BT %d %d Td (%s) Tj ET\n", int(pg.x), int(pg.y), ob.escape(s))
+	// BT: begin text   Td: move text position   Tj: show text   ET: end text
 	pg.x += ob.textWidthPt1000(s)
 	return ob
 } //                                                                drawTextLine
