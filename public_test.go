@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-28 03:12:33 C7F387                               [public_test.go]
+// :v: 2018-03-28 03:16:48 896DE3                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -79,28 +79,33 @@ func TestPublicAPI(t *testing.T) {
 		// FontName() string
 		// SetFontName(name string) *PDF
 
-		//TODO: SetFont(name string, points float64) *PDF
+		utest.SetFont, // SetFont(name string, points float64) *PDF
 
 		//TODO: utest.FontSize,
 		// FontSize() float64
 		// SetFontSize(points float64) *PDF
 
-		//TODO: HorizontalScaling() uint16
-		//TODO: SetHorizontalScaling(percent uint16) *PDF
+		utest.HorizontalScaling,
+		// HorizontalScaling() uint16
+		// SetHorizontalScaling(percent uint16) *PDF
 
-		//TODO: LineWidth() float64
-		//TODO: SetLineWidth(points float64) *PDF
+		utest.LineWidth,
+		// LineWidth() float64
+		// SetLineWidth(points float64) *PDF
 
-		//TODO: SetX(x float64) *PDF
-		//TODO: SetY(y float64) *PDF
+		utest.X,
+		// X() float64
+		// SetX(x float64) *PDF
 
 		//TODO: utest.SetXY, // SetXY(x, y float64) *PDF
+
+		utest.Y,
+		// Y() float64
+		// SetY(y float64) *PDF
 
 		utest.Units,
 		// Units() string
 		// SetUnits(unitName string) *PDF
-		//TODO: X() float64
-		//TODO: Y() float64
 
 		// ---------------------------------------------------------------------
 		// # Methods (ob *PDF)

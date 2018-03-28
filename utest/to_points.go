@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 18:56:20 FD57A0                           [utest/to_points.go]
+// :v: 2018-03-28 03:14:14 A23481                           [utest/to_points.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -74,6 +74,7 @@ func ToPoints(t *testing.T) {
 	//
 	// test some bad units
 	test(0, fmt.Errorf(`Unknown unit name "km"`), []string{"1km"})
+	test(0, fmt.Errorf(`Invalid number "1.0.1"`), []string{"1.0.1mm"})
 } //                                                                    ToPoints
 
 //end
