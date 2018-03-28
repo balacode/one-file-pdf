@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-28 02:55:44 29A99D                              [one_file_pdf.go]
+// :v: 2018-03-28 03:06:37 98E198                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -272,7 +272,7 @@ func (ob *PDF) Y() float64 {
 // (e.g. "HoneyDew") or HTML color value such as "#191970"
 // for midnight blue (#RRGGBB). The current color is used
 // for subsequent text and line drawing and fills.
-// If the name is unknown or valid, sets the current color to black.
+// If the name is unknown or invalid, sets color to black.
 func (ob *PDF) SetColor(nameOrHTMLColor string) *PDF {
 	var color, err = ob.init().ToColor(nameOrHTMLColor)
 	if err, isT := err.(pdfError); isT {
@@ -986,8 +986,7 @@ func (ob *PDF) drawTextLine(s string) *PDF {
 		return ob
 	}
 	// draw the text
-	var pg = ob.ppage
-	err := ob.applyFont()
+	var pg, err = ob.ppage, ob.applyFont()
 	if err, isT := err.(pdfError); isT {
 		ob.putError(0xEAEAC4, err.msg, err.val)
 	}
@@ -1250,9 +1249,8 @@ func (ob *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
 		ob.write("]")
 	}
 	ob.writeEndobj()
-	for _, pg := range ob.pages { //                            write each page
-		ob.writeObj("/Page").
-			write("/Parent 2 0 R/Contents %d 0 R", ob.objNo+1)
+	for _, pg := range ob.pages { //                             write each page
+		ob.writeObj("/Page").write("/Parent 2 0 R/Contents %d 0 R", ob.objNo+1)
 		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
 			ob.write("/Resources<<")
 		}
