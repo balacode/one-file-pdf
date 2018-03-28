@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-27 22:10:13 C842AF                               [public_test.go]
+// :v: 2018-03-28 03:12:33 C7F387                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -33,6 +33,7 @@ func TestPublicAPI(t *testing.T) {
 
 		// ---------------------------------------------------------------------
 		// # Constructor
+
 		utest.NewPDF, // NewPDF(paperSize string) PDF
 
 		// ---------------------------------------------------------------------
@@ -45,43 +46,44 @@ func TestPublicAPI(t *testing.T) {
 		// ---------------------------------------------------------------------
 		// # Properties
 
+		utest.Color,
 		// Color() color.RGBA
 		// SetColor(nameOrHTMLColor string) *PDF
 		// SetColorRGB(red, green, blue int) *PDF
-		utest.Color,
 
+		utest.Compression,
 		// Compression() bool
 		// SetCompression(compress bool) *PDF
-		utest.Compression,
 
+		utest.DocAuthor,
 		// DocAuthor() string
 		// SetDocAuthor(s string) *PDF
-		utest.DocAuthor,
 
+		utest.DocCreator,
 		// DocCreator() string
 		// SetDocCreator(s string) *PDF
-		utest.DocCreator,
 
+		utest.DocKeywords,
 		// DocKeywords() string
 		// SetDocKeywords(s string) *PDF
-		utest.DocKeywords,
 
+		utest.DocSubject,
 		// DocSubject() string
 		// SetDocSubject(s string) *PDF
-		utest.DocSubject,
 
+		utest.DocTitle,
 		// DocTitle() string
 		// SetDocTitle(s string) *PDF
-		utest.DocTitle,
 
+		utest.FontName,
 		// FontName() string
 		// SetFontName(name string) *PDF
-		utest.FontName,
 
 		//TODO: SetFont(name string, points float64) *PDF
 
-		//TODO: FontSize() float64
-		//TODO: SetFontSize(points float64) *PDF
+		//TODO: utest.FontSize,
+		// FontSize() float64
+		// SetFontSize(points float64) *PDF
 
 		//TODO: HorizontalScaling() uint16
 		//TODO: SetHorizontalScaling(percent uint16) *PDF
@@ -90,101 +92,89 @@ func TestPublicAPI(t *testing.T) {
 		//TODO: SetLineWidth(points float64) *PDF
 
 		//TODO: SetX(x float64) *PDF
-		//TODO: SetXY(x, y float64) *PDF
 		//TODO: SetY(y float64) *PDF
 
+		//TODO: utest.SetXY, // SetXY(x, y float64) *PDF
+
+		utest.Units,
 		// Units() string
 		// SetUnits(unitName string) *PDF
-		utest.Units,
-
 		//TODO: X() float64
 		//TODO: Y() float64
 
 		// ---------------------------------------------------------------------
 		// # Methods (ob *PDF)
 
-		//TODO: AddPage() *PDF
+		//TODO: utest.AddPage, // AddPage() *PDF
 
-		//TODO: Bytes() []byte
+		//TODO: utest.Bytes, // Bytes() []byte
 
-		// DrawBox(x, y, width, height float64, fill ...bool) *PDF
 		utest.DrawBox,
+		// DrawBox(x, y, width, height float64, fill ...bool) *PDF
 
-		// DrawCircle(x, y, radius float64, fill ...bool) *PDF
-		utest.DrawCircle,
+		utest.DrawCircle, // DrawCircle(x, y, radius float64, fill ...bool) *PDF
 
-		//TODO: DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF
+		//TODO: utest.DrawEllipse,
+		// DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF
 
+		utest.DrawImage,
 		// DrawImage(x, y, height float64, fileNameOrBytes interface{},
 		//     backColor ...string) *PDF
-		utest.DrawImage,
 
-		//TODO: DrawLine(x1, y1, x2, y2 float64) *PDF
+		//TODO: utest.DrawLine, // DrawLine(x1, y1, x2, y2 float64) *PDF
 
-		// DrawText(s string) *PDF
-		utest.DrawText,
+		utest.DrawText, // DrawText(s string) *PDF
 
-		//TODO: DrawTextAlignedToBox(
-		//          x, y, width, height float64, align, text string) *PDF
+		//TODO: utest.DrawTextAlignedToBox,
+		// DrawTextAlignedToBox(
+		//     x, y, width, height float64, align, text string) *PDF
 
-		// DrawTextAt(x, y float64, text string) *PDF
-		utest.DrawTextAt,
+		utest.DrawTextAt, // DrawTextAt(x, y float64, text string) *PDF
 
+		utest.DrawTextInBox,
 		// DrawTextInBox(
 		//     x, y, width, height float64, align, text string ) *PDF
-		utest.DrawTextInBox,
 
-		// DrawUnitGrid() *PDF
-		utest.DrawUnitGrid,
+		utest.DrawUnitGrid, // DrawUnitGrid() *PDF
+		utest.FillBox,      // FillBox(x, y, width, height float64) *PDF
+		utest.FillCircle,   // FillCircle(x, y, radius float64) *PDF
 
-		// FillBox(x, y, width, height float64) *PDF
-		utest.FillBox,
+		//TODO: utest.FillEllipse,
+		// FillEllipse(x, y, xRadius, yRadius float64) *PDF
 
-		// FillCircle(x, y, radius float64) *PDF
-		utest.FillCircle,
+		//TODO: utest.NextLine, // NextLine() *PDF
 
-		//TODO: FillEllipse(x, y, xRadius, yRadius float64) *PDF
+		utest.Reset, // Reset() *PDF
 
-		//TODO: NextLine() *PDF
+		//TODO: utest.SaveFile, // SaveFile(filename string) error
 
-		// Reset() *PDF
-		utest.Reset,
-
-		//TODO: SaveFile(filename string) error
-
-		//TODO: SetColumnWidths(widths ...float64) *PDF
+		//TODO: utest.SetColumnWidths,
+		// SetColumnWidths(widths ...float64) *PDF
 
 		// ---------------------------------------------------------------------
 		// # Metrics Methods (ob *PDF)
 
-		//TODO: TextWidth(s string) float64
+		//TODO: utest.TextWidth, // TextWidth(s string) float64
 
-		// ToColor(nameOrHTMLColor string) (color.RGBA, error)
 		utest.ToColorT1,
 		utest.ToColorT2,
+		// ToColor(nameOrHTMLColor string) (color.RGBA, error)
 
 		// ---------------------------------------------------------------------
 		// # Metrics Methods (ob *PDF)
 
-		// ToPoints(numberAndUnit string) (float64, error)
-		utest.ToPoints,
+		utest.ToPoints, // ToPoints(numberAndUnit string) (float64, error)
+		utest.ToUnits,  // ToUnits(points float64) float64
 
-		// ToUnits(points float64) float64
-		utest.ToUnits,
-
-		//TODO: WrapTextLines(width float64, text string) (ret []string)
+		//TODO: utest.WrapTextLines,
+		// WrapTextLines(width float64, text string) (ret []string)
 
 		// ---------------------------------------------------------------------
 		// # Error Handling Methods (ob *PDF)
 
-		// Clean() *PDF
-		utest.Clean,
-
-		// Errors() []error
-		utest.Errors,
-
-		// PullError() error
-		utest.PullError,
+		utest.Clean,     // Clean() *PDF
+		utest.Errors,    // Errors() []error
+		utest.PullError, // PullError() error
 	} {
 		fn(t)
 	}
