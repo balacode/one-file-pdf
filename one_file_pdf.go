@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-28 03:06:37 98E198                              [one_file_pdf.go]
+// :v: 2018-03-29 14:18:00 1FA2DC                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -102,7 +102,7 @@ package pdf
 //   makeImage(source image.Image, back color.RGBA,
 //       ) (widthPx, heightPx int, isGray bool, data []byte)
 //   reservePage() *PDF
-//   textWidthPt1000(s string) float64
+//   textWidthPt(s string) float64
 //
 // # Internal Generation Methods (ob *PDF)
 //   nextObj() int
@@ -686,7 +686,7 @@ func (ob *PDF) SetColumnWidths(widths ...float64) *PDF {
 
 // TextWidth returns the width of the text in current units.
 func (ob *PDF) TextWidth(s string) float64 {
-	return ob.ToUnits(ob.textWidthPt1000(s))
+	return ob.ToUnits(ob.textWidthPt(s))
 } //                                                                   TextWidth
 
 // ToColor returns an RGBA color value from a web/X11 color name
@@ -998,7 +998,7 @@ func (ob *PDF) drawTextLine(s string) *PDF {
 	ob.writeMode(true) // fill/nonStroke
 	ob.write("BT %d %d Td (%s) Tj ET\n", int(pg.x), int(pg.y), ob.escape(s))
 	// BT: begin text   Td: move text position   Tj: show text   ET: end text
-	pg.x += ob.textWidthPt1000(s)
+	pg.x += ob.textWidthPt(s)
 	return ob
 } //                                                                drawTextLine
 
@@ -1038,9 +1038,9 @@ func (ob *PDF) drawTextBox(x, y, width, height float64,
 		if strings.Contains(align, "L") {
 			off = ob.fontSizePt / 6 //                              left margin
 		} else if strings.Contains(align, "R") {
-			off = width - ob.textWidthPt1000(line) - ob.fontSizePt/6
+			off = width - ob.textWidthPt(line) - ob.fontSizePt/6
 		} else {
-			off = width/2 - ob.textWidthPt1000(line)/2 //                center
+			off = width/2 - ob.textWidthPt(line)/2 //                     center
 		}
 		ob.ppage.x, ob.ppage.y = x+off, y
 		ob.drawTextLine(line)
@@ -1150,8 +1150,8 @@ func (ob *PDF) reservePage() *PDF {
 	return ob
 } //                                                                  reservePage
 
-// textWidthPt1000 returns the width of text in thousandths of a point
-func (ob *PDF) textWidthPt1000(s string) float64 {
+// textWidthPt returns the width of text in points
+func (ob *PDF) textWidthPt(s string) float64 {
 	if s == "" {
 		return 0
 	}
@@ -1166,7 +1166,7 @@ func (ob *PDF) textWidthPt1000(s string) float64 {
 		// TODO: [0] is not considering the current font!
 	}
 	return w * ob.fontSizePt / 1000 * float64(ob.horzScaling) / 100
-} //                                                             textWidthPt1000
+} //                                                                 textWidthPt
 
 // -----------------------------------------------------------------------------
 // # Internal Generation Methods (ob *PDF)
@@ -1604,7 +1604,8 @@ var pdfFontNames = []string{
 	"ZapfDingbats",          // 9
 } //                                                                pdfFontNames
 
-// pdfFontWidths specifies the widths of build-in fonts
+// pdfFontWidths specifies widths of built-in fonts,
+// in thousandths of a point per point of height
 var pdfFontWidths = [][]int{
 	{278, 278, 278, 278, 250, 250, 250, 250, 250, 000},         // 000
 	{278, 278, 278, 278, 250, 250, 250, 250, 250, 000},         // 001
