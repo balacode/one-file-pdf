@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-29 16:35:34 936D5E                              [one_file_pdf.go]
+// :v: 2018-03-29 17:24:30 FD7099                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -809,7 +809,7 @@ func (ob *PDF) WrapTextLines(width float64, text string) (ret []string) {
 				break
 			}
 			ret = append(ret, iter[:n])
-			iter = iter[n-1:]
+			iter = iter[n:]
 		}
 		ret = append(ret, iter)
 	}
