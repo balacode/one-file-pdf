@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-29 14:18:00 1FA2DC                              [one_file_pdf.go]
+// :v: 2018-03-29 16:35:34 936D5E                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -422,7 +422,7 @@ func (ob *PDF) Bytes() []byte {
 	// write fonts
 	for _, iter := range ob.fonts {
 		ob.writeObj("/Font")
-		if iter.isBuiltIn {
+		if iter.builtInIndex >= 0 {
 			ob.write("/Subtype/Type1/Name/F%d/BaseFont/%s"+
 				"/Encoding/WinAnsiEncoding", iter.fontID, iter.fontName)
 		}
@@ -866,9 +866,10 @@ func (err pdfError) Error() string {
 
 // pdfFont represents a font name and its appearance
 type pdfFont struct {
-	fontID                      int
-	fontName                    string
-	isBuiltIn, isBold, isItalic bool
+	fontID           int
+	fontName         string
+	builtInIndex     int
+	isBold, isItalic bool
 } //                                                                     pdfFont
 
 // pdfImage represents an image
@@ -928,10 +929,10 @@ func (ob *PDF) applyFont() (err error) {
 			}
 			var has = strings.Contains
 			font = pdfFont{
-				fontName:  pdfFontNames[i],
-				isBuiltIn: true,
-				isBold:    has(iter, "BOLD"),
-				isItalic:  has(iter, "OBLIQUE") || has(iter, "ITALIC"),
+				fontName:     pdfFontNames[i],
+				builtInIndex: i,
+				isBold:       has(iter, "BOLD"),
+				isItalic:     has(iter, "OBLIQUE") || has(iter, "ITALIC"),
 			}
 			valid = true
 			break
@@ -1012,6 +1013,9 @@ func (ob *PDF) drawTextBox(x, y, width, height float64,
 		return ob
 	}
 	ob.reservePage()
+	if err, isT := ob.applyFont().(pdfError); isT {
+		ob.putError(0xE0737C, err.msg, err.val)
+	}
 	var lines []string
 	if wrapText {
 		lines = ob.WrapTextLines(width, text)
@@ -1162,10 +1166,14 @@ func (ob *PDF) textWidthPt(s string) float64 {
 				fmt.Sprintf("at %d = '%s'", i, string(r)))
 			break
 		}
-		w += float64(pdfFontWidths[r][0])
-		// TODO: [0] is not considering the current font!
+		var id = ob.fonts[ob.ppage.fontID-1].builtInIndex
+		if id >= 0 && id <= 9 {
+			w += float64(pdfFontWidths[r][id])
+		} else {
+			w += 600 // for Courier font
+		}
 	}
-	return w * ob.fontSizePt / 1000 * float64(ob.horzScaling) / 100
+	return w * ob.fontSizePt / 1000.0 * float64(ob.horzScaling) / 100.0
 } //                                                                 textWidthPt
 
 // -----------------------------------------------------------------------------
@@ -1588,10 +1596,6 @@ var pdfBlack = color.RGBA{A: 255}
 
 // pdfFontNames contains font names available on all PDF implementations
 var pdfFontNames = []string{
-	"Courier",               // fixed-width
-	"Courier-Bold",          // fixed-width
-	"Courier-BoldOblique",   // fixed-width
-	"Courier-Oblique",       // fixed-width
 	"Helvetica",             // 0
 	"Helvetica-Bold",        // 1
 	"Helvetica-BoldOblique", // 2
@@ -1602,6 +1606,10 @@ var pdfFontNames = []string{
 	"Times-Italic",          // 7
 	"Times-Roman",           // 8
 	"ZapfDingbats",          // 9
+	"Courier",               // <- keep fixed-width Courier
+	"Courier-Bold",          // font at the end of the list
+	"Courier-BoldOblique",
+	"Courier-Oblique",
 } //                                                                pdfFontNames
 
 // pdfFontWidths specifies widths of built-in fonts,
