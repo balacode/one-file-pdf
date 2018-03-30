@@ -1,4 +1,7 @@
-## Detailed Change Log
+## Detailed Change Log  
+
+These are the changes in the functionality of the package, 
+not including internal changes which are best seen in the commits history.  
 
 **2018-MAR-08**
 - New methods DrawCircle(), DrawEllipse(), FillCircle(), FillEllipse()

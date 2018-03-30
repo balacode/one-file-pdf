@@ -21,10 +21,6 @@ The result is a single .go file with less than 1999 lines of code, about 400 of 
     go get github.com/balacode/one-file-pdf
 ```
 
-### Naming Convention:  
-All types in are prefixed with PDF for public, and 'pdf' for private types.
-The only type you need to use is PDF, while PDFColorNames are left public for reference.
-
 ### Features:  
 - Use all built-in PDF fonts: Courier, Helvetica, Symbol, Times, ZapfDingbats, and their variants
 - Recognises 144 web colo(u)r names, or any RGB value
@@ -42,6 +38,10 @@ The only type you need to use is PDF, while PDFColorNames are left public for re
 - Font embedding
 - PDF encryption
 - Paths, curves and complex graphics
+
+### Naming Convention:  
+All types in are prefixed with PDF for public, and 'pdf' for private types.
+The only type you need to use is PDF, while PDFColorNames are left public for reference.
 
 ### Hello World:  
 
@@ -99,11 +99,13 @@ Click on a sample to see the PDF in more detail.
 
 [!["Synergy Ipsum" sample image](demo/samples/corporate.png)](demo/samples/corporate.pdf)  
 
-### Changelog (excluding internal changes):
+### Changelog:  
 
-**ALTERED API:**
-- **Removed SetErrorLogger() method**
-- **ToPoints(): added error return value**  
+These are the most recent changes in the functionality of the package,
+not including internal changes which are best seen in the commits history.
+
+- **ALTERED API: Removed SetErrorLogger() method**
+- **ALTERED API: ToPoints(): added error return value**  
 
 - Initialize PDF automatically, even when NewPDF() wasn't called. The paper size
   is A4, and the units CM by default. You have to use NewPDF() to specify a paper size.
