@@ -104,6 +104,7 @@ Click on a sample to see the PDF in more detail.
 These are the most recent changes in the functionality of the package,
 not including internal changes which are best seen in the commits history.
 
+**2018-MAR-30**  
 - **ALTERED API: Removed SetErrorLogger() method**
 - **ALTERED API: ToPoints(): added error return value**  
 
