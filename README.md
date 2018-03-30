@@ -11,33 +11,33 @@ The main idea behind this project was:
 
 The result is a single .go file with less than 1999 lines of code, about 400 of which are color and glyph-size constants, and ~350 are comments.
 
-- All the basics for generating PDF documents, enough for generating mundane business reports.
 - It's easier to learn about the internals of the PDF format with a small, concise library.
 - The current version of the file is indicated in the header (the timestamp).
 
-### To Install:  
-
-```bash
-    go get github.com/balacode/one-file-pdf
-```
-
 ### Features:  
+- The essentials for generating PDF documents, sufficient for common business reports.
 - Use all built-in PDF fonts: Courier, Helvetica, Symbol, Times, ZapfDingbats, and their variants
-- Recognises 144 web colo(u)r names, or any RGB value
-- Stream compression can be turned on or off (PDF files normally compress streams to reduce file size, but turning it off helps in debugging or learning about PDF commands)
+- Specify colo(u)rs by name (144 web colors), HTML codes (#RRGGBB) or RGB value
+- Set columns for text (like tab stops on the page)
+- Built-in grid option to help measurement and positioning
 - Metadata properties: author, creator, keywords, subject and title
 - Set the measurement units you want: mm, cm, inches, twips or points
 - Draw lines with different thickness
 - Filled or outline rectangles, circles and ellipses
 - JPEG, GIF and transparent PNG images (filled with specified background color)
-- Set columns for text (like tab stops on the page)
-- Built-in grid option to help measurement and positioning
+- Stream compression can be turned on or off (PDF files normally compress streams to reduce file size, but turning it off helps in debugging or learning about PDF commands)
 
-### Not Supported:  
+### Not Yet Supported:  
 - Unicode (requires font embedding)
 - Font embedding
 - PDF encryption
 - Paths, curves and complex graphics
+
+### Installation:  
+
+```bash
+    go get github.com/balacode/one-file-pdf
+```
 
 ### Naming Convention:  
 All types in are prefixed with PDF for public, and 'pdf' for private types.
@@ -108,7 +108,7 @@ not including internal changes which are best seen in the commits history.
 - **ALTERED API: ToPoints(): added error return value**  
 
 - Initialize PDF automatically, even when NewPDF() wasn't called. The paper size
-  is A4, and the units CM by default. You have to use NewPDF() to specify a paper size.
+  is A4, and the units CM by default. To specify a different paper size, use NewPDF().
 - No need to add the first page with AddPage(). It is inserted automatically.
 - New error handling methods Clean(), Errors(), ErrorInfo() and PullError().
 - SetColumnWidths(): can be called without arguments when you need to reset all columns.
@@ -116,3 +116,10 @@ not including internal changes which are best seen in the commits history.
 - Fixed text wrapping bug that could cause PDF to freeze.
 
 See [changelog.md](./doc/changelog.md) for changes made earlier.
+
+### Roadmap:  
+
+- Achieve 100% test coverage
+- Create a unit test for every method
+- Unicode support
+- Partial font embedding
