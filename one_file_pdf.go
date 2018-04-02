@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-02 23:49:07 08C94B                              [one_file_pdf.go]
+// :v: 2018-04-02 23:50:14 F455FB                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -111,7 +111,7 @@ package pdf
 //   writeEndobj() *PDF
 //   writeMode(fill ...bool) (mode string)
 //   writeObj(objType string) *PDF
-//   writePages(fontsIndex, imagesIndex int) *PDF
+//   writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF
 //   writeStream(content []byte) *PDF
 //   writeStreamData(content []byte) *PDF
 //
@@ -132,7 +132,6 @@ package pdf
 // # Internal Constants
 //   pdfFontNames = []string
 //   pdfFontWidths = [][]int
-//   pdfPagesIndex = 3
 //   pdfStandardPaperSizes = []pdfPaperSize
 
 import (
@@ -404,7 +403,8 @@ func (ob *PDF) AddPage() *PDF {
 func (ob *PDF) Bytes() []byte {
 	// free any existing generated content and write PDF header
 	ob.reservePage()
-	var fontsIndex = pdfPagesIndex + len(ob.pages)*2
+	const pagesIndex = 3
+	var fontsIndex = pagesIndex + len(ob.pages)*2
 	var imagesIndex = fontsIndex + len(ob.fonts)
 	var infoIndex int // set when metadata found
 	var prevBuf = ob.pbuf
@@ -416,7 +416,7 @@ func (ob *PDF) Bytes() []byte {
 		writeObj("/Catalog").write("/Pages 2 0 R").writeEndobj()
 	//
 	//  write /Pages object (2 0 obj), page count, page size and the pages
-	ob.writePages(fontsIndex, imagesIndex)
+	ob.writePages(pagesIndex, fontsIndex, imagesIndex)
 	//
 	// write fonts
 	for _, iter := range ob.fonts {
@@ -1239,12 +1239,12 @@ func (ob *PDF) writeObj(objType string) *PDF {
 } //                                                                    writeObj
 
 // writePages writes all PDF pages
-func (ob *PDF) writePages(fontsIndex, imagesIndex int) *PDF {
+func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
 	ob.writeObj("/Pages").write("/Count %d/MediaBox[0 0 %d %d]",
 		len(ob.pages), int(ob.paperSize.widthPt), int(ob.paperSize.heightPt))
 	//                                                        write page numbers
 	if len(ob.pages) > 0 {
-		var pageObjNo = pdfPagesIndex
+		var pageObjNo = pagesIndex
 		ob.write("/Kids[")
 		for i := range ob.pages {
 			if i > 0 {
@@ -1871,9 +1871,6 @@ var pdfFontWidths = [][]int{
 	{556, 611, 611, 556, 494, 556, 500, 500, 500, 918},         // 254
 	{500, 556, 556, 500, 000, 500, 444, 444, 500, 000},         // 255
 } //                                                               pdfFontWidths
-
-// pdfPagesIndex is the starting page object index (after Catalog and Pages)
-const pdfPagesIndex = 3
 
 // pdfStandardPaperSizes contains standard paper sizes in mm (width x height)
 var pdfStandardPaperSizes = map[string][2]int{
