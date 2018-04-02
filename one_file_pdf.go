@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-29 17:24:30 FD7099                              [one_file_pdf.go]
+// :v: 2018-04-02 23:49:07 08C94B                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -135,24 +135,23 @@ package pdf
 //   pdfPagesIndex = 3
 //   pdfStandardPaperSizes = []pdfPaperSize
 
-import "bytes"         // standard
-import "compress/zlib" // standard
-import "crypto/sha512" // standard
-import "fmt"           // standard
-import "image"         // standard
-import "image/color"   // standard
-import "io/ioutil"     // standard
-import "reflect"       // standard
-import "runtime"       // standard
-import "strconv"       // standard
-import "strings"       // standard
-import "unicode"       // standard   only uses IsDigit(), IsLetter(), IsSpace()
-import _ "image/gif"   // standard
-import _ "image/jpeg"  // standard
-import _ "image/png"   // standard   init image decoders
-
-// PL is an alias of fmt.Println() used only for debugging
-var PL = fmt.Println
+import (
+	"bytes"
+	"compress/zlib"
+	"crypto/sha512"
+	"fmt"
+	"image"
+	"image/color"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png" // init image decoders
+	"io/ioutil"
+	"reflect"
+	"runtime"
+	"strconv"
+	"strings"
+	"unicode" // only uses IsDigit(), IsLetter(), IsSpace()
+)
 
 // -----------------------------------------------------------------------------
 // # Main Structure and Constructor
@@ -546,7 +545,7 @@ func (ob *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 	var w = float64(img.widthPx) / float64(img.heightPx) * h
 	y = ob.paperSize.heightPt - y*ob.ptPerUnit - h
 	return ob.write("q\n %f 0 0 %f %f %f cm\n/IMG%d Do\nQ\n", w, h, x, y, idx)
-	//                     w      h  x  y
+	//                   w      h  x  y
 	//                q: save graphics state
 	//               cm: concatenate matrix to current transform matrix
 	//               Do: invoke named XObject (/IMGn)
