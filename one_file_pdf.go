@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-02 23:50:14 F455FB                              [one_file_pdf.go]
+// :v: 2018-04-02 23:57:14 FD4840                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -444,17 +444,14 @@ func (ob *PDF) Bytes() []byte {
 		//
 		infoIndex = imagesIndex + len(ob.images)
 		ob.writeObj("/Info")
-		for _, iter := range []struct {
-			label string
-			field string
-		}{
+		for _, iter := range [][]string{
 			{"/Title ", ob.docTitle}, {"/Subject ", ob.docSubject},
 			{"/Keywords ", ob.docKeywords}, {"/Author ", ob.docAuthor},
 			{"/Creator ", ob.docCreator},
 		} {
-			if iter.field != "" {
-				ob.write(iter.label).
-					write("(").write(string(ob.escape(iter.field))).write(")")
+			if iter[1] != "" {
+				ob.write(iter[0]).
+					write("(").write(string(ob.escape(iter[1]))).write(")")
 			}
 		}
 		ob.writeEndobj()
