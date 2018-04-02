@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-02 23:57:14 FD4840                              [one_file_pdf.go]
+// :v: 2018-04-03 00:02:18 DC0C2B                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -475,8 +475,7 @@ func (ob *PDF) Bytes() []byte {
 // DrawBox draws a rectangle.
 func (ob *PDF) DrawBox(x, y, width, height float64, fill ...bool) *PDF {
 	width, height = width*ob.ptPerUnit, height*ob.ptPerUnit
-	x *= ob.ptPerUnit
-	y = ob.paperSize.heightPt - y*ob.ptPerUnit - height
+	x, y = x*ob.ptPerUnit, ob.paperSize.heightPt-y*ob.ptPerUnit-height
 	var mode = ob.writeMode(fill...)
 	return ob.write("%.3f %.3f %.3f %.3f re %s\n", x, y, width, height, mode)
 	// re: construct a rectangular path
@@ -537,10 +536,9 @@ func (ob *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 		pg.imageNos = append(pg.imageNos, idx)
 	}
 	// draw the image
-	x *= ob.ptPerUnit
 	var h = height * ob.ptPerUnit
 	var w = float64(img.widthPx) / float64(img.heightPx) * h
-	y = ob.paperSize.heightPt - y*ob.ptPerUnit - h
+	x, y = x*ob.ptPerUnit, ob.paperSize.heightPt-y*ob.ptPerUnit-h
 	return ob.write("q\n %f 0 0 %f %f %f cm\n/IMG%d Do\nQ\n", w, h, x, y, idx)
 	//                   w      h  x  y
 	//                q: save graphics state
@@ -564,8 +562,7 @@ func (ob *PDF) DrawText(s string) *PDF {
 		return ob.drawTextLine(s)
 	}
 	var x = 0.0
-	for i := 0; i < ob.columnNo; i++ {
-		x += ob.columnWidths[i]
+	for i := 0; i < ob.columnNo; i, x = i+1, x+ob.columnWidths[i] {
 	}
 	ob.SetX(x).drawTextLine(s)
 	if ob.columnNo < len(ob.columnWidths)-1 {
@@ -606,15 +603,13 @@ func (ob *PDF) DrawTextInBox(
 func (ob *PDF) DrawUnitGrid() *PDF {
 	var pw, ph = ob.PageWidth(), ob.PageHeight()
 	ob.SetLineWidth(0.1).SetFont("Helvetica", 8)
-	for i, x := 0, 0.0; x < pw; x++ { //                        vertical lines |
+	for i, x := 0, 0.0; x < pw; i, x = i+1, x+1 { //            vertical lines |
 		ob.SetColorRGB(200, 200, 200).DrawLine(x, 0, x, ph).
 			SetColor("Indigo").SetXY(x+0.1, 0.3).DrawText(strconv.Itoa(i))
-		i++
 	}
-	for i, y := 0, 0.0; y < ph; y++ { //                      horizontal lines -
+	for i, y := 0, 0.0; y < ph; i, y = i+1, y+1 { //          horizontal lines -
 		ob.SetColorRGB(200, 200, 200).DrawLine(0, y, pw, y).
 			SetColor("Indigo").SetXY(0.1, y+0.3).DrawText(strconv.Itoa(i))
-		i++
 	}
 	return ob
 } //                                                                DrawUnitGrid
