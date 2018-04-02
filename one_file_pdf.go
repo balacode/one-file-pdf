@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-03 00:02:18 DC0C2B                              [one_file_pdf.go]
+// :v: 2018-04-03 00:06:12 66EB99                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -520,20 +520,19 @@ func (ob *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 	}
 	// add the image to the current page, if not already referenced
 	ob.reservePage()
-	var pg = ob.ppage
 	var img, idx, err = ob.loadImage(fileNameOrBytes, back)
 	if err, isT := err.(pdfError); isT {
 		return ob.putError(0xE8F375, err.msg, err.val)
 	}
 	var found bool
-	for _, iter := range pg.imageNos {
+	for _, iter := range ob.ppage.imageNos {
 		if iter == idx {
 			found = true
 			break
 		}
 	}
 	if !found {
-		pg.imageNos = append(pg.imageNos, idx)
+		ob.ppage.imageNos = append(ob.ppage.imageNos, idx)
 	}
 	// draw the image
 	var h = height * ob.ptPerUnit
@@ -659,9 +658,8 @@ func (ob *PDF) SaveFile(filename string) error {
 	var err = ioutil.WriteFile(filename, ob.Bytes(), 0644)
 	if err != nil {
 		ob.putError(0xED3F6D, "Failed writing file", err.Error())
-		return err
 	}
-	return nil
+	return err
 } //                                                                    SaveFile
 
 // SetColumnWidths creates column positions (tab stops) along the X-axis.
@@ -947,26 +945,25 @@ func (ob *PDF) applyFont() (err error) {
 		font.fontID = 1 + len(ob.fonts)
 		ob.fonts = append(ob.fonts, font)
 	}
-	var pg = ob.ppage
-	if pg.fontID == font.fontID &&
-		int(pg.fontSizePt*100) == int(ob.fontSizePt)*100 {
+	if ob.ppage.fontID == font.fontID &&
+		int(ob.ppage.fontSizePt*100) == int(ob.fontSizePt)*100 {
 		return err
 	}
 	// add the font ID to the current page, if not already referenced
 	var alreadyUsedOnPage bool
-	for _, id := range pg.fontIDs {
+	for _, id := range ob.ppage.fontIDs {
 		if id == font.fontID {
 			alreadyUsedOnPage = true
 			break
 		}
 	}
 	if !alreadyUsedOnPage {
-		pg.fontIDs = append(pg.fontIDs, 0)
-		pg.fontIDs[len(pg.fontIDs)-1] = font.fontID
+		ob.ppage.fontIDs = append(ob.ppage.fontIDs, 0)
+		ob.ppage.fontIDs[len(ob.ppage.fontIDs)-1] = font.fontID
 	}
-	pg.fontID = font.fontID
-	pg.fontSizePt = ob.fontSizePt
-	ob.write("BT /FNT%d %d Tf ET\n", pg.fontID, int(pg.fontSizePt))
+	ob.ppage.fontID = font.fontID
+	ob.ppage.fontSizePt = ob.fontSizePt
+	ob.write("BT /FNT%d %d Tf ET\n", ob.ppage.fontID, int(ob.ppage.fontSizePt))
 	// BT: begin text   /FNT0 i0 Tf: set font to FNT0 index i0   ET: end text
 	return err
 } //                                                                   applyFont
@@ -978,19 +975,19 @@ func (ob *PDF) drawTextLine(s string) *PDF {
 		return ob
 	}
 	// draw the text
-	var pg, err = ob.ppage, ob.applyFont()
-	if err, isT := err.(pdfError); isT {
+	if err, isT := ob.applyFont().(pdfError); isT {
 		ob.putError(0xEAEAC4, err.msg, err.val)
 	}
-	if pg.horzScaling != ob.horzScaling {
-		pg.horzScaling = ob.horzScaling
-		ob.write("BT %d Tz ET\n", pg.horzScaling)
+	if ob.ppage.horzScaling != ob.horzScaling {
+		ob.ppage.horzScaling = ob.horzScaling
+		ob.write("BT %d Tz ET\n", ob.ppage.horzScaling)
 		// BT: begin text   n0 Tz: set horiz. text scaling to n0%   ET: end text
 	}
 	ob.writeMode(true) // fill/nonStroke
-	ob.write("BT %d %d Td (%s) Tj ET\n", int(pg.x), int(pg.y), ob.escape(s))
+	ob.write("BT %d %d Td (%s) Tj ET\n",
+		int(ob.ppage.x), int(ob.ppage.y), ob.escape(s))
 	// BT: begin text   Td: move text position   Tj: show text   ET: end text
-	pg.x += ob.textWidthPt(s)
+	ob.ppage.x += ob.textWidthPt(s)
 	return ob
 } //                                                                drawTextLine
 
