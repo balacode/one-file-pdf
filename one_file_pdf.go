@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-04 01:26:51 7C71B9                              [one_file_pdf.go]
+// :v: 2018-04-04 01:38:39 5502B8                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -110,7 +110,6 @@ package pdf
 //   nextObj() int
 //   write(format string, args ...interface{}) *PDF
 //   writeCurve(x1, y1, x2, y2, x3, y3 float64) *PDF
-//   writeEndobj() *PDF
 //   writeMode(optFill ...bool) (mode string)
 //   writeObj(objType string) *PDF
 //   writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF
@@ -132,6 +131,8 @@ package pdf
 //   PDFColorNames = map[string]color.RGBA
 //
 // # Internal Constants
+//   pdfBlack = color.RGBA{A: 255}
+//   pdfEndobj = ">>\nendobj\n"
 //   pdfFontNames = []string
 //   pdfFontWidths = [][]int
 //   pdfStandardPaperSizes = []pdfPaperSize
@@ -415,7 +416,7 @@ func (ob *PDF) Bytes() []byte {
 	ob.objOffsets = []int{}
 	ob.objNo = 0
 	ob.write("%%PDF-1.4\n").
-		writeObj("/Catalog").write("/Pages 2 0 R").writeEndobj()
+		writeObj("/Catalog").write("/Pages 2 0 R").write(pdfEndobj)
 	//
 	//  write /Pages object (2 0 obj), page count, page size and the pages
 	ob.writePages(pagesIndex, fontsIndex, imagesIndex)
@@ -427,7 +428,7 @@ func (ob *PDF) Bytes() []byte {
 			ob.write("/Subtype/Type1/Name/F%d/BaseFont/%s"+
 				"/Encoding/WinAnsiEncoding", iter.fontID, iter.fontName)
 		}
-		ob.writeEndobj()
+		ob.write(pdfEndobj)
 	}
 	// write images
 	for _, iter := range ob.images {
@@ -456,7 +457,7 @@ func (ob *PDF) Bytes() []byte {
 					write("(").write(string(ob.escape(iter[1]))).write(")")
 			}
 		}
-		ob.writeEndobj()
+		ob.write(pdfEndobj)
 	}
 	// write cross-reference table at end of document
 	var startXref = ob.content.Len()
@@ -1199,11 +1200,6 @@ func (ob *PDF) writeCurve(x1, y1, x2, y2, x3, y3 float64) *PDF {
 	// x1 y1 x2 y2 x3 y3 c: append cubic Bézier curve to the current path
 } //                                                                  writeCurve
 
-// writeEndobj writes 'endobj' (PDF object end marker)
-func (ob *PDF) writeEndobj() *PDF {
-	return ob.write(">>\nendobj\n")
-} //                                                                 writeEndobj
-
 // writeMode sets the stroking or non-stroking color and line width.
 // 'fill' arg specifies non-stroking (true) or stroking mode (none/false)
 func (ob *PDF) writeMode(optFill ...bool) (mode string) {
@@ -1251,7 +1247,7 @@ func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
 		}
 		ob.write("]")
 	}
-	ob.writeEndobj()
+	ob.write(pdfEndobj)
 	for _, pg := range ob.pages { //                             write each page
 		ob.writeObj("/Page").write("/Parent 2 0 R/Contents %d 0 R", ob.objNo+1)
 		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
@@ -1274,7 +1270,7 @@ func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
 		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
 			ob.write(">>")
 		}
-		ob.writeEndobj().writeStream([]byte(pg.content.String()))
+		ob.write(pdfEndobj).writeStream([]byte(pg.content.String()))
 	}
 	return ob
 } //                                                                  writePages
@@ -1588,6 +1584,8 @@ var PDFColorNames = map[string]color.RGBA{
 // # Internal Constants
 
 var pdfBlack = color.RGBA{A: 255}
+
+const pdfEndobj = ">>\nendobj\n"
 
 // pdfFontNames contains font names available on all PDF implementations
 var pdfFontNames = []string{
