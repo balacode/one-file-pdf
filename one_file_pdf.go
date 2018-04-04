@@ -1,8 +1,9 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-03 00:06:12 66EB99                              [one_file_pdf.go]
+// :v: 2018-04-04 01:26:51 7C71B9                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
+// Package pdf provides a PDF writer type to generate PDF files.
 package pdf
 
 // # Main Structure and Constructor
@@ -45,9 +46,10 @@ package pdf
 // # Methods (ob *PDF)
 //   AddPage() *PDF
 //   Bytes() []byte
-//   DrawBox(x, y, width, height float64, fill ...bool) *PDF
-//   DrawCircle(x, y, radius float64, fill ...bool) *PDF
-//   DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF
+//   DrawBox(x, y, width, height float64, optFill ...bool) *PDF
+//   DrawCircle(x, y, radius float64, optFill ...bool) *PDF
+//   DrawEllipse(x, y, xRadius, yRadius float64,
+//       optFill ...bool) *PDF
 //   DrawImage(x, y, height float64, fileNameOrBytes interface{},
 //       backColor ...string) *PDF
 //   DrawLine(x1, y1, x2, y2 float64) *PDF
@@ -109,7 +111,7 @@ package pdf
 //   write(format string, args ...interface{}) *PDF
 //   writeCurve(x1, y1, x2, y2, x3, y3 float64) *PDF
 //   writeEndobj() *PDF
-//   writeMode(fill ...bool) (mode string)
+//   writeMode(optFill ...bool) (mode string)
 //   writeObj(objType string) *PDF
 //   writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF
 //   writeStream(content []byte) *PDF
@@ -224,19 +226,19 @@ func (ob *PDF) Color() color.RGBA { ob.init(); return ob.color }
 // which is useful for debugging or to study PDF commands.
 func (ob *PDF) Compression() bool { ob.init(); return ob.compression }
 
-// DocAuthor returns the optional 'document author' metadata entry.
+// DocAuthor returns the optional 'document author' metadata property.
 func (ob *PDF) DocAuthor() string { ob.init(); return ob.docAuthor }
 
-// DocCreator returns the optional 'document creator' metadata entry.
+// DocCreator returns the optional 'document creator' metadata property.
 func (ob *PDF) DocCreator() string { ob.init(); return ob.docCreator }
 
-// DocKeywords returns the optional 'document keywords' metadata entry.
+// DocKeywords returns the optional 'document keywords' metadata property.
 func (ob *PDF) DocKeywords() string { ob.init(); return ob.docKeywords }
 
-// DocSubject returns the optional 'document subject' metadata entry.
+// DocSubject returns the optional 'document subject' metadata property.
 func (ob *PDF) DocSubject() string { ob.init(); return ob.docSubject }
 
-// DocTitle returns the optional 'document subject' metadata entry.
+// DocTitle returns the optional 'document subject' metadata property.
 func (ob *PDF) DocTitle() string { ob.init(); return ob.docTitle }
 
 // FontName returns the name of the currently-active typeface.
@@ -298,19 +300,19 @@ func (ob *PDF) SetCompression(val bool) *PDF {
 	return ob
 } //                                                              SetCompression
 
-// SetDocAuthor sets the optional 'document author' metadata entry.
+// SetDocAuthor sets the optional 'document author' metadata property.
 func (ob *PDF) SetDocAuthor(s string) *PDF { ob.docAuthor = s; return ob }
 
-// SetDocCreator sets the optional 'document creator' metadata entry.
+// SetDocCreator sets the optional 'document creator' metadata property.
 func (ob *PDF) SetDocCreator(s string) *PDF { ob.docCreator = s; return ob }
 
-// SetDocKeywords sets the optional 'document keywords' metadata entry.
+// SetDocKeywords sets the optional 'document keywords' metadata property.
 func (ob *PDF) SetDocKeywords(s string) *PDF { ob.docKeywords = s; return ob }
 
-// SetDocSubject sets the optional 'document subject' metadata entry.
+// SetDocSubject sets the optional 'document subject' metadata property.
 func (ob *PDF) SetDocSubject(s string) *PDF { ob.docSubject = s; return ob }
 
-// SetDocTitle sets the optional 'document title' metadata entry.
+// SetDocTitle sets the optional 'document title' metadata property.
 func (ob *PDF) SetDocTitle(s string) *PDF { ob.docTitle = s; return ob }
 
 // SetFont changes the current font name and size in points.
@@ -472,31 +474,36 @@ func (ob *PDF) Bytes() []byte {
 	return ob.content.Bytes()
 } //                                                                       Bytes
 
-// DrawBox draws a rectangle.
-func (ob *PDF) DrawBox(x, y, width, height float64, fill ...bool) *PDF {
+// DrawBox draws a rectangle of the specified width and height,
+// with the top-left corner starting at point (x, y).
+// To fill the rectangle, pass true in the optional optFill.
+func (ob *PDF) DrawBox(x, y, width, height float64, optFill ...bool) *PDF {
 	width, height = width*ob.ptPerUnit, height*ob.ptPerUnit
 	x, y = x*ob.ptPerUnit, ob.paperSize.heightPt-y*ob.ptPerUnit-height
-	var mode = ob.writeMode(fill...)
+	var mode = ob.writeMode(optFill...)
 	return ob.write("%.3f %.3f %.3f %.3f re %s\n", x, y, width, height, mode)
 	// re: construct a rectangular path
 } //                                                                     DrawBox
 
 // DrawCircle draws a circle of radius r centered on (x, y),
 // by drawing 4 Bézier curves (PDF has no circle primitive)
-func (ob *PDF) DrawCircle(x, y, radius float64, fill ...bool) *PDF {
-	return ob.DrawEllipse(x, y, radius, radius, fill...)
+// To fill the circle, pass true in the optional optFill.
+func (ob *PDF) DrawCircle(x, y, radius float64, optFill ...bool) *PDF {
+	return ob.DrawEllipse(x, y, radius, radius, optFill...)
 } //                                                                  DrawCircle
 
 // DrawEllipse draws an ellipse centered on (x, y),
 // with horizontal radius xRadius and vertical radius yRadius
-// by drawing 4 Bézier curves (PDF has no ellipse primitive)
-func (ob *PDF) DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF {
+// by drawing 4 Bézier curves (PDF has no ellipse primitive).
+// To fill the ellipse, pass true in the optional optFill.
+func (ob *PDF) DrawEllipse(x, y, xRadius, yRadius float64,
+	optFill ...bool) *PDF {
 	x, y = x*ob.ptPerUnit, ob.paperSize.heightPt-y*ob.ptPerUnit
-	const ratio = 0.552284749830794  // (4/3) * tan(PI/8)
-	var r = xRadius * ob.ptPerUnit   // horizontal radius
-	var v = yRadius * ob.ptPerUnit   // vertical radius
-	var m, n = r * ratio, v * ratio  // ratios for control points
-	var mode = ob.writeMode(fill...) // prepare colors/line width
+	const ratio = 0.552284749830794     // (4/3) * tan(PI/8)
+	var r = xRadius * ob.ptPerUnit      // horizontal radius
+	var v = yRadius * ob.ptPerUnit      // vertical radius
+	var m, n = r * ratio, v * ratio     // ratios for control points
+	var mode = ob.writeMode(optFill...) // prepare colors/line width
 	//
 	return ob.write(" %.3f %.3f m", x-r, y). // x0 y0 m: move to point (x0, y0)
 		//         control-1 control-2 endpoint
@@ -750,7 +757,7 @@ func (ob *PDF) ToUnits(points float64) float64 {
 
 // WrapTextLines splits a string into multiple lines so that the text
 // fits in the specified width. The text is wrapped on word boundaries.
-// Newline characters (CR and "\n") also cause text to be split.
+// Newline characters ("\r" and "\n") also cause text to be split.
 // You can find out the number of lines needed to wrap some
 // text by checking the length of the returned array.
 func (ob *PDF) WrapTextLines(width float64, text string) (ret []string) {
@@ -1105,7 +1112,7 @@ func (ob *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 func makeImage(source image.Image, back color.RGBA,
 ) (widthPx, heightPx int, isGray bool, ar []byte) {
 	//
-	// blends color into the background 'back', using opacity (alpha) value
+	// blends color into the background (back), using opacity (alpha) value
 	var blend = func(color, alpha uint32, back byte) byte {
 		var c, a = float64(color), 65535 - float64(alpha) // range 0-65535
 		return byte((c + (float64(back)*255-c)/65536*a) / 65536 * 255)
@@ -1199,10 +1206,10 @@ func (ob *PDF) writeEndobj() *PDF {
 
 // writeMode sets the stroking or non-stroking color and line width.
 // 'fill' arg specifies non-stroking (true) or stroking mode (none/false)
-func (ob *PDF) writeMode(fill ...bool) (mode string) {
+func (ob *PDF) writeMode(optFill ...bool) (mode string) {
 	ob.reservePage()
 	mode = "S" // S: stroke path (for lines)
-	if len(fill) > 0 && fill[0] {
+	if len(optFill) > 0 && optFill[0] {
 		mode = "b" // b: fill / text
 		if pv := &ob.ppage.nonStrokeColor; *pv != ob.color {
 			*pv = ob.color
@@ -1279,7 +1286,7 @@ func (ob *PDF) writeStream(content []byte) *PDF {
 
 // writeStreamData writes a stream or image stream
 func (ob *PDF) writeStreamData(ar []byte) *PDF {
-	var s string // filter
+	var flt string // filter
 	if ob.compression {
 		var buf bytes.Buffer
 		var wr = zlib.NewWriter(&buf)
@@ -1289,9 +1296,9 @@ func (ob *PDF) writeStreamData(ar []byte) *PDF {
 		}
 		wr.Close() // don't defer, close before reading Bytes()
 		ar = buf.Bytes()
-		s = "/Filter/FlateDecode"
+		flt = "/Filter/FlateDecode"
 	}
-	return ob.write("%s/Length %d>>stream\n%s\nendstream\n", s, len(ar), ar)
+	return ob.write("%s/Length %d>>stream\n%s\nendstream\n", flt, len(ar), ar)
 } //                                                             writeStreamData
 
 // -----------------------------------------------------------------------------
