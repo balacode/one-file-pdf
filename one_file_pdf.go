@@ -1,9 +1,13 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-04 01:38:39 5502B8                              [one_file_pdf.go]
+// :v: 2018-04-05 00:57:42 3F80EF                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
+// Create a new PDF writer by assigning pdf.NewPDF(paperSize) to a variable.
+// Then call property setters and methods to render the document.
+// Finally, call WriteFile(filename) to save the file,
+// or use Bytes() to get the PDF document as an array of bytes.
 package pdf
 
 // # Main Structure and Constructor
@@ -26,7 +30,7 @@ package pdf
 //
 // # Property Setters (ob *PDF)
 //   SetColor(nameOrHTMLColor string) *PDF
-//   SetColorRGB(red, green, blue int) *PDF
+//   SetColorRGB(r, g, b byte) *PDF
 //   SetCompression(val bool) *PDF
 //   SetDocAuthor(s string) *PDF
 //   SetDocCreator(s string) *PDF
@@ -58,7 +62,7 @@ package pdf
 //       x, y, width, height float64, align, text string) *PDF
 //   DrawTextAt(x, y float64, text string) *PDF
 //   DrawTextInBox(
-//       x, y, width, height float64, align, text string ) *PDF
+//       x, y, width, height float64, align, text string) *PDF
 //   DrawUnitGrid() *PDF
 //   FillBox(x, y, width, height float64) *PDF
 //   FillCircle(x, y, radius float64) *PDF
@@ -102,7 +106,7 @@ package pdf
 //   loadImage(fileNameOrBytes interface{}, back color.RGBA,
 //       ) (img pdfImage, idx int, err error)
 //   makeImage(source image.Image, back color.RGBA,
-//       ) (widthPx, heightPx int, isGray bool, data []byte)
+//       ) (widthPx, heightPx int, isGray bool, ar []byte)
 //   reservePage() *PDF
 //   textWidthPt(s string) float64
 //
@@ -113,8 +117,8 @@ package pdf
 //   writeMode(optFill ...bool) (mode string)
 //   writeObj(objType string) *PDF
 //   writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF
-//   writeStream(content []byte) *PDF
-//   writeStreamData(content []byte) *PDF
+//   writeStream(ar []byte) *PDF
+//   writeStreamData(ar []byte) *PDF
 //
 // # Internal Functions (*PDF) - just attached to PDF, but not using its data
 //   escape(s string) []byte
@@ -135,7 +139,7 @@ package pdf
 //   pdfEndobj = ">>\nendobj\n"
 //   pdfFontNames = []string
 //   pdfFontWidths = [][]int
-//   pdfStandardPaperSizes = []pdfPaperSize
+//   pdfStandardPaperSizes = map[string][2]int
 
 import (
 	"bytes"
@@ -188,7 +192,7 @@ type PDF struct {
 } //                                                                         PDF
 
 // NewPDF creates and initializes a new PDF object. Specify paperSize as:
-// A, B, C series (e.g. "A4") or "LEGAL", "TABLOID", "LETTER", or "LEDGER".
+// A, B, C series (e.g. "A4") or "LETTER", "LEGAL", "LEDGER", or "TABLOID"
 // To specify a landscape orientation, add "-L" suffix e.g. "A4-L".
 // You can also specify custom paper sizes using "width unit x height unit",
 // for example "20 cm x 20 cm" or even "15cm x 10inch", etc.
@@ -1003,8 +1007,7 @@ func (ob *PDF) drawTextLine(s string) *PDF {
 // align: specify up to 2 flags: L R T B to align left, right, top or bottom
 // the default (blank) is C center, both vertically and horizontally
 func (ob *PDF) drawTextBox(x, y, width, height float64,
-	wrapText bool, align, text string,
-) *PDF {
+	wrapText bool, align, text string) *PDF {
 	if text == "" {
 		return ob
 	}
@@ -1276,8 +1279,8 @@ func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
 } //                                                                  writePages
 
 // writeStream outputs a stream object to the document's main buffer
-func (ob *PDF) writeStream(content []byte) *PDF {
-	return ob.write("%d 0 obj <<", ob.nextObj()).writeStreamData(content)
+func (ob *PDF) writeStream(ar []byte) *PDF {
+	return ob.write("%d 0 obj <<", ob.nextObj()).writeStreamData(ar)
 } //                                                                 writeStream
 
 // writeStreamData writes a stream or image stream
