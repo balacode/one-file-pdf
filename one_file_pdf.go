@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-05 00:57:42 3F80EF                              [one_file_pdf.go]
+// :v: 2018-04-05 00:59:20 A58D37                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -1273,7 +1273,7 @@ func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
 		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
 			ob.write(">>")
 		}
-		ob.write(pdfEndobj).writeStream([]byte(pg.content.String()))
+		ob.write(pdfEndobj).writeStream(pg.content.Bytes())
 	}
 	return ob
 } //                                                                  writePages
