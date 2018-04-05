@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-05 01:04:20 8FF77B                              [one_file_pdf.go]
+// :v: 2018-04-05 01:05:08 FEA7AA                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -15,7 +15,6 @@ package pdf
 //   NewPDF(paperSize string) PDF
 //
 // # Read-Only Properties (ob *PDF)
-//   CurrentPage() int
 //   PageHeight() float64
 //   PageWidth() float64
 //
@@ -23,6 +22,7 @@ package pdf
 //   Color() color.RGBA             SetColor(nameOrHTMLColor string) *PDF
 //                                  SetColorRGB(r, g, b byte) *PDF
 //   Compression() bool             SetCompression(val bool) *PDF
+//   CurrentPage() int              SetCurrentPage(pageNo int) *PDF
 //   DocAuthor() string             SetDocAuthor(s string) *PDF
 //   DocCreator() string            SetDocCreator(s string) *PDF
 //   DocKeywords() string           SetDocKeywords(s string) *PDF
@@ -200,8 +200,6 @@ func NewPDF(paperSize string) PDF {
 // -----------------------------------------------------------------------------
 // # Read-Only Properties (ob *PDF)
 
-// CurrentPage returns the current page's number, 1 being the first page.
-func (ob *PDF) CurrentPage() int { return ob.pageNo + 1 }
 
 // PageHeight returns the height of the current page in selected units.
 func (ob *PDF) PageHeight() float64 { return ob.ToUnits(ob.paperSize.heightPt) }
@@ -252,6 +250,18 @@ func (ob *PDF) SetCompression(val bool) *PDF {
 	ob.compression = val
 	return ob
 } //                                                              SetCompression
+
+// CurrentPage returns the current page's number, 1 being the first page.
+func (ob *PDF) CurrentPage() int { return ob.pageNo + 1 }
+
+// SetCurrentPage makes the specified page current. Page numbers start from 1.
+func (ob *PDF) SetCurrentPage(pageNo int) *PDF {
+	if pageNo < 1 || pageNo > len(ob.pages) {
+		ob.putError(0xE65AF0, "pageNo out of range",
+			fmt.Sprintf("pageNo:%d range:%d..%d", pageNo, 1, len(ob.pages)))
+	}
+	return ob
+} //                                                              SetCurrentPage
 
 // DocAuthor returns the optional 'document author' metadata property.
 func (ob *PDF) DocAuthor() string { ob.init(); return ob.docAuthor }
