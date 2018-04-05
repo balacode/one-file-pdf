@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-05 00:59:20 A58D37                              [one_file_pdf.go]
+// :v: 2018-04-05 01:04:20 8FF77B                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -19,34 +19,24 @@ package pdf
 //   PageHeight() float64
 //   PageWidth() float64
 //
-// # Property Getters (ob *PDF)
-//   Color() color.RGBA             FontName() string
-//   Compression() bool             FontSize() float64
-//   DocAuthor() string             HorizontalScaling() uint16
-//   DocCreator() string            LineWidth() float64
-//   DocKeywords() string           Units() string
-//   DocSubject() string            X() float64
-//   DocTitle() string              Y() float64
-//
-// # Property Setters (ob *PDF)
-//   SetColor(nameOrHTMLColor string) *PDF
-//   SetColorRGB(r, g, b byte) *PDF
-//   SetCompression(val bool) *PDF
-//   SetDocAuthor(s string) *PDF
-//   SetDocCreator(s string) *PDF
-//   SetDocKeywords(s string) *PDF
-//   SetDocSubject(s string) *PDF
-//   SetDocTitle(s string) *PDF
-//   SetFont(name string, points float64) *PDF
-//   SetFontName(name string) *PDF
-//   SetFontSize(points float64) *PDF
-//   SetHorizontalScaling(percent uint16) *PDF
-//   SetLineWidth(points float64) *PDF
-//   SetUnits(unitName string) *PDF
-//   SetX(x float64) *PDF
-//   SetXY(x, y float64) *PDF
-//   SetY(y float64) *PDF
-//
+// # Properties
+//   Color() color.RGBA             SetColor(nameOrHTMLColor string) *PDF
+//                                  SetColorRGB(r, g, b byte) *PDF
+//   Compression() bool             SetCompression(val bool) *PDF
+//   DocAuthor() string             SetDocAuthor(s string) *PDF
+//   DocCreator() string            SetDocCreator(s string) *PDF
+//   DocKeywords() string           SetDocKeywords(s string) *PDF
+//   DocSubject() string            SetDocSubject(s string) *PDF
+//   DocTitle() string              SetDocTitle(s string) *PDF
+//   FontName() string              SetFontName(name string) *PDF
+//   FontSize() float64             SetFontSize(points float64) *PDF
+//                                  SetFont(name string, points float64) *PDF
+//   HorizontalScaling() uint16     SetHorizontalScaling(percent uint16) *PDF
+//   LineWidth() float64            SetLineWidth(points float64) *PDF
+//   Units() string                 SetUnits(unitName string) *PDF
+//   X() float64                    SetX(x float64) *PDF
+//   Y() float64                    SetY(y float64) *PDF
+//                                  SetXY(x, y float64) *PDF
 // # Methods (ob *PDF)
 //   AddPage() *PDF
 //   Bytes() []byte
@@ -220,58 +210,10 @@ func (ob *PDF) PageHeight() float64 { return ob.ToUnits(ob.paperSize.heightPt) }
 func (ob *PDF) PageWidth() float64 { return ob.ToUnits(ob.paperSize.widthPt) }
 
 // -----------------------------------------------------------------------------
-// # Property Getters (ob *PDF)
+// # Properties (ob *PDF)
 
 // Color returns the current color, which is used for text, lines and fills.
 func (ob *PDF) Color() color.RGBA { ob.init(); return ob.color }
-
-// Compression returns the current compression mode. If it is true,
-// all PDF content will be compressed when the PDF is generated. If
-// false, most PDF content (excluding images) will be in plain text,
-// which is useful for debugging or to study PDF commands.
-func (ob *PDF) Compression() bool { ob.init(); return ob.compression }
-
-// DocAuthor returns the optional 'document author' metadata property.
-func (ob *PDF) DocAuthor() string { ob.init(); return ob.docAuthor }
-
-// DocCreator returns the optional 'document creator' metadata property.
-func (ob *PDF) DocCreator() string { ob.init(); return ob.docCreator }
-
-// DocKeywords returns the optional 'document keywords' metadata property.
-func (ob *PDF) DocKeywords() string { ob.init(); return ob.docKeywords }
-
-// DocSubject returns the optional 'document subject' metadata property.
-func (ob *PDF) DocSubject() string { ob.init(); return ob.docSubject }
-
-// DocTitle returns the optional 'document subject' metadata property.
-func (ob *PDF) DocTitle() string { ob.init(); return ob.docTitle }
-
-// FontName returns the name of the currently-active typeface.
-func (ob *PDF) FontName() string { ob.init(); return ob.fontName }
-
-// FontSize returns the current font size in points.
-func (ob *PDF) FontSize() float64 { ob.init(); return ob.fontSizePt }
-
-// HorizontalScaling returns the current horizontal scaling in percent.
-func (ob *PDF) HorizontalScaling() uint16 { ob.init(); return ob.horzScaling }
-
-// LineWidth returns the current line width in points.
-func (ob *PDF) LineWidth() float64 { ob.init(); return ob.lineWidth }
-
-// Units returns the currently selected measurement units.
-// E.g.: mm cm " in inch inches tw twip twips pt point points
-func (ob *PDF) Units() string { ob.init(); return ob.unitName }
-
-// X returns the X-coordinate of the current drawing position.
-func (ob *PDF) X() float64 { return ob.reservePage().ToUnits(ob.ppage.x) }
-
-// Y returns the Y-coordinate of the current drawing position.
-func (ob *PDF) Y() float64 {
-	return ob.reservePage().ToUnits(ob.paperSize.heightPt - ob.ppage.y)
-} //                                                                           Y
-
-// -----------------------------------------------------------------------------
-// # Property Setters (ob *PDF)
 
 // SetColor sets the current color using a web/X11 color name
 // (e.g. "HoneyDew") or HTML color value such as "#191970"
@@ -295,6 +237,12 @@ func (ob *PDF) SetColorRGB(r, g, b byte) *PDF {
 	return ob
 } //                                                                 SetColorRGB
 
+// Compression returns the current compression mode. If it is true,
+// all PDF content will be compressed when the PDF is generated. If
+// false, most PDF content (excluding images) will be in plain text,
+// which is useful for debugging or to study PDF commands.
+func (ob *PDF) Compression() bool { ob.init(); return ob.compression }
+
 // SetCompression sets the compression mode used to generate the PDF.
 // If set to true, all PDF steams will be compressed when the PDF is
 // generated. If false, most content (excluding images) will be in
@@ -305,27 +253,38 @@ func (ob *PDF) SetCompression(val bool) *PDF {
 	return ob
 } //                                                              SetCompression
 
+// DocAuthor returns the optional 'document author' metadata property.
+func (ob *PDF) DocAuthor() string { ob.init(); return ob.docAuthor }
+
 // SetDocAuthor sets the optional 'document author' metadata property.
 func (ob *PDF) SetDocAuthor(s string) *PDF { ob.docAuthor = s; return ob }
+
+// DocCreator returns the optional 'document creator' metadata property.
+func (ob *PDF) DocCreator() string { ob.init(); return ob.docCreator }
 
 // SetDocCreator sets the optional 'document creator' metadata property.
 func (ob *PDF) SetDocCreator(s string) *PDF { ob.docCreator = s; return ob }
 
+// DocKeywords returns the optional 'document keywords' metadata property.
+func (ob *PDF) DocKeywords() string { ob.init(); return ob.docKeywords }
+
 // SetDocKeywords sets the optional 'document keywords' metadata property.
 func (ob *PDF) SetDocKeywords(s string) *PDF { ob.docKeywords = s; return ob }
+
+// DocSubject returns the optional 'document subject' metadata property.
+func (ob *PDF) DocSubject() string { ob.init(); return ob.docSubject }
 
 // SetDocSubject sets the optional 'document subject' metadata property.
 func (ob *PDF) SetDocSubject(s string) *PDF { ob.docSubject = s; return ob }
 
+// DocTitle returns the optional 'document subject' metadata property.
+func (ob *PDF) DocTitle() string { ob.init(); return ob.docTitle }
+
 // SetDocTitle sets the optional 'document title' metadata property.
 func (ob *PDF) SetDocTitle(s string) *PDF { ob.docTitle = s; return ob }
 
-// SetFont changes the current font name and size in points.
-// For the font name, use one of the standard font names, e.g. 'Helvetica'.
-// This font will be used for subsequent text drawing.
-func (ob *PDF) SetFont(name string, points float64) *PDF {
-	return ob.SetFontName(name).SetFontSize(points)
-} //                                                                     SetFont
+// FontName returns the name of the currently-active typeface.
+func (ob *PDF) FontName() string { ob.init(); return ob.fontName }
 
 // SetFontName changes the current font, while using the
 // same font size as the previous font. Use one of the
@@ -336,6 +295,9 @@ func (ob *PDF) SetFontName(name string) *PDF {
 	return ob
 } //                                                                 SetFontName
 
+// FontSize returns the current font size in points.
+func (ob *PDF) FontSize() float64 { ob.init(); return ob.fontSizePt }
+
 // SetFontSize changes the current font size in points,
 // without changing the currently-selected font typeface.
 func (ob *PDF) SetFontSize(points float64) *PDF {
@@ -343,6 +305,16 @@ func (ob *PDF) SetFontSize(points float64) *PDF {
 	ob.fontSizePt = points
 	return ob
 } //                                                                 SetFontSize
+
+// SetFont changes the current font name and size in points.
+// For the font name, use one of the standard font names, e.g. 'Helvetica'.
+// This font will be used for subsequent text drawing.
+func (ob *PDF) SetFont(name string, points float64) *PDF {
+	return ob.SetFontName(name).SetFontSize(points)
+} //                                                                     SetFont
+
+// HorizontalScaling returns the current horizontal scaling in percent.
+func (ob *PDF) HorizontalScaling() uint16 { ob.init(); return ob.horzScaling }
 
 // SetHorizontalScaling changes the horizontal scaling in percent.
 // For example, 200 will stretch text to double its normal width.
@@ -352,12 +324,19 @@ func (ob *PDF) SetHorizontalScaling(percent uint16) *PDF {
 	return ob
 } //                                                        SetHorizontalScaling
 
+// LineWidth returns the current line width in points.
+func (ob *PDF) LineWidth() float64 { ob.init(); return ob.lineWidth }
+
 // SetLineWidth changes the line width in points.
 func (ob *PDF) SetLineWidth(points float64) *PDF {
 	ob.init()
 	ob.lineWidth = points
 	return ob
 } //                                                                SetLineWidth
+
+// Units returns the currently selected measurement units.
+// E.g.: mm cm " in inch inches tw twip twips pt point points
+func (ob *PDF) Units() string { ob.init(); return ob.unitName }
 
 // SetUnits changes the current measurement units:
 // mm cm " in inch inches tw twip twips pt point points (can be in any case)
@@ -370,6 +349,9 @@ func (ob *PDF) SetUnits(unitName string) *PDF {
 	return ob
 } //                                                                    SetUnits
 
+// X returns the X-coordinate of the current drawing position.
+func (ob *PDF) X() float64 { return ob.reservePage().ToUnits(ob.ppage.x) }
+
 // SetX changes the X-coordinate of the current drawing position.
 func (ob *PDF) SetX(x float64) *PDF {
 	ob.init().reservePage()
@@ -377,8 +359,10 @@ func (ob *PDF) SetX(x float64) *PDF {
 	return ob
 } //                                                                        SetX
 
-// SetXY changes both X- and Y-coordinates of the current drawing position.
-func (ob *PDF) SetXY(x, y float64) *PDF { return ob.SetX(x).SetY(y) }
+// Y returns the Y-coordinate of the current drawing position.
+func (ob *PDF) Y() float64 {
+	return ob.reservePage().ToUnits(ob.paperSize.heightPt - ob.ppage.y)
+} //                                                                           Y
 
 // SetY changes the Y-coordinate of the current drawing position.
 func (ob *PDF) SetY(y float64) *PDF {
@@ -386,6 +370,9 @@ func (ob *PDF) SetY(y float64) *PDF {
 	ob.ppage.y = ob.paperSize.heightPt - y*ob.ptPerUnit
 	return ob
 } //                                                                        SetY
+
+// SetXY changes both X- and Y-coordinates of the current drawing position.
+func (ob *PDF) SetXY(x, y float64) *PDF { return ob.SetX(x).SetY(y) }
 
 // -----------------------------------------------------------------------------
 // # Methods (ob *PDF)
