@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-06 22:38:01 C71588                              [one_file_pdf.go]
+// :v: 2018-04-06 22:40:14 B950F2                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -715,10 +715,13 @@ func (ob *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error) {
 			hex[2]*16 + hex[3],
 			hex[4]*16 + hex[5], 255}, nil
 	}
-	// otherwise search for color name
-	var c, found = PDFColorNames[s]
-	if found {
-		return color.RGBA{c.R, c.G, c.B, 255}, nil
+	if cl, found := PDFColorNames[s]; found { //   search for color name (quick)
+		return color.RGBA{cl.R, cl.G, cl.B, 255}, nil
+	}
+	for k, v := range PDFColorNames { //                         (slower search)
+		if ob.toUpperLettersDigits(k, "") == s {
+			return v, nil
+		}
 	}
 	return pdfBlack, pdfError{id: 0xE00982, src: "ToColor",
 		msg: "Unknown color name", val: nameOrHTMLColor}
@@ -1436,151 +1439,151 @@ func (ob *PDF) putError(id int, msg, val string) *PDF {
 // PDFColorNames maps web (X11) color names to values.
 // From https://en.wikipedia.org/wiki/X11_color_names
 var PDFColorNames = map[string]color.RGBA{
-	"ALICEBLUE":            {R: 240, G: 248, B: 255}, // #F0F8FF
-	"ANTIQUEWHITE":         {R: 250, G: 235, B: 215}, // #FAEBD7
-	"AQUA":                 {R: 000, G: 255, B: 255}, // #00FFFF
-	"AQUAMARINE":           {R: 127, G: 255, B: 212}, // #7FFFD4
-	"AZURE":                {R: 240, G: 255, B: 255}, // #F0FFFF
-	"BEIGE":                {R: 245, G: 245, B: 220}, // #F5F5DC
-	"BISQUE":               {R: 255, G: 228, B: 196}, // #FFE4C4
-	"BLACK":                {R: 000, G: 000, B: 000}, // #000000
-	"BLANCHEDALMOND":       {R: 255, G: 235, B: 205}, // #FFEBCD
-	"BLUE":                 {R: 000, G: 000, B: 255}, // #0000FF
-	"BLUEVIOLET":           {R: 138, G: 43, B: 226},  // #8A2BE2
-	"BROWN":                {R: 165, G: 42, B: 42},   // #A52A2A
-	"BURLYWOOD":            {R: 222, G: 184, B: 135}, // #DEB887
-	"CADETBLUE":            {R: 95, G: 158, B: 160},  // #5F9EA0
-	"CHARTREUSE":           {R: 127, G: 255, B: 000}, // #7FFF00
-	"CHOCOLATE":            {R: 210, G: 105, B: 30},  // #D2691E
-	"CORAL":                {R: 255, G: 127, B: 80},  // #FF7F50
-	"CORNFLOWERBLUE":       {R: 100, G: 149, B: 237}, // #6495ED
-	"CORNSILK":             {R: 255, G: 248, B: 220}, // #FFF8DC
-	"CRIMSON":              {R: 220, G: 20, B: 60},   // #DC143C
-	"CYAN":                 {R: 000, G: 255, B: 255}, // #00FFFF
-	"DARKBLUE":             {R: 000, G: 000, B: 139}, // #00008B
-	"DARKCYAN":             {R: 000, G: 139, B: 139}, // #008B8B
-	"DARKGOLDENROD":        {R: 184, G: 134, B: 11},  // #B8860B
-	"DARKGRAY":             {R: 169, G: 169, B: 169}, // #A9A9A9
-	"DARKGREEN":            {R: 000, G: 100, B: 000}, // #006400
-	"DARKKHAKI":            {R: 189, G: 183, B: 107}, // #BDB76B
-	"DARKMAGENTA":          {R: 139, G: 000, B: 139}, // #8B008B
-	"DARKOLIVEGREEN":       {R: 85, G: 107, B: 47},   // #556B2F
-	"DARKORANGE":           {R: 255, G: 140, B: 000}, // #FF8C00
-	"DARKORCHID":           {R: 153, G: 50, B: 204},  // #9932CC
-	"DARKRED":              {R: 139, G: 000, B: 000}, // #8B0000
-	"DARKSALMON":           {R: 233, G: 150, B: 122}, // #E9967A
-	"DARKSEAGREEN":         {R: 143, G: 188, B: 143}, // #8FBC8F
-	"DARKSLATEBLUE":        {R: 72, G: 61, B: 139},   // #483D8B
-	"DARKSLATEGRAY":        {R: 47, G: 79, B: 79},    // #2F4F4F
-	"DARKTURQUOISE":        {R: 000, G: 206, B: 209}, // #00CED1
-	"DARKVIOLET":           {R: 148, G: 000, B: 211}, // #9400D3
-	"DEEPPINK":             {R: 255, G: 20, B: 147},  // #FF1493
-	"DEEPSKYBLUE":          {R: 000, G: 191, B: 255}, // #00BFFF
-	"DIMGRAY":              {R: 105, G: 105, B: 105}, // #696969
-	"DODGERBLUE":           {R: 30, G: 144, B: 255},  // #1E90FF
-	"FIREBRICK":            {R: 178, G: 34, B: 34},   // #B22222
-	"FLORALWHITE":          {R: 255, G: 250, B: 240}, // #FFFAF0
-	"FORESTGREEN":          {R: 34, G: 139, B: 34},   // #228B22
-	"FUCHSIA":              {R: 255, G: 000, B: 255}, // #FF00FF
-	"GAINSBORO":            {R: 220, G: 220, B: 220}, // #DCDCDC
-	"GHOSTWHITE":           {R: 248, G: 248, B: 255}, // #F8F8FF
-	"GOLD":                 {R: 255, G: 215, B: 000}, // #FFD700
-	"GOLDENROD":            {R: 218, G: 165, B: 32},  // #DAA520
-	"GRAY":                 {R: 190, G: 190, B: 190}, // #BEBEBE X11 Version
-	"GREEN":                {R: 000, G: 255, B: 000}, // #00FF00 X11 Version
-	"GREENYELLOW":          {R: 173, G: 255, B: 47},  // #ADFF2F
-	"HONEYDEW":             {R: 240, G: 255, B: 240}, // #F0FFF0
-	"HOTPINK":              {R: 255, G: 105, B: 180}, // #FF69B4
-	"INDIANRED":            {R: 205, G: 92, B: 92},   // #CD5C5C
-	"INDIGO":               {R: 75, G: 000, B: 130},  // #4B0082
-	"IVORY":                {R: 255, G: 255, B: 240}, // #FFFFF0
-	"KHAKI":                {R: 240, G: 230, B: 140}, // #F0E68C
-	"LAVENDER":             {R: 230, G: 230, B: 250}, // #E6E6FA
-	"LAVENDERBLUSH":        {R: 255, G: 240, B: 245}, // #FFF0F5
-	"LAWNGREEN":            {R: 124, G: 252, B: 000}, // #7CFC00
-	"LEMONCHIFFON":         {R: 255, G: 250, B: 205}, // #FFFACD
-	"LIGHTBLUE":            {R: 173, G: 216, B: 230}, // #ADD8E6
-	"LIGHTCORAL":           {R: 240, G: 128, B: 128}, // #F08080
-	"LIGHTCYAN":            {R: 224, G: 255, B: 255}, // #E0FFFF
-	"LIGHTGOLDENRODYELLOW": {R: 250, G: 250, B: 210}, // #FAFAD2
-	"LIGHTGRAY":            {R: 211, G: 211, B: 211}, // #D3D3D3
-	"LIGHTGREEN":           {R: 144, G: 238, B: 144}, // #90EE90
-	"LIGHTPINK":            {R: 255, G: 182, B: 193}, // #FFB6C1
-	"LIGHTSALMON":          {R: 255, G: 160, B: 122}, // #FFA07A
-	"LIGHTSEAGREEN":        {R: 32, G: 178, B: 170},  // #20B2AA
-	"LIGHTSKYBLUE":         {R: 135, G: 206, B: 250}, // #87CEFA
-	"LIGHTSLATEGRAY":       {R: 119, G: 136, B: 153}, // #778899
-	"LIGHTSTEELBLUE":       {R: 176, G: 196, B: 222}, // #B0C4DE
-	"LIGHTYELLOW":          {R: 255, G: 255, B: 224}, // #FFFFE0
-	"LIME":                 {R: 000, G: 255, B: 000}, // #00FF00
-	"LIMEGREEN":            {R: 50, G: 205, B: 50},   // #32CD32
-	"LINEN":                {R: 250, G: 240, B: 230}, // #FAF0E6
-	"MAGENTA":              {R: 255, G: 000, B: 255}, // #FF00FF
-	"MAROON":               {R: 176, G: 48, B: 96},   // #B03060 X11 Version
-	"MEDIUMAQUAMARINE":     {R: 102, G: 205, B: 170}, // #66CDAA
-	"MEDIUMBLUE":           {R: 000, G: 000, B: 205}, // #0000CD
-	"MEDIUMORCHID":         {R: 186, G: 85, B: 211},  // #BA55D3
-	"MEDIUMPURPLE":         {R: 147, G: 112, B: 219}, // #9370DB
-	"MEDIUMSEAGREEN":       {R: 60, G: 179, B: 113},  // #3CB371
-	"MEDIUMSLATEBLUE":      {R: 123, G: 104, B: 238}, // #7B68EE
-	"MEDIUMSPRINGGREEN":    {R: 000, G: 250, B: 154}, // #00FA9A
-	"MEDIUMTURQUOISE":      {R: 72, G: 209, B: 204},  // #48D1CC
-	"MEDIUMVIOLETRED":      {R: 199, G: 21, B: 133},  // #C71585
-	"MIDNIGHTBLUE":         {R: 25, G: 25, B: 112},   // #191970
-	"MINTCREAM":            {R: 245, G: 255, B: 250}, // #F5FFFA
-	"MISTYROSE":            {R: 255, G: 228, B: 225}, // #FFE4E1
-	"MOCCASIN":             {R: 255, G: 228, B: 181}, // #FFE4B5
-	"NAVAJOWHITE":          {R: 255, G: 222, B: 173}, // #FFDEAD
-	"NAVY":                 {R: 000, G: 000, B: 128}, // #000080
-	"OLDLACE":              {R: 253, G: 245, B: 230}, // #FDF5E6
-	"OLIVE":                {R: 128, G: 128, B: 000}, // #808000
-	"OLIVEDRAB":            {R: 107, G: 142, B: 35},  // #6B8E23
-	"ORANGE":               {R: 255, G: 165, B: 000}, // #FFA500
-	"ORANGERED":            {R: 255, G: 69, B: 000},  // #FF4500
-	"ORCHID":               {R: 218, G: 112, B: 214}, // #DA70D6
-	"PALEGOLDENROD":        {R: 238, G: 232, B: 170}, // #EEE8AA
-	"PALEGREEN":            {R: 152, G: 251, B: 152}, // #98FB98
-	"PALETURQUOISE":        {R: 175, G: 238, B: 238}, // #AFEEEE
-	"PALEVIOLETRED":        {R: 219, G: 112, B: 147}, // #DB7093
-	"PAPAYAWHIP":           {R: 255, G: 239, B: 213}, // #FFEFD5
-	"PEACHPUFF":            {R: 255, G: 218, B: 185}, // #FFDAB9
-	"PERU":                 {R: 205, G: 133, B: 63},  // #CD853F
-	"PINK":                 {R: 255, G: 192, B: 203}, // #FFC0CB
-	"PLUM":                 {R: 221, G: 160, B: 221}, // #DDA0DD
-	"POWDERBLUE":           {R: 176, G: 224, B: 230}, // #B0E0E6
-	"PURPLE":               {R: 160, G: 32, B: 240},  // #A020F0 X11 Version
-	"REBECCAPURPLE":        {R: 102, G: 51, B: 153},  // #663399
-	"RED":                  {R: 255, G: 000, B: 000}, // #FF0000
-	"ROSYBROWN":            {R: 188, G: 143, B: 143}, // #BC8F8F
-	"ROYALBLUE":            {R: 65, G: 105, B: 225},  // #4169E1
-	"SADDLEBROWN":          {R: 139, G: 69, B: 19},   // #8B4513
-	"SALMON":               {R: 250, G: 128, B: 114}, // #FA8072
-	"SANDYBROWN":           {R: 244, G: 164, B: 96},  // #F4A460
-	"SEAGREEN":             {R: 46, G: 139, B: 87},   // #2E8B57
-	"SEASHELL":             {R: 255, G: 245, B: 238}, // #FFF5EE
-	"SIENNA":               {R: 160, G: 82, B: 45},   // #A0522D
-	"SILVER":               {R: 192, G: 192, B: 192}, // #C0C0C0
-	"SKYBLUE":              {R: 135, G: 206, B: 235}, // #87CEEB
-	"SLATEBLUE":            {R: 106, G: 90, B: 205},  // #6A5ACD
-	"SLATEGRAY":            {R: 112, G: 128, B: 144}, // #708090
-	"SNOW":                 {R: 255, G: 250, B: 250}, // #FFFAFA
-	"SPRINGGREEN":          {R: 000, G: 255, B: 127}, // #00FF7F
-	"STEELBLUE":            {R: 70, G: 130, B: 180},  // #4682B4
-	"TAN":                  {R: 210, G: 180, B: 140}, // #D2B48C
-	"TEAL":                 {R: 000, G: 128, B: 128}, // #008080
-	"THISTLE":              {R: 216, G: 191, B: 216}, // #D8BFD8
-	"TOMATO":               {R: 255, G: 99, B: 71},   // #FF6347
-	"TURQUOISE":            {R: 64, G: 224, B: 208},  // #40E0D0
-	"VIOLET":               {R: 238, G: 130, B: 238}, // #EE82EE
-	"WEBGRAY":              {R: 128, G: 128, B: 128}, // #808080 Web Version
-	"WEBGREEN":             {R: 000, G: 128, B: 000}, // #008000 Web Version
-	"WEBMAROON":            {R: 127, G: 000, B: 000}, // #7F0000 Web Version
-	"WEBPURPLE":            {R: 127, G: 000, B: 127}, // #7F007F Web Version
-	"WHEAT":                {R: 245, G: 222, B: 179}, // #F5DEB3
-	"WHITE":                {R: 255, G: 255, B: 255}, // #FFFFFF
-	"WHITESMOKE":           {R: 245, G: 245, B: 245}, // #F5F5F5
-	"YELLOW":               {R: 255, G: 255, B: 000}, // #FFFF00
-	"YELLOWGREEN":          {R: 154, G: 205, B: 50},  // #9ACD32
+	"ALICE BLUE":             {R: 240, G: 248, B: 255, A: 255}, // #F0F8FF
+	"ANTIQUE WHITE":          {R: 250, G: 235, B: 215, A: 255}, // #FAEBD7
+	"AQUA":                   {R: 000, G: 255, B: 255, A: 255}, // #00FFFF
+	"AQUAMARINE":             {R: 127, G: 255, B: 212, A: 255}, // #7FFFD4
+	"AZURE":                  {R: 240, G: 255, B: 255, A: 255}, // #F0FFFF
+	"BEIGE":                  {R: 245, G: 245, B: 220, A: 255}, // #F5F5DC
+	"BISQUE":                 {R: 255, G: 228, B: 196, A: 255}, // #FFE4C4
+	"BLACK":                  {R: 000, G: 000, B: 000, A: 255}, // #000000
+	"BLANCHED ALMOND":        {R: 255, G: 235, B: 205, A: 255}, // #FFEBCD
+	"BLUE":                   {R: 000, G: 000, B: 255, A: 255}, // #0000Ff
+	"BLUE VIOLET":            {R: 138, G: 43, B: 226, A: 255},  // #8A2Be2
+	"BROWN":                  {R: 165, G: 42, B: 42, A: 255},   // #A52A2A
+	"BURLYWOOD":              {R: 222, G: 184, B: 135, A: 255}, // #Deb887
+	"CADET BLUE":             {R: 95, G: 158, B: 160, A: 255},  // #5F9EA0
+	"CHARTREUSE":             {R: 127, G: 255, B: 000, A: 255}, // #7FFF00
+	"CHOCOLATE":              {R: 210, G: 105, B: 30, A: 255},  // #D2691E
+	"CORAL":                  {R: 255, G: 127, B: 80, A: 255},  // #FF7F50
+	"CORNFLOWER BLUE":        {R: 100, G: 149, B: 237, A: 255}, // #6495ED
+	"CORNSILK":               {R: 255, G: 248, B: 220, A: 255}, // #FFF8DC
+	"CRIMSON":                {R: 220, G: 20, B: 60, A: 255},   // #DC143C
+	"CYAN":                   {R: 000, G: 255, B: 255, A: 255}, // #00FFFF
+	"DARK BLUE":              {R: 000, G: 000, B: 139, A: 255}, // #00008B
+	"DARK CYAN":              {R: 000, G: 139, B: 139, A: 255}, // #008B8B
+	"DARK GOLDEN ROD":        {R: 184, G: 134, B: 11, A: 255},  // #B8860B
+	"DARK GRAY":              {R: 169, G: 169, B: 169, A: 255}, // #A9A9A9
+	"DARK GREEN":             {R: 000, G: 100, B: 000, A: 255}, // #006400
+	"DARK KHAKI":             {R: 189, G: 183, B: 107, A: 255}, // #BDB76B
+	"DARK MAGENTA":           {R: 139, G: 000, B: 139, A: 255}, // #8B008B
+	"DARK OLIVE GREEN":       {R: 85, G: 107, B: 47, A: 255},   // #556B2F
+	"DARK ORANGE":            {R: 255, G: 140, B: 000, A: 255}, // #FF8C00
+	"DARK ORCHID":            {R: 153, G: 50, B: 204, A: 255},  // #9932CC
+	"DARK RED":               {R: 139, G: 000, B: 000, A: 255}, // #8B0000
+	"DARK SALMON":            {R: 233, G: 150, B: 122, A: 255}, // #E9967A
+	"DARK SEA GREEN":         {R: 143, G: 188, B: 143, A: 255}, // #8FBC8F
+	"DARK SLATE BLUE":        {R: 72, G: 61, B: 139, A: 255},   // #483D8B
+	"DARK SLATE GRAY":        {R: 47, G: 79, B: 79, A: 255},    // #2F4F4F
+	"DARK TURQUOISE":         {R: 000, G: 206, B: 209, A: 255}, // #00CED1
+	"DARK VIOLET":            {R: 148, G: 000, B: 211, A: 255}, // #9400D3
+	"DEEP PINK":              {R: 255, G: 20, B: 147, A: 255},  // #FF1493
+	"DEEP SKY BLUE":          {R: 000, G: 191, B: 255, A: 255}, // #00BFFF
+	"DIM GRAY":               {R: 105, G: 105, B: 105, A: 255}, // #696969
+	"DODGER BLUE":            {R: 30, G: 144, B: 255, A: 255},  // #1E90FF
+	"FIRE BRICK":             {R: 178, G: 34, B: 34, A: 255},   // #B22222
+	"FLORAL WHITE":           {R: 255, G: 250, B: 240, A: 255}, // #FFFAF0
+	"FOREST GREEN":           {R: 34, G: 139, B: 34, A: 255},   // #228B22
+	"FUCHSIA":                {R: 255, G: 000, B: 255, A: 255}, // #FF00FF
+	"GAINSBORO":              {R: 220, G: 220, B: 220, A: 255}, // #DCDCDC
+	"GHOST WHITE":            {R: 248, G: 248, B: 255, A: 255}, // #F8F8FF
+	"GOLD":                   {R: 255, G: 215, B: 000, A: 255}, // #FFD700
+	"GOLDEN ROD":             {R: 218, G: 165, B: 32, A: 255},  // #DAA520
+	"GRAY":                   {R: 190, G: 190, B: 190, A: 255}, // #BEBEBE (X11)
+	"GREEN":                  {R: 000, G: 255, B: 000, A: 255}, // #00FF00 (X11)
+	"GREEN YELLOW":           {R: 173, G: 255, B: 47, A: 255},  // #ADFF2F
+	"HONEY DEW":              {R: 240, G: 255, B: 240, A: 255}, // #F0FFF0
+	"HOT PINK":               {R: 255, G: 105, B: 180, A: 255}, // #FF69B4
+	"INDIAN RED":             {R: 205, G: 92, B: 92, A: 255},   // #CD5C5C
+	"INDIGO":                 {R: 75, G: 000, B: 130, A: 255},  // #4B0082
+	"IVORY":                  {R: 255, G: 255, B: 240, A: 255}, // #FFFFF0
+	"KHAKI":                  {R: 240, G: 230, B: 140, A: 255}, // #F0E68C
+	"LAVENDER":               {R: 230, G: 230, B: 250, A: 255}, // #E6E6FA
+	"LAVENDER BLUSH":         {R: 255, G: 240, B: 245, A: 255}, // #FFF0F5
+	"LAWN GREEN":             {R: 124, G: 252, B: 000, A: 255}, // #7CFC00
+	"LEMON CHIFFON":          {R: 255, G: 250, B: 205, A: 255}, // #FFFACD
+	"LIGHT BLUE":             {R: 173, G: 216, B: 230, A: 255}, // #ADD8E6
+	"LIGHT CORAL":            {R: 240, G: 128, B: 128, A: 255}, // #F08080
+	"LIGHT CYAN":             {R: 224, G: 255, B: 255, A: 255}, // #E0FFFF
+	"LIGHT GOLDENROD YELLOW": {R: 250, G: 250, B: 210, A: 255}, // #FAFAD2
+	"LIGHT GRAY":             {R: 211, G: 211, B: 211, A: 255}, // #D3D3D3
+	"LIGHT GREEN":            {R: 144, G: 238, B: 144, A: 255}, // #90EE90
+	"LIGHT PINK":             {R: 255, G: 182, B: 193, A: 255}, // #FFB6C1
+	"LIGHT SALMON":           {R: 255, G: 160, B: 122, A: 255}, // #FFA07A
+	"LIGHT SEA GREEN":        {R: 32, G: 178, B: 170, A: 255},  // #20B2AA
+	"LIGHT SKY BLUE":         {R: 135, G: 206, B: 250, A: 255}, // #87CEFA
+	"LIGHT SLATE GRAY":       {R: 119, G: 136, B: 153, A: 255}, // #778899
+	"LIGHT STEEL BLUE":       {R: 176, G: 196, B: 222, A: 255}, // #B0C4DE
+	"LIGHT YELLOW":           {R: 255, G: 255, B: 224, A: 255}, // #FFFFE0
+	"LIME":                   {R: 000, G: 255, B: 000, A: 255}, // #00FF00
+	"LIME GREEN":             {R: 50, G: 205, B: 50, A: 255},   // #32CD32
+	"LINEN":                  {R: 250, G: 240, B: 230, A: 255}, // #FAF0E6
+	"MAGENTA":                {R: 255, G: 000, B: 255, A: 255}, // #FF00FF
+	"MAROON":                 {R: 176, G: 48, B: 96, A: 255},   // #B03060 (X11)
+	"MEDIUM AQUAMARINE":      {R: 102, G: 205, B: 170, A: 255}, // #66CDAA
+	"MEDIUM BLUE":            {R: 000, G: 000, B: 205, A: 255}, // #0000CD
+	"MEDIUM ORCHID":          {R: 186, G: 85, B: 211, A: 255},  // #BA55D3
+	"MEDIUM PURPLE":          {R: 147, G: 112, B: 219, A: 255}, // #9370DB
+	"MEDIUM SEA GREEN":       {R: 60, G: 179, B: 113, A: 255},  // #3CB371
+	"MEDIUM SLATE BLUE":      {R: 123, G: 104, B: 238, A: 255}, // #7B68EE
+	"MEDIUM SPRING GREEN":    {R: 000, G: 250, B: 154, A: 255}, // #00FA9A
+	"MEDIUM TURQUOISE":       {R: 72, G: 209, B: 204, A: 255},  // #48D1CC
+	"MEDIUM VIOLET RED":      {R: 199, G: 21, B: 133, A: 255},  // #C71585
+	"MIDNIGHT BLUE":          {R: 25, G: 25, B: 112, A: 255},   // #191970
+	"MINT CREAM":             {R: 245, G: 255, B: 250, A: 255}, // #F5FFFA
+	"MISTY ROSE":             {R: 255, G: 228, B: 225, A: 255}, // #FFE4E1
+	"MOCCASIN":               {R: 255, G: 228, B: 181, A: 255}, // #FFE4B5
+	"NAVAJO WHITE":           {R: 255, G: 222, B: 173, A: 255}, // #FFDEAD
+	"NAVY":                   {R: 000, G: 000, B: 128, A: 255}, // #000080
+	"OLD LACE":               {R: 253, G: 245, B: 230, A: 255}, // #FDF5E6
+	"OLIVE":                  {R: 128, G: 128, B: 000, A: 255}, // #808000
+	"OLIVE DRAB":             {R: 107, G: 142, B: 35, A: 255},  // #6B8E23
+	"ORANGE":                 {R: 255, G: 165, B: 000, A: 255}, // #FFA500
+	"ORANGE RED":             {R: 255, G: 69, B: 000, A: 255},  // #FF4500
+	"ORCHID":                 {R: 218, G: 112, B: 214, A: 255}, // #DA70D6
+	"PALE GOLDEN ROD":        {R: 238, G: 232, B: 170, A: 255}, // #EEE8AA
+	"PALE GREEN":             {R: 152, G: 251, B: 152, A: 255}, // #98FB98
+	"PALE TURQUOISE":         {R: 175, G: 238, B: 238, A: 255}, // #AFEEEE
+	"PALE VIOLET RED":        {R: 219, G: 112, B: 147, A: 255}, // #DB7093
+	"PAPAYA WHIP":            {R: 255, G: 239, B: 213, A: 255}, // #FFEFD5
+	"PEACH PUFF":             {R: 255, G: 218, B: 185, A: 255}, // #FFDAB9
+	"PERU":                   {R: 205, G: 133, B: 63, A: 255},  // #CD853F
+	"PINK":                   {R: 255, G: 192, B: 203, A: 255}, // #FFC0CB
+	"PLUM":                   {R: 221, G: 160, B: 221, A: 255}, // #DDA0DD
+	"POWDER BLUE":            {R: 176, G: 224, B: 230, A: 255}, // #B0E0E6
+	"PURPLE":                 {R: 160, G: 32, B: 240, A: 255},  // #A020F0 (X11)
+	"REBECCA PURPLE":         {R: 102, G: 51, B: 153, A: 255},  // #663399
+	"RED":                    {R: 255, G: 000, B: 000, A: 255}, // #FF0000
+	"ROSY BROWN":             {R: 188, G: 143, B: 143, A: 255}, // #BC8F8F
+	"ROYAL BLUE":             {R: 65, G: 105, B: 225, A: 255},  // #4169E1
+	"SADDLE BROWN":           {R: 139, G: 69, B: 19, A: 255},   // #8B4513
+	"SALMON":                 {R: 250, G: 128, B: 114, A: 255}, // #FA8072
+	"SANDY BROWN":            {R: 244, G: 164, B: 96, A: 255},  // #F4A460
+	"SEA GREEN":              {R: 46, G: 139, B: 87, A: 255},   // #2E8B57
+	"SEASHELL":               {R: 255, G: 245, B: 238, A: 255}, // #FFF5EE
+	"SIENNA":                 {R: 160, G: 82, B: 45, A: 255},   // #A0522D
+	"SILVER":                 {R: 192, G: 192, B: 192, A: 255}, // #C0C0C0
+	"SKY BLUE":               {R: 135, G: 206, B: 235, A: 255}, // #87CEEB
+	"SLATE BLUE":             {R: 106, G: 90, B: 205, A: 255},  // #6A5ACD
+	"SLATE GRAY":             {R: 112, G: 128, B: 144, A: 255}, // #708090
+	"SNOW":                   {R: 255, G: 250, B: 250, A: 255}, // #FFFAFA
+	"SPRING GREEN":           {R: 000, G: 255, B: 127, A: 255}, // #00FF7F
+	"STEEL BLUE":             {R: 70, G: 130, B: 180, A: 255},  // #4682B4
+	"TAN":                    {R: 210, G: 180, B: 140, A: 255}, // #D2B48C
+	"TEAL":                   {R: 000, G: 128, B: 128, A: 255}, // #008080
+	"THISTLE":                {R: 216, G: 191, B: 216, A: 255}, // #D8BFD8
+	"TOMATO":                 {R: 255, G: 99, B: 71, A: 255},   // #FF6347
+	"TURQUOISE":              {R: 64, G: 224, B: 208, A: 255},  // #40E0D0
+	"VIOLET":                 {R: 238, G: 130, B: 238, A: 255}, // #EE82EE
+	"WEB GRAY":               {R: 128, G: 128, B: 128, A: 255}, // #808080 (Web)
+	"WEB GREEN":              {R: 000, G: 128, B: 000, A: 255}, // #008000 (Web)
+	"WEB MAROON":             {R: 127, G: 000, B: 000, A: 255}, // #7F0000 (Web)
+	"WEB PURPLE":             {R: 127, G: 000, B: 127, A: 255}, // #7F007F (Web)
+	"WHEAT":                  {R: 245, G: 222, B: 179, A: 255}, // #F5DEB3
+	"WHITE":                  {R: 255, G: 255, B: 255, A: 255}, // #FFFFFF
+	"WHITE SMOKE":            {R: 245, G: 245, B: 245, A: 255}, // #F5F5F5
+	"YELLOW":                 {R: 255, G: 255, B: 000, A: 255}, // #FFFF00
+	"YELLOW GREEN":           {R: 154, G: 205, B: 50, A: 255},  // #9ACD32
 } //                                                               PDFColorNames
 
 // -----------------------------------------------------------------------------
