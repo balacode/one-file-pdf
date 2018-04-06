@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 12:39:11 D778A4                           [utest/draw_text.go]
+// :v: 2018-04-06 22:38:01 411432                           [utest/draw_text.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -46,7 +46,7 @@ func DrawText(t *testing.T) {
 		BT 141 700 Td (THIRD) Tj ET
 		endstream
 		5 0 obj<</Type/Font/Subtype/Type1/Name/F1/BaseFont/Helvetica-Bold\
-		/Encoding/WinAnsiEncoding>>
+		/Encoding/StandardEncoding>>
 		endobj
 		xref
 		0 6
@@ -59,7 +59,7 @@ func DrawText(t *testing.T) {
 		trailer
 		<</Size 6/Root 1 0 R>>
 		startxref
-		501
+		502
 		%%EOF
 		`
 		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
@@ -91,7 +91,7 @@ func DrawText(t *testing.T) {
 		BT 141 700 Td (Ye-Olde-Scriptte) Tj ET
 		endstream
 		5 0 obj<</Type/Font/Subtype/Type1/Name/F1/BaseFont/Helvetica\
-		/Encoding/WinAnsiEncoding>>
+		/Encoding/StandardEncoding>>
 		endobj
 		xref
 		0 6
@@ -104,7 +104,7 @@ func DrawText(t *testing.T) {
 		trailer
 		<</Size 6/Root 1 0 R>>
 		startxref
-		466
+		467
 		%%EOF
 		`
 		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)

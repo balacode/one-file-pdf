@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 18:56:20 CF11A2                      [utest/draw_unit_grid.go]
+// :v: 2018-04-06 22:38:01 2C6FC1                      [utest/draw_unit_grid.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -338,8 +338,8 @@ func DrawUnitGrid(t *testing.T) {
 	0.294 0.000 0.510 RG
 	BT 2 11 Td (29) Tj ET
 	endstream
-	5 0 obj<</Type/Font/Subtype/Type1/Name/F1/\
-		BaseFont/Helvetica/Encoding/WinAnsiEncoding>>
+	5 0 obj<</Type/Font/Subtype/Type1/Name/F1/BaseFont/Helvetica\
+	/Encoding/StandardEncoding>>
 	endobj
 	xref
 	0 6
@@ -352,7 +352,7 @@ func DrawUnitGrid(t *testing.T) {
 	trailer
 	<</Size 6/Root 1 0 R>>
 	startxref
-	7771
+	7772
 	%%EOF
 	`
 	pdfCompare(t, result, expect, pdfStreamsInText)

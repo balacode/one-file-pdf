@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-29 17:24:30 217E86                    [utest/draw_text_in_box.go]
+// :v: 2018-04-06 22:38:01 72245F                    [utest/draw_text_in_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -86,7 +86,7 @@ func DrawTextInBox(t *testing.T) {
 	BT 164 339 Td (laborum.) Tj ET
 	endstream
 	5 0 obj<</Type/Font/Subtype/Type1/Name/F1/BaseFont/Helvetica\
-	/Encoding/WinAnsiEncoding>>
+	/Encoding/StandardEncoding>>
 	endobj
 	xref
 	0 6
@@ -99,7 +99,7 @@ func DrawTextInBox(t *testing.T) {
 	trailer
 	<</Size 6/Root 1 0 R>>
 	startxref
-	1629
+	1630
 	%%EOF
 	`
 	pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)

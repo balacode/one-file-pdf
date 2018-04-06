@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 13:13:57 FD0666                               [utest/reset.go]
+// :v: 2018-04-06 22:38:01 A5D705                               [utest/reset.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -45,7 +45,7 @@ func Reset(t *testing.T) {
 		BT 141 700 Td (THIRD) Tj ET
 		endstream
 		5 0 obj<</Type/Font/Subtype/Type1/Name/F1/BaseFont/Helvetica-Bold\
-		/Encoding/WinAnsiEncoding>>
+		/Encoding/StandardEncoding>>
 		endobj
 		xref
 		0 6
@@ -58,9 +58,9 @@ func Reset(t *testing.T) {
 		trailer
 		<</Size 6/Root 1 0 R>>
 		startxref
-		501
+		502
 		%%EOF
-	`
+		`
 		var result = doc.Bytes()
 		pdfCompare(t, result, expect, pdfStreamsInText)
 	}

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-28 03:14:14 F86584                            [utest/set_font.go]
+// :v: 2018-04-06 22:38:01 8AF6DB                            [utest/set_font.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -141,46 +141,46 @@ func SetFont(t *testing.T) {
 		BT 28 87 Td (Five hexing wizard bots jump quickly) Tj ET
 		endstream
 		5 0 obj<</Type/Font/Subtype/Type1/Name/F1/BaseFont/Times-Bold\
-		/Encoding/WinAnsiEncoding>>
+		/Encoding/StandardEncoding>>
 		endobj
 		6 0 obj<</Type/Font/Subtype/Type1/Name/F2/BaseFont/Helvetica\
-		/Encoding/WinAnsiEncoding>>
+		/Encoding/StandardEncoding>>
 		endobj
 		7 0 obj<</Type/Font/Subtype/Type1/Name/F3/BaseFont/Courier\
-		/Encoding/WinAnsiEncoding>>
+		/Encoding/StandardEncoding>>
 		endobj
 		8 0 obj<</Type/Font/Subtype/Type1/Name/F4/BaseFont/Courier-Bold\
-		/Encoding/WinAnsiEncoding>>
+		/Encoding/StandardEncoding>>
 		endobj
 		9 0 obj<</Type/Font/Subtype/Type1/Name/F5/BaseFont/Courier-BoldOblique\
-		/Encoding/WinAnsiEncoding>>
+		/Encoding/StandardEncoding>>
 		endobj
 		10 0 obj<</Type/Font/Subtype/Type1/Name/F6/BaseFont/Courier-Oblique\
-		/Encoding/WinAnsiEncoding>>
+		/Encoding/StandardEncoding>>
 		endobj
 		11 0 obj<</Type/Font/Subtype/Type1/Name/F7/BaseFont/Helvetica-Bold\
-		/Encoding/WinAnsiEncoding>>
+		/Encoding/StandardEncoding>>
 		endobj
 		12 0 obj<</Type/Font/Subtype/Type1/Name/F8/BaseFont/Helvetica-BoldOblique\
-		/Encoding/WinAnsiEncoding>>
+		/Encoding/StandardEncoding>>
 		endobj
 		13 0 obj<</Type/Font/Subtype/Type1/Name/F9/BaseFont/Helvetica-Oblique\
-		/Encoding/WinAnsiEncoding>>
+		/Encoding/StandardEncoding>>
 		endobj
 		14 0 obj<</Type/Font/Subtype/Type1/Name/F10/BaseFont/Symbol\
-		/Encoding/WinAnsiEncoding>>
+		/Encoding/StandardEncoding>>
 		endobj
 		15 0 obj<</Type/Font/Subtype/Type1/Name/F11/BaseFont/Times-BoldItalic\
-		/Encoding/WinAnsiEncoding>>
+		/Encoding/StandardEncoding>>
 		endobj
 		16 0 obj<</Type/Font/Subtype/Type1/Name/F12/BaseFont/Times-Italic\
-		/Encoding/WinAnsiEncoding>>
+		/Encoding/StandardEncoding>>
 		endobj
 		17 0 obj<</Type/Font/Subtype/Type1/Name/F13/BaseFont/Times-Roman\
-		/Encoding/WinAnsiEncoding>>
+		/Encoding/StandardEncoding>>
 		endobj
 		18 0 obj<</Type/Font/Subtype/Type1/Name/F14/BaseFont/ZapfDingbats\
-		/Encoding/WinAnsiEncoding>>
+		/Encoding/StandardEncoding>>
 		endobj
 		xref
 		0 19
@@ -190,23 +190,23 @@ func SetFont(t *testing.T) {
 		0000000125 00000 n
 		0000000374 00000 n
 		0000002326 00000 n
-		0000002422 00000 n
-		0000002517 00000 n
-		0000002610 00000 n
-		0000002708 00000 n
-		0000002813 00000 n
-		0000002915 00000 n
-		0000003016 00000 n
-		0000003124 00000 n
-		0000003228 00000 n
-		0000003322 00000 n
-		0000003426 00000 n
-		0000003526 00000 n
-		0000003625 00000 n
+		0000002423 00000 n
+		0000002519 00000 n
+		0000002613 00000 n
+		0000002712 00000 n
+		0000002818 00000 n
+		0000002921 00000 n
+		0000003023 00000 n
+		0000003132 00000 n
+		0000003237 00000 n
+		0000003332 00000 n
+		0000003437 00000 n
+		0000003538 00000 n
+		0000003638 00000 n
 		trailer
 		<</Size 19/Root 1 0 R>>
 		startxref
-		3725
+		3739
 		%%EOF
         `
 		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)

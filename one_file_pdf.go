@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-05 01:10:08 27F904                              [one_file_pdf.go]
+// :v: 2018-04-06 22:38:01 C71588                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -430,7 +430,7 @@ func (ob *PDF) Bytes() []byte {
 		ob.writeObj("/Font")
 		if iter.builtInIndex >= 0 {
 			ob.write("/Subtype/Type1/Name/F%d/BaseFont/%s"+
-				"/Encoding/WinAnsiEncoding", iter.fontID, iter.fontName)
+				"/Encoding/StandardEncoding", iter.fontID, iter.fontName)
 		}
 		ob.write(pdfEndobj)
 	}
