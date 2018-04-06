@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-06 22:40:14 B950F2                              [one_file_pdf.go]
+// :v: 2018-04-06 22:41:41 FDEA41                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -1428,8 +1428,7 @@ func (ob *PDF) putError(id int, msg, val string) *PDF {
 		}
 		break
 	}
-	ob.errors = append(ob.errors,
-		pdfError{id: id, src: fn, msg: msg, val: val})
+	ob.errors = append(ob.errors, pdfError{id: id, src: fn, msg: msg, val: val})
 	return ob
 } //                                                                    putError
 
@@ -1595,20 +1594,16 @@ const pdfEndobj = ">>\nendobj\n"
 
 // pdfFontNames contains font names available on all PDF implementations
 var pdfFontNames = []string{
-	"Helvetica",             // 0
-	"Helvetica-Bold",        // 1
-	"Helvetica-BoldOblique", // 2
-	"Helvetica-Oblique",     // 3
-	"Symbol",                // 4
-	"Times-Bold",            // 5
-	"Times-BoldItalic",      // 6
-	"Times-Italic",          // 7
-	"Times-Roman",           // 8
-	"ZapfDingbats",          // 9
-	"Courier",               // <- keep fixed-width Courier
-	"Courier-Bold",          // font at the end of the list
-	"Courier-BoldOblique",
-	"Courier-Oblique",
+	// 0 1 2 3
+	"Helvetica", "Helvetica-Bold", "Helvetica-BoldOblique", "Helvetica-Oblique",
+	// 4
+	"Symbol",
+	// 5 6 7 8
+	"Times-Bold", "Times-BoldItalic", "Times-Italic", "Times-Roman",
+	// 9
+	"ZapfDingbats",
+	// keep fixed-width Courier font at the end of the list
+	"Courier", "Courier-Bold", "Courier-BoldOblique", "Courier-Oblique",
 } //                                                                pdfFontNames
 
 // pdfFontWidths specifies widths of built-in fonts,
