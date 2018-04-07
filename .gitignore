@@ -2,6 +2,7 @@
 
 # binary files
 *.exe
+*.ttf
 demo/demo
 
 # test binary, build with `go test -c`
@@ -10,7 +11,7 @@ demo/demo
 # output of the go coverage tool
 *.out
 
-# drafts, logfiles, etc.
+# drafts, etc.
 *.repl
 *`*
 __*
