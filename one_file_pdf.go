@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-06 22:41:41 FDEA41                              [one_file_pdf.go]
+// :v: 2018-04-10 17:19:36 88396A                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -254,10 +254,10 @@ func (ob *PDF) SetCompression(val bool) *PDF {
 	return ob
 } //                                                              SetCompression
 
-// CurrentPage returns the current page's number, 1 being the first page.
+// CurrentPage returns the current page's number, starting from 1.
 func (ob *PDF) CurrentPage() int { return ob.pageNo + 1 }
 
-// SetCurrentPage makes the specified page current. Page numbers start from 1.
+// SetCurrentPage opens the specified page. Page numbers start from 1.
 func (ob *PDF) SetCurrentPage(pageNo int) *PDF {
 	if pageNo < 1 || pageNo > len(ob.pages) {
 		ob.putError(0xE65AF0, "pageNo out of range",
