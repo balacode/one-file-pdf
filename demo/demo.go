@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 22:05:46 2AD351                                      [demo.go]
+// :v: 2018-04-10 17:21:11 B4F377                                      [demo.go]
 // -----------------------------------------------------------------------------
 
 package main
@@ -8,22 +8,25 @@ package main
 // This demo generates the sample PDF files
 // and demonstrates the API of One-File-PDF
 
-import "fmt"     // standard
-import "strings" // standard
+import (
+	"fmt"
+	"strings"
 
-import "github.com/balacode/one-file-pdf"
+	"github.com/balacode/one-file-pdf"
+)
 
 func main() {
-	helloWorld()
-	corporateIpsum()
-	pngImages()
+	/*1*/ helloWorld()
+	/*2*/ corporateIpsum()
+	/*3*/ pngImages()
+	/*4*/ dingbats()
 } //                                                                        main
 
 func helloWorld() {
 	fmt.Println(`Generating a "Hello World" PDF...`)
 	//
 	// create a new PDF using 'A4' page size
-	var doc = pdf.NewPDF("A4") // initialized PDF
+	var doc = pdf.NewPDF("A4")
 	//
 	// you can call AddPage() to add the first page, but it is
 	// not required: the first page is added automatically
@@ -66,7 +69,7 @@ func helloWorld() {
 func corporateIpsum() {
 	const FILENAME = "corporate.pdf"
 	fmt.Println("Generating sample PDF:", FILENAME, "...")
-	var doc = pdf.NewPDF("A4") // initialized PDF // create a new PDF using 'A4' page size
+	var doc = pdf.NewPDF("A4") // create a new PDF using 'A4' page size
 	doc.SetUnits("cm")
 	//
 	// draw the heading
@@ -107,7 +110,7 @@ func corporateIpsum() {
 func pngImages() {
 	const FILENAME = "png_images.pdf"
 	fmt.Println("Generating sample PDF:", FILENAME, "...")
-	var doc = pdf.NewPDF("A4") // initialized PDF
+	var doc = pdf.NewPDF("A4")
 	doc.SetUnits("cm")
 	//
 	// draw background pattern
@@ -132,5 +135,57 @@ func pngImages() {
 	//
 	doc.SaveFile(FILENAME)
 } //                                                                   pngImages
+
+// dingbats generates a useful table of icon codes for Zapf-Dingbats
+func dingbats() {
+	const filename = "zapf_dingbats_table.pdf"
+	fmt.Println("Generating", filename, "...")
+	//
+	// create a new PDF using 'A4' page size
+	var doc = pdf.NewPDF("A4")
+	doc.SetUnits("cm")
+	//
+	const boxSize = 1.2 // cm
+	var x, y = 1.0, 1.0 // cm
+	//
+	doc.SetFont("Helvetica-Bold", 100)
+	doc.SetLineWidth(0.02)
+	//
+	for row := 0; row < 16; row++ {
+		x = 1.0
+		for col := 0; col < 16; col++ {
+			//
+			// draw border around each icon
+			doc.SetColor("gray")
+			doc.DrawBox(x, y, boxSize, boxSize)
+			//
+			// draw hex code
+			doc.SetColor("dark green")
+			doc.SetFont("Helvetica", 7)
+			doc.DrawTextInBox(x+0.1, y, boxSize, boxSize, "TL",
+				fmt.Sprintf("%02Xh", row*16+col))
+			//
+			// draw decimmal code
+			doc.SetColor("dark violet")
+			doc.SetFont("Helvetica", 7)
+			doc.DrawTextInBox(x, y, boxSize, boxSize, "TR",
+				fmt.Sprintf("%d", row*16+col))
+			//
+			// this is the right way to use a dingbat code (0-255):
+			// (casting int to rune to string won't work expected)
+			var code = row*16 + col
+			var s = string([]byte{byte(code)})
+			//
+			// draw the dingbat icon
+			doc.SetColor("black")
+			doc.SetFont("ZapfDingbats", 20)
+			doc.DrawTextInBox(x, y+0.1, boxSize, boxSize, "C", s)
+			//
+			x += boxSize
+		}
+		y += boxSize
+	}
+	doc.SaveFile(filename)
+} //                                                                    dingbats
 
 //end
