@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-10 17:19:36 88396A                              [one_file_pdf.go]
+// :v: 2018-04-11 00:32:57 3ECA58                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -112,7 +112,7 @@ package pdf
 //   writeStreamData(ar []byte) *PDF
 //
 // # Internal Functions (*PDF) - just attached to PDF, but not using its data
-//   escape(s string) []byte
+//   escape(s string) string
 //   isWhiteSpace(s string) bool
 //   splitLines(s string) []string
 //   toUpperLettersDigits(s, extras string) string
@@ -457,8 +457,7 @@ func (ob *PDF) Bytes() []byte {
 			{"/Creator ", ob.docCreator},
 		} {
 			if iter[1] != "" {
-				ob.write(iter[0]).
-					write("(").write(string(ob.escape(iter[1]))).write(")")
+				ob.write(iter[0]).write("(%s)", ob.escape(iter[1]))
 			}
 		}
 		ob.write(pdfEndobj)
@@ -1308,10 +1307,10 @@ func (ob *PDF) writeStreamData(ar []byte) *PDF {
 
 // escape escapes special characters '(', '(' and '\' in strings
 // in order to avoid them interfering with PDF commands
-func (*PDF) escape(s string) []byte {
+func (*PDF) escape(s string) string {
 	var has = strings.Contains
 	if !has(s, "(") && !has(s, ")") && !has(s, "\\") {
-		return []byte(s)
+		return s
 	}
 	var buf = bytes.NewBuffer(make([]byte, 0, len(s)))
 	for _, r := range s {
@@ -1320,7 +1319,7 @@ func (*PDF) escape(s string) []byte {
 		}
 		buf.WriteRune(r)
 	}
-	return buf.Bytes()
+	return buf.String()
 } //                                                                      escape
 
 // isWhiteSpace returns true if all the chars. in 's' are white-spaces
