@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-11 01:21:39 19CD6D                              [one_file_pdf.go]
+// :v: 2018-04-11 01:38:52 1DA5E5                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -550,8 +550,8 @@ func (ob *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 	var h = height * ob.ptPerUnit
 	var w = float64(img.widthPx) / float64(img.heightPx) * h
 	x, y = x*ob.ptPerUnit, ob.paperSize.heightPt-y*ob.ptPerUnit-h
-	return ob.write(fmt.Sprintf(
-		"q\n %f 0 0 %f %f %f cm\n/IMG%d Do\nQ\n", w, h, x, y, idx))
+	return ob.write(
+		"q\n ", w, " 0 0 ", h, " ", x, " ", y, " cm\n/IMG", idx, " Do\nQ\n")
 	//    q: save graphics state
 	//   cm: concatenate matrix to current transform matrix
 	//   Do: invoke named XObject (/IMGn)

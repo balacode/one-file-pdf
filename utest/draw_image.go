@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 12:39:11 8AD73C                          [utest/draw_image.go]
+// :v: 2018-04-11 01:38:52 F28645                          [utest/draw_image.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -68,11 +68,11 @@ func DrawImage(t *testing.T) {
 	3 0 obj<</Type/Page/Parent 2 0 R/Contents 4 0 R\
 	/Resources<</XObject<</IMG0 5 0 R>>>>>>
 	endobj
-	4 0 obj <</Filter/FlateDecode/Length 57>>stream
-	0A 78 9C 2A E4 52 30 B2 30 D6 33 31 33 31 35 33
-	57 30 50 30 40 E6 1A 9A 18 EA 99 1B 1B 19 59 18
-	23 33 93 73 B9 F4 3D 7D DD 0D 14 5C F2 B9 02 B9
-	00 01 00 00 FF FF A4 FA 0D 1A 0A
+	4 0 obj <</Filter/FlateDecode/Length 50>>stream
+	0A 78 9C 2A E4 52 30 B2 30 D6 33 31 33 55 30 50
+	30 80 B3 0D 4D 0C F5 CC 8D 8D E0 74 72 2E 97 BE
+	A7 AF BB 81 82 4B 3E 57 20 17 20 00 00 FF FF 15
+	AC 0A 9E 0A
 	endstream
 	5 0 obj<</Type/XObject/Subtype/Image/Width 64/Height 64\
 	/ColorSpace/DeviceRGB/BitsPerComponent 8\
@@ -92,14 +92,13 @@ func DrawImage(t *testing.T) {
 	0000000053 00000 n
 	0000000125 00000 n
 	0000000219 00000 n
-	0000000335 00000 n
+	0000000328 00000 n
 	trailer
 	<</Size 6/Root 1 0 R>>
 	startxref
-	576
+	569
 	%%EOF
 	`
-
 	// generate image from an array of PNG bytes
 	func() {
 		var doc = pdf.NewPDF("20cm x 20cm")
@@ -135,12 +134,12 @@ func DrawImage(t *testing.T) {
 			3 0 obj<</Type/Page/Parent 2 0 R/Contents 4 0 R\
 			/Resources<</XObject<</IMG0 5 0 R/IMG1 6 0 R>>>>>>
 			endobj
-			4 0 obj <</Filter/FlateDecode/Length 75>>stream
-			0A 78 9C 2A E4 52 30 34 31 D4 33 37 36 32 B2 30
-			56 30 50 30 40 E6 22 31 8D 2C 8C F5 4C CC 4C 4C
-			CD CC 15 92 73 B9 F4 3D 7D DD 0D 14 5C F2 B9 02
-			B9 88 35 C0 D0 D0 58 CF D8 C2 D4 C2 08 6E 80 21
-			C4 00 40 00 00 00 FF FF 90 A9 1A 11 0A
+			4 0 obj <</Filter/FlateDecode/Length 66>>stream
+			0A 78 9C 2A E4 52 30 34 31 D4 33 37 36 52 30 50
+			30 80 B3 61 B4 91 85 B1 9E 89 99 A9 42 72 2E 97
+			BE A7 AF BB 81 82 4B 3E 57 20 17 01 4D 86 86 C6
+			7A C6 16 66 30 4D 86 10 4D 80 00 00 00 FF FF 56
+			75 15 22 0A
 			endstream
 			5 0 obj<</Type/XObject/Subtype/Image/Width 64/Height 64\
 			/ColorSpace/DeviceRGB/BitsPerComponent 8\
@@ -201,8 +200,8 @@ func DrawImage(t *testing.T) {
 			37 32 3E 97 C3 7F 01 00 00 FF FF FB 12 FC A0 0A
 			endstream
 			endobj
-			6 0 obj<</Type/XObject/Subtype/Image/Width 64/Height 64\
-			/ColorSpace/DeviceRGB/BitsPerComponent 8\
+			6 0 obj<</Type/XObject/Subtype/Image/Width 64\
+			/Height 64/ColorSpace/DeviceRGB/BitsPerComponent 8\
 			/Filter/FlateDecode/Length 872>>stream
 			0A 78 9C EC D4 CD 4B 5B 59 1C C6 F1 E7 AF 99 81
 			E9 A2 8B 0E 54 48 40 C1 2E 5A 68 A1 85 24 54 99
@@ -268,12 +267,12 @@ func DrawImage(t *testing.T) {
 			0000000053 00000 n
 			0000000125 00000 n
 			0000000230 00000 n
-			0000000364 00000 n
-			0000001379 00000 n
+			0000000355 00000 n
+			0000001370 00000 n
 			trailer
 			<</Size 7/Root 1 0 R>>
 			startxref
-			2404
+			2395
 			%%EOF
 			`
 		)
