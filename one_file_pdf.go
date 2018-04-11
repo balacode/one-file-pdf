@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-11 00:32:57 3ECA58                              [one_file_pdf.go]
+// :v: 2018-04-11 01:21:39 19CD6D                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -103,7 +103,7 @@ package pdf
 //
 // # Internal Generation Methods (ob *PDF)
 //   nextObj() int
-//   write(format string, args ...interface{}) *PDF
+//   write(args ...interface{}) *PDF
 //   writeCurve(x1, y1, x2, y2, x3, y3 float64) *PDF
 //   writeMode(optFill ...bool) (mode string)
 //   writeObj(objType string) *PDF
@@ -261,7 +261,7 @@ func (ob *PDF) CurrentPage() int { return ob.pageNo + 1 }
 func (ob *PDF) SetCurrentPage(pageNo int) *PDF {
 	if pageNo < 1 || pageNo > len(ob.pages) {
 		ob.putError(0xE65AF0, "pageNo out of range",
-			fmt.Sprintf("pageNo:%d range:%d..%d", pageNo, 1, len(ob.pages)))
+			fmt.Sprint("pageNo:", pageNo, " range:1..", len(ob.pages)))
 	}
 	return ob
 } //                                                              SetCurrentPage
@@ -419,8 +419,8 @@ func (ob *PDF) Bytes() []byte {
 	ob.pbuf = &ob.content
 	ob.objOffsets = []int{}
 	ob.objNo = 0
-	ob.write("%%PDF-1.4\n").
-		writeObj("/Catalog").write("/Pages 2 0 R").write(pdfEndobj)
+	ob.write("%PDF-1.4\n").
+		writeObj("/Catalog").write("/Pages 2 0 R", pdfEndobj)
 	//
 	//  write /Pages object (2 0 obj), page count, page size and the pages
 	ob.writePages(pagesIndex, fontsIndex, imagesIndex)
@@ -429,8 +429,8 @@ func (ob *PDF) Bytes() []byte {
 	for _, iter := range ob.fonts {
 		ob.writeObj("/Font")
 		if iter.builtInIndex >= 0 {
-			ob.write("/Subtype/Type1/Name/F%d/BaseFont/%s"+
-				"/Encoding/StandardEncoding", iter.fontID, iter.fontName)
+			ob.write("/Subtype/Type1/Name/F", iter.fontID,
+				"/BaseFont/", iter.fontName, "/Encoding/StandardEncoding")
 		}
 		ob.write(pdfEndobj)
 	}
@@ -441,8 +441,9 @@ func (ob *PDF) Bytes() []byte {
 			colorSpace = "DeviceGray"
 		}
 		ob.writeObj("/XObject").
-			write("/Subtype/Image/Width %d/Height %d/ColorSpace/%s"+
-				"/BitsPerComponent 8", iter.widthPx, iter.heightPx, colorSpace).
+			write("/Subtype/Image",
+				"/Width ", iter.widthPx, "/Height ", iter.heightPx,
+				"/ColorSpace/", colorSpace, "/BitsPerComponent 8").
 			writeStreamData(iter.data).write("\nendobj\n")
 	}
 	// write info object
@@ -457,23 +458,23 @@ func (ob *PDF) Bytes() []byte {
 			{"/Creator ", ob.docCreator},
 		} {
 			if iter[1] != "" {
-				ob.write(iter[0]).write("(%s)", ob.escape(iter[1]))
+				ob.write(iter[0], "(", ob.escape(iter[1]), ")")
 			}
 		}
 		ob.write(pdfEndobj)
 	}
 	// write cross-reference table at end of document
 	var startXref = ob.content.Len()
-	ob.write("xref\n0 %d\n0000000000 65535 f \n", len(ob.objOffsets))
+	ob.write("xref\n0 ", len(ob.objOffsets), "\n0000000000 65535 f \n")
 	for _, offset := range ob.objOffsets[1:] {
-		ob.write("%010d 00000 n \n", offset)
+		ob.write(fmt.Sprintf("%010d 00000 n \n", offset))
 	}
 	// write the trailer
-	ob.write("trailer\n<</Size %d/Root 1 0 R", len(ob.objOffsets))
+	ob.write("trailer\n<</Size ", len(ob.objOffsets), "/Root 1 0 R")
 	if infoIndex > 0 {
-		ob.write("/Info %d 0 R", infoIndex) // optional reference to info
+		ob.write("/Info ", infoIndex, " 0 R") // optional reference to info
 	}
-	ob.write(">>\nstartxref\n%d\n", startXref).write("%%%%EOF\n")
+	ob.write(">>\nstartxref\n", startXref, "\n", "%%EOF\n")
 	ob.pbuf = prevBuf
 	return ob.content.Bytes()
 } //                                                                       Bytes
@@ -485,7 +486,7 @@ func (ob *PDF) DrawBox(x, y, width, height float64, optFill ...bool) *PDF {
 	width, height = width*ob.ptPerUnit, height*ob.ptPerUnit
 	x, y = x*ob.ptPerUnit, ob.paperSize.heightPt-y*ob.ptPerUnit-height
 	var mode = ob.writeMode(optFill...)
-	return ob.write("%.3f %.3f %.3f %.3f re %s\n", x, y, width, height, mode)
+	return ob.write(x, " ", y, " ", width, " ", height, " re ", mode, "\n")
 	// re: construct a rectangular path
 } //                                                                     DrawBox
 
@@ -509,13 +510,13 @@ func (ob *PDF) DrawEllipse(x, y, xRadius, yRadius float64,
 	var m, n = r * ratio, v * ratio     // ratios for control points
 	var mode = ob.writeMode(optFill...) // prepare colors/line width
 	//
-	return ob.write(" %.3f %.3f m", x-r, y). // x0 y0 m: move to point (x0, y0)
+	return ob.write(" ", x-r, " ", y, " m"). // x0 y0 m: move to point (x0, y0)
 		//         control-1 control-2 endpoint
 		writeCurve(x-r, y+n, x-m, y+v, x+0, y+v). // top left arc
 		writeCurve(x+m, y+v, x+r, y+n, x+r, y+0). // top right
 		writeCurve(x+r, y-n, x+m, y-v, x+0, y-v). // bottom right
 		writeCurve(x-m, y-v, x-r, y-n, x-r, y+0). // bottom left
-		write(" %s\n", mode)                      // b: fill or S: stroke
+		write(" ", mode, "\n")                    // b: fill or S: stroke
 } //                                                                 DrawEllipse
 
 // DrawImage draws a PNG image. x, y, height specify the position and height
@@ -549,12 +550,12 @@ func (ob *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 	var h = height * ob.ptPerUnit
 	var w = float64(img.widthPx) / float64(img.heightPx) * h
 	x, y = x*ob.ptPerUnit, ob.paperSize.heightPt-y*ob.ptPerUnit-h
-	return ob.write("q\n %f 0 0 %f %f %f cm\n/IMG%d Do\nQ\n", w, h, x, y, idx)
-	//                   w      h  x  y
-	//                q: save graphics state
-	//               cm: concatenate matrix to current transform matrix
-	//               Do: invoke named XObject (/IMGn)
-	//                Q: restore graphics state
+	return ob.write(fmt.Sprintf(
+		"q\n %f 0 0 %f %f %f cm\n/IMG%d Do\nQ\n", w, h, x, y, idx))
+	//    q: save graphics state
+	//   cm: concatenate matrix to current transform matrix
+	//   Do: invoke named XObject (/IMGn)
+	//    Q: restore graphics state
 } //                                                                   DrawImage
 
 // DrawLine draws a straight line from point (x1, y1) to point (x2, y2).
@@ -562,8 +563,8 @@ func (ob *PDF) DrawLine(x1, y1, x2, y2 float64) *PDF {
 	x1, y1 = x1*ob.ptPerUnit, ob.paperSize.heightPt-y1*ob.ptPerUnit
 	x2, y2 = x2*ob.ptPerUnit, ob.paperSize.heightPt-y2*ob.ptPerUnit
 	ob.writeMode(true) // prepare color/line width
-	return ob.write("%.3f %.3f m %.3f %.3f l S\n", x1, y1, x2, y2)
-	// m: move  S: stroke path (for lines)
+	return ob.write(x1, " ", y1, " m ", x2, " ", y2, " l S\n")
+	// m: move  l:line  S: stroke path (for lines)
 } //                                                                    DrawLine
 
 // DrawText draws a text string at the current position (X, Y).
@@ -977,7 +978,8 @@ func (ob *PDF) applyFont() (err error) {
 	}
 	ob.ppage.fontID = font.fontID
 	ob.ppage.fontSizePt = ob.fontSizePt
-	ob.write("BT /FNT%d %d Tf ET\n", ob.ppage.fontID, int(ob.ppage.fontSizePt))
+	ob.write("BT /FNT", ob.ppage.fontID, " ", int(ob.ppage.fontSizePt),
+		" Tf ET\n")
 	// BT: begin text   /FNT0 i0 Tf: set font to FNT0 index i0   ET: end text
 	return err
 } //                                                                   applyFont
@@ -994,12 +996,12 @@ func (ob *PDF) drawTextLine(s string) *PDF {
 	}
 	if ob.ppage.horzScaling != ob.horzScaling {
 		ob.ppage.horzScaling = ob.horzScaling
-		ob.write("BT %d Tz ET\n", ob.ppage.horzScaling)
+		ob.write("BT ", ob.ppage.horzScaling, " Tz ET\n")
 		// BT: begin text   n0 Tz: set horiz. text scaling to n0%   ET: end text
 	}
 	ob.writeMode(true) // fill/nonStroke
-	ob.write("BT %d %d Td (%s) Tj ET\n",
-		int(ob.ppage.x), int(ob.ppage.y), ob.escape(s))
+	ob.write("BT ", int(ob.ppage.x), " ", int(ob.ppage.y),
+		" Td (", ob.escape(s), ") Tj ET\n")
 	// BT: begin text   Td: move text position   Tj: show text   ET: end text
 	ob.ppage.x += ob.textWidthPt(s)
 	return ob
@@ -1189,11 +1191,24 @@ func (ob *PDF) nextObj() int {
 	return ob.objNo
 } //                                                                     nextObj
 
-// write writes formatted strings (like fmt.Sprintf) to the current page's
-// content stream or to the final generated PDF, if there is no active page
-func (ob *PDF) write(format string, args ...interface{}) *PDF {
+// write writes strings and numbers to the current page's content
+// stream or to the final generated PDF, if there is no active page
+func (ob *PDF) write(args ...interface{}) *PDF {
 	ob.reservePage()
-	ob.pbuf.Write([]byte(fmt.Sprintf(format, args...)))
+	for _, any := range args {
+		switch val := any.(type) {
+		case string:
+			ob.pbuf.WriteString(val)
+		case float64:
+			ob.pbuf.WriteString(strconv.FormatFloat(val, 'f', 3, 64))
+		case int:
+			ob.pbuf.WriteString(strconv.FormatInt(int64(val), 10))
+		case uint16:
+			ob.pbuf.WriteString(strconv.FormatInt(int64(val), 10))
+		default:
+			fmt.Printf("Invalid type %s = %v", reflect.TypeOf(val), val)
+		}
+	}
 	return ob
 } //                                                                       write
 
@@ -1201,8 +1216,7 @@ func (ob *PDF) write(format string, args ...interface{}) *PDF {
 // The starting point is the current (x, y) position.
 // (x1, y1) and (x2, y2) are the two control points, (x3, y3) the end point.
 func (ob *PDF) writeCurve(x1, y1, x2, y2, x3, y3 float64) *PDF {
-	return ob.write(" %.3f %.3f %.3f %.3f %.3f %.3f c", x1, y1, x2, y2, x3, y3)
-	// x1 y1 x2 y2 x3 y3 c: append cubic Bézier curve to the current path
+	return ob.write(" ", x1, " ", y1, " ", x2, " ", y2, " ", x3, " ", y3, " c")
 } //                                                                  writeCurve
 
 // writeMode sets the stroking or non-stroking color and line width.
@@ -1214,31 +1228,31 @@ func (ob *PDF) writeMode(optFill ...bool) (mode string) {
 		mode = "b" // b: fill / text
 		if pv := &ob.ppage.nonStrokeColor; *pv != ob.color {
 			*pv = ob.color
-			ob.write(" %.3f %.3f %.3f rg\n", // rg: set non-stroking/text color
-				float64(pv.R)/255, float64(pv.G)/255, float64(pv.B)/255)
+			ob.write(" ", float64(pv.R)/255, " ", float64(pv.G)/255, " ",
+				float64(pv.B)/255, " rg\n") // rg: set non-stroking/text color
 		}
 	}
 	if pv := &ob.ppage.strokeColor; *pv != ob.color {
 		*pv = ob.color
-		ob.write("%.3f %.3f %.3f RG\n", // RG: set stroke (line) color
-			float64(pv.R)/255, float64(pv.G)/255, float64(pv.B)/255)
+		ob.write(float64(pv.R)/255, " ", float64(pv.G)/255,
+			" ", float64(pv.B)/255, " RG\n") // RG: set stroke (line) color
 	}
 	if pv := &ob.ppage.lineWidth; int(*pv*100) != int(ob.lineWidth*100) {
 		*pv = ob.lineWidth
-		ob.write("%.3f w\n", float64(*pv)) // n0 w: set line width to n0
+		ob.write(float64(*pv), " w\n") // n0 w: set line width to n0
 	}
 	return mode
 } //                                                                   writeMode
 
 // writeObj writes an object header. objType must start with '/', e.g. /Catalog
 func (ob *PDF) writeObj(objType string) *PDF {
-	return ob.write("%d 0 obj<</Type%s", ob.nextObj(), objType)
+	return ob.write(ob.nextObj(), " 0 obj<</Type", objType)
 } //                                                                    writeObj
 
 // writePages writes all PDF pages
 func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
-	ob.writeObj("/Pages").write("/Count %d/MediaBox[0 0 %d %d]",
-		len(ob.pages), int(ob.paperSize.widthPt), int(ob.paperSize.heightPt))
+	ob.writeObj("/Pages").write("/Count ", len(ob.pages), "/MediaBox[0 0 ",
+		int(ob.paperSize.widthPt), " ", int(ob.paperSize.heightPt), "]")
 	//                                                        write page numbers
 	if len(ob.pages) > 0 {
 		var pageObjNo = pagesIndex
@@ -1247,28 +1261,29 @@ func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
 			if i > 0 {
 				ob.write(" ")
 			}
-			ob.write("%d 0 R", pageObjNo)
+			ob.write(pageObjNo, " 0 R")
 			pageObjNo += 2 //                           1 for page, 1 for stream
 		}
 		ob.write("]")
 	}
 	ob.write(pdfEndobj)
 	for _, pg := range ob.pages { //                             write each page
-		ob.writeObj("/Page").write("/Parent 2 0 R/Contents %d 0 R", ob.objNo+1)
+		ob.writeObj("/Page").
+			write("/Parent 2 0 R/Contents ", ob.objNo+1, " 0 R")
 		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
 			ob.write("/Resources<<")
 		}
 		if len(pg.fontIDs) > 0 {
 			ob.write("/Font <<")
 			for fontNo := range ob.fonts {
-				ob.write("/FNT%d %d 0 R", fontNo+1, fontsIndex+fontNo)
+				ob.write("/FNT", fontNo+1, " ", fontsIndex+fontNo, " 0 R")
 			}
 			ob.write(">>")
 		}
 		if len(pg.imageNos) > 0 {
 			ob.write("/XObject<<")
 			for imageNo := range pg.imageNos {
-				ob.write("/IMG%d %d 0 R", imageNo, imagesIndex+imageNo)
+				ob.write("/IMG", imageNo, " ", imagesIndex+imageNo, " 0 R")
 			}
 			ob.write(">>")
 		}
@@ -1282,7 +1297,7 @@ func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
 
 // writeStream outputs a stream object to the document's main buffer
 func (ob *PDF) writeStream(ar []byte) *PDF {
-	return ob.write("%d 0 obj <<", ob.nextObj()).writeStreamData(ar)
+	return ob.write(ob.nextObj(), " 0 obj <<").writeStreamData(ar)
 } //                                                                 writeStream
 
 // writeStreamData writes a stream or image stream
@@ -1299,7 +1314,8 @@ func (ob *PDF) writeStreamData(ar []byte) *PDF {
 		ar = buf.Bytes()
 		flt = "/Filter/FlateDecode"
 	}
-	return ob.write("%s/Length %d>>stream\n%s\nendstream\n", flt, len(ar), ar)
+	return ob.write(flt, "/Length ", len(ar),
+		">>stream\n", string(ar), "\nendstream\n")
 } //                                                             writeStreamData
 
 // -----------------------------------------------------------------------------
