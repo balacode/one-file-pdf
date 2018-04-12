@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-11 01:38:52 1DA5E5                              [one_file_pdf.go]
+// :v: 2018-04-12 23:39:07 645BE8                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -127,7 +127,7 @@ package pdf
 //
 // # Internal Constants
 //   pdfBlack = color.RGBA{A: 255}
-//   pdfEndobj = ">>\nendobj\n"
+//   pdfENDOBJ = ">>\nendobj\n"
 //   pdfFontNames = []string
 //   pdfFontWidths = [][]int
 //   pdfStandardPaperSizes = map[string][2]int
@@ -419,8 +419,7 @@ func (ob *PDF) Bytes() []byte {
 	ob.pbuf = &ob.content
 	ob.objOffsets = []int{}
 	ob.objNo = 0
-	ob.write("%PDF-1.4\n").
-		writeObj("/Catalog").write("/Pages 2 0 R", pdfEndobj)
+	ob.write("%PDF-1.4\n").writeObj("/Catalog").write("/Pages 2 0 R", pdfENDOBJ)
 	//
 	//  write /Pages object (2 0 obj), page count, page size and the pages
 	ob.writePages(pagesIndex, fontsIndex, imagesIndex)
@@ -432,7 +431,7 @@ func (ob *PDF) Bytes() []byte {
 			ob.write("/Subtype/Type1/Name/F", iter.fontID,
 				"/BaseFont/", iter.fontName, "/Encoding/StandardEncoding")
 		}
-		ob.write(pdfEndobj)
+		ob.write(pdfENDOBJ)
 	}
 	// write images
 	for _, iter := range ob.images {
@@ -461,10 +460,10 @@ func (ob *PDF) Bytes() []byte {
 				ob.write(iter[0], "(", ob.escape(iter[1]), ")")
 			}
 		}
-		ob.write(pdfEndobj)
+		ob.write(pdfENDOBJ)
 	}
 	// write cross-reference table at end of document
-	var startXref = ob.content.Len()
+	var start = ob.content.Len()
 	ob.write("xref\n0 ", len(ob.objOffsets), "\n0000000000 65535 f \n")
 	for _, offset := range ob.objOffsets[1:] {
 		ob.write(fmt.Sprintf("%010d 00000 n \n", offset))
@@ -474,7 +473,7 @@ func (ob *PDF) Bytes() []byte {
 	if infoIndex > 0 {
 		ob.write("/Info ", infoIndex, " 0 R") // optional reference to info
 	}
-	ob.write(">>\nstartxref\n", startXref, "\n", "%%EOF\n")
+	ob.write(">>\nstartxref\n", start, "\n", "%%EOF\n")
 	ob.pbuf = prevBuf
 	return ob.content.Bytes()
 } //                                                                       Bytes
@@ -1266,7 +1265,7 @@ func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
 		}
 		ob.write("]")
 	}
-	ob.write(pdfEndobj)
+	ob.write(pdfENDOBJ)
 	for _, pg := range ob.pages { //                             write each page
 		ob.writeObj("/Page").
 			write("/Parent 2 0 R/Contents ", ob.objNo+1, " 0 R")
@@ -1290,7 +1289,7 @@ func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
 		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
 			ob.write(">>")
 		}
-		ob.write(pdfEndobj).writeStream(pg.content.Bytes())
+		ob.write(pdfENDOBJ).writeStream(pg.content.Bytes())
 	}
 	return ob
 } //                                                                  writePages
@@ -1605,7 +1604,7 @@ var PDFColorNames = map[string]color.RGBA{
 
 var pdfBlack = color.RGBA{A: 255}
 
-const pdfEndobj = ">>\nendobj\n"
+const pdfENDOBJ = ">>\nendobj\n"
 
 // pdfFontNames contains font names available on all PDF implementations
 var pdfFontNames = []string{
