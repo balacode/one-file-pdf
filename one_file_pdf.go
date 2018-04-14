@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-12 23:39:07 645BE8                              [one_file_pdf.go]
+// :v: 2018-04-14 23:49:22 5830CC                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -13,6 +13,9 @@ package pdf
 // # Main Structure and Constructor
 //   PDF struct
 //   NewPDF(paperSize string) PDF
+//
+// # Plugins
+//   pdfNewFontHandler func ()pdfFontHandler
 //
 // # Read-Only Properties (ob *PDF)
 //   PageCount() int
@@ -89,7 +92,7 @@ package pdf
 //   pdfPaperSize struct
 //
 // # Internal Methods (ob *PDF)
-//   applyFont() (err error)
+//   applyFont() (handler pdfFontHandler, err error)
 //   drawTextLine(s string) *PDF
 //   drawTextBox(x, y, width, height float64,
 //       wrapText bool, align, text string) *PDF
@@ -197,6 +200,12 @@ func NewPDF(paperSize string) PDF {
 	ob.paperSize = size
 	return ob
 } //                                                                      NewPDF
+
+// -----------------------------------------------------------------------------
+// # Plugins
+
+// plugin to instantiate a font handler
+var pdfNewFontHandler func() pdfFontHandler
 
 // -----------------------------------------------------------------------------
 // # Read-Only Properties (ob *PDF)
@@ -430,6 +439,8 @@ func (ob *PDF) Bytes() []byte {
 		if iter.builtInIndex >= 0 {
 			ob.write("/Subtype/Type1/Name/F", iter.fontID,
 				"/BaseFont/", iter.fontName, "/Encoding/StandardEncoding")
+		} else {
+			iter.handler.write(ob)
 		}
 		ob.write(pdfENDOBJ)
 	}
@@ -867,12 +878,21 @@ func (err pdfError) Error() string {
 	return ret
 } //                                                                       Error
 
+// pdfFontHandler interface provides methods to parse and embed TrueType fonts
+type pdfFontHandler interface {
+	loadFont(font interface{}) bool
+	encode(s string) string
+	textWidthPt(s string, fontSizePt float64) float64
+	write(doc *PDF)
+} //                                                              pdfFontHandler
+
 // pdfFont represents a font name and its appearance
 type pdfFont struct {
 	fontID           int
 	fontName         string
 	builtInIndex     int
 	isBold, isItalic bool
+	handler          pdfFontHandler
 } //                                                                     pdfFont
 
 // pdfImage represents an image
@@ -919,7 +939,7 @@ type pdfPaperSize struct {
 //   standard (built-in) font like Helvetica or a TrueType font.
 // - Fills the document-wide list of fonts (ob.fonts).
 // - Adds items to the list of font ID's used on the current page.
-func (ob *PDF) applyFont() (err error) {
+func (ob *PDF) applyFont() (handler pdfFontHandler, err error) {
 	var font pdfFont
 	var name = ob.toUpperLettersDigits(ob.fontName, "")
 	var valid = name != ""
@@ -941,12 +961,16 @@ func (ob *PDF) applyFont() (err error) {
 			break
 		}
 	}
+	if !valid && pdfNewFontHandler != nil {
+		handler = pdfNewFontHandler()
+		valid = handler.loadFont(ob.fontName)
+	}
 	// if there is no selected font or it's invalid, use Helvetica
 	if !valid {
 		err = pdfError{id: 0xE86819, msg: "Invalid font", val: ob.fontName}
 		ob.fontName = "Helvetica"
 		ob.applyFont()
-		return err
+		return nil, err
 	}
 	// has the font been added to the global list? if not, add it:
 	for _, iter := range ob.fonts {
@@ -961,7 +985,7 @@ func (ob *PDF) applyFont() (err error) {
 	}
 	if ob.ppage.fontID == font.fontID &&
 		int(ob.ppage.fontSizePt*100) == int(ob.fontSizePt)*100 {
-		return err
+		return handler, err
 	}
 	// add the font ID to the current page, if not already referenced
 	var alreadyUsedOnPage bool
@@ -980,7 +1004,7 @@ func (ob *PDF) applyFont() (err error) {
 	ob.write("BT /FNT", ob.ppage.fontID, " ", int(ob.ppage.fontSizePt),
 		" Tf ET\n")
 	// BT: begin text   /FNT0 i0 Tf: set font to FNT0 index i0   ET: end text
-	return err
+	return handler, err
 } //                                                                   applyFont
 
 // drawTextLine writes a line of text at the current coordinates to the
@@ -990,7 +1014,8 @@ func (ob *PDF) drawTextLine(s string) *PDF {
 		return ob
 	}
 	// draw the text
-	if err, isT := ob.applyFont().(pdfError); isT {
+	var handler, err = ob.applyFont()
+	if err, isT := err.(pdfError); isT {
 		ob.putError(0xEAEAC4, err.msg, err.val)
 	}
 	if ob.ppage.horzScaling != ob.horzScaling {
@@ -999,10 +1024,15 @@ func (ob *PDF) drawTextLine(s string) *PDF {
 		// BT: begin text   n0 Tz: set horiz. text scaling to n0%   ET: end text
 	}
 	ob.writeMode(true) // fill/nonStroke
-	ob.write("BT ", int(ob.ppage.x), " ", int(ob.ppage.y),
-		" Td (", ob.escape(s), ") Tj ET\n")
-	// BT: begin text   Td: move text position   Tj: show text   ET: end text
-	ob.ppage.x += ob.textWidthPt(s)
+	if handler == nil {
+		ob.write("BT ", int(ob.ppage.x), " ", int(ob.ppage.y),
+			" Td (", ob.escape(s), ") Tj ET\n")
+		// BT: begin text   Td: move text position   Tj: show text   ET: end text
+		ob.ppage.x += ob.textWidthPt(s)
+	} else {
+		ob.write(handler.encode(s))
+		ob.ppage.x += handler.textWidthPt(s, ob.fontSizePt)
+	}
 	return ob
 } //                                                                drawTextLine
 
@@ -1015,12 +1045,14 @@ func (ob *PDF) drawTextBox(x, y, width, height float64,
 		return ob
 	}
 	ob.reservePage()
-	if err, isT := ob.applyFont().(pdfError); isT {
+	var handler, err = ob.applyFont()
+	if err, isT := err.(pdfError); isT {
 		ob.putError(0xE0737C, err.msg, err.val)
 	}
 	var lines []string
 	if wrapText {
 		lines = ob.WrapTextLines(width, text)
+		_ = handler //TODO: ^needs to interact with font handler to get width
 	} else {
 		lines = []string{text}
 	}
