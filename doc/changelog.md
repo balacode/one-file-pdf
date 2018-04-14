@@ -4,6 +4,17 @@ These are the changes in the functionality of the package,
 not including internal changes. Internal changes are are 
 best seen in the commits history.  
 
+**2018-MAR-30**  
+- **ALTERED API: Removed SetErrorLogger() method**
+- **ALTERED API: ToPoints(): added error return value**  
+- Initialize PDF automatically, even when NewPDF() wasn't called. The paper size
+  is A4, and the units CM by default. To specify a different paper size, use NewPDF().
+- No need to add the first page with AddPage(). It is inserted automatically.
+- New error handling methods Clean(), Errors(), ErrorInfo() and PullError().
+- SetColumnWidths(): can be called without arguments when you need to reset all columns.
+- Added various unit tests, for 95% code coverage.
+- Fixed text wrapping bug that could cause PDF to freeze.
+
 **2018-MAR-14**
 - Added support for color JPEG, GIF and PNG images with transparency blending
 - Added all standard A, B, and C paper sizes, and US Tabloid and Ledger
