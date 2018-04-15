@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-14 23:49:22 5830CC                              [one_file_pdf.go]
+// :v: 2018-04-15 21:49:57 3E0A66                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -878,11 +878,19 @@ func (err pdfError) Error() string {
 	return ret
 } //                                                                       Error
 
-// pdfFontHandler interface provides methods to parse and embed TrueType fonts
+// pdfFontHandler interface provides methods to parse and embed TrueType fonts.
 type pdfFontHandler interface {
+	//
+	// loads a font from a file name, slice of bytes, or io.Reader
 	loadFont(font interface{}) bool
+	//
+	// encodes text in the string 's'
 	encode(s string) string
+	//
+	// returns the width (in points) of the text in s
 	textWidthPt(s string, fontSizePt float64) float64
+	//
+	// writes the PDF objects that define the subset font (i.e. embeds font)
 	write(doc *PDF)
 } //                                                              pdfFontHandler
 
