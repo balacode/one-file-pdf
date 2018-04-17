@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-06 22:38:01 D5E298                        [utest/draw_text_at.go]
+// :v: 2018-04-17 23:15:55 D26E14                        [utest/draw_text_at.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -52,7 +52,7 @@ func DrawTextAt(t *testing.T) {
 	283.465 555.591 2.835 2.835 re b
 	425.197 413.858 2.835 2.835 re b
 	endstream
-	5 0 obj<</Type/Font/Subtype/Type1/Name/F1/BaseFont/Helvetica-Bold\
+	5 0 obj<</Type/Font/Subtype/Type1/Name/FNT1/BaseFont/Helvetica-Bold\
 	/Encoding/StandardEncoding>>
 	endobj
 	xref
@@ -66,7 +66,7 @@ func DrawTextAt(t *testing.T) {
 	trailer
 	<</Size 6/Root 1 0 R>>
 	startxref
-	656
+	658
 	%%EOF
 	`
 	pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)

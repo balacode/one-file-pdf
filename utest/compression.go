@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-06 22:38:01 8B7780                         [utest/compression.go]
+// :v: 2018-04-17 23:15:55 2ED857                         [utest/compression.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -52,7 +52,7 @@ func Compression(t *testing.T) {
 		90 39 9A 0A 21 59 20 93 01 01 00 00 FF FF F6 FE
 		19 77 0A
 		endstream
-		5 0 obj<</Type/Font/Subtype/Type1/Name/F1/BaseFont/Helvetica\
+		5 0 obj<</Type/Font/Subtype/Type1/Name/FNT1/BaseFont/Helvetica\
 		/Encoding/StandardEncoding>>
 		endobj
 		xref
@@ -66,7 +66,7 @@ func Compression(t *testing.T) {
 		trailer
 		<</Size 6/Root 1 0 R>>
 		startxref
-		453
+		455
 		%%EOF
 		`
 		var doc = pdf.NewPDF("A4") // initialized PDF
@@ -93,7 +93,7 @@ func Compression(t *testing.T) {
 		0.000 0.000 0.000 RG
 		BT 28 813 Td (Hello World! Hello World!) Tj ET
 		endstream
-		5 0 obj<</Type/Font/Subtype/Type1/Name/F1/BaseFont/Helvetica\
+		5 0 obj<</Type/Font/Subtype/Type1/Name/FNT1/BaseFont/Helvetica\
 		/Encoding/StandardEncoding>>
 		endobj
 		xref
@@ -107,7 +107,7 @@ func Compression(t *testing.T) {
 		trailer
 		<</Size 6/Root 1 0 R>>
 		startxref
-		462
+		464
 		%%EOF
 		`
 		var doc = pdf.NewPDF("A4") // initialized PDF

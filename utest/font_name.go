@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-06 22:38:01 5E0589                           [utest/font_name.go]
+// :v: 2018-04-17 23:15:55 964292                           [utest/font_name.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -69,7 +69,7 @@ func FontName(t *testing.T) {
 		0.000 0.000 0.000 RG
 		BT 28 813 Td (Hello World!) Tj ET
 		endstream
-		5 0 obj<</Type/Font/Subtype/Type1/Name/F1/BaseFont/Times-Roman\
+		5 0 obj<</Type/Font/Subtype/Type1/Name/FNT1/BaseFont/Times-Roman\
 		/Encoding/StandardEncoding>>
 		endobj
 		xref
@@ -83,7 +83,7 @@ func FontName(t *testing.T) {
 		trailer
 		<</Size 6/Root 1 0 R>>
 		startxref
-		450
+		452
 		%%EOF
         `
 		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)

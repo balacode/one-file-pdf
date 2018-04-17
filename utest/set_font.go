@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-06 22:38:01 8AF6DB                            [utest/set_font.go]
+// :v: 2018-04-17 23:15:55 921FD6                            [utest/set_font.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -140,46 +140,46 @@ func SetFont(t *testing.T) {
 		BT /FNT14 20 Tf ET
 		BT 28 87 Td (Five hexing wizard bots jump quickly) Tj ET
 		endstream
-		5 0 obj<</Type/Font/Subtype/Type1/Name/F1/BaseFont/Times-Bold\
+		5 0 obj<</Type/Font/Subtype/Type1/Name/FNT1/BaseFont/Times-Bold\
 		/Encoding/StandardEncoding>>
 		endobj
-		6 0 obj<</Type/Font/Subtype/Type1/Name/F2/BaseFont/Helvetica\
+		6 0 obj<</Type/Font/Subtype/Type1/Name/FNT2/BaseFont/Helvetica\
 		/Encoding/StandardEncoding>>
 		endobj
-		7 0 obj<</Type/Font/Subtype/Type1/Name/F3/BaseFont/Courier\
+		7 0 obj<</Type/Font/Subtype/Type1/Name/FNT3/BaseFont/Courier\
 		/Encoding/StandardEncoding>>
 		endobj
-		8 0 obj<</Type/Font/Subtype/Type1/Name/F4/BaseFont/Courier-Bold\
+		8 0 obj<</Type/Font/Subtype/Type1/Name/FNT4/BaseFont/Courier-Bold\
 		/Encoding/StandardEncoding>>
 		endobj
-		9 0 obj<</Type/Font/Subtype/Type1/Name/F5/BaseFont/Courier-BoldOblique\
+		9 0 obj<</Type/Font/Subtype/Type1/Name/FNT5/BaseFont/Courier-BoldOblique\
 		/Encoding/StandardEncoding>>
 		endobj
-		10 0 obj<</Type/Font/Subtype/Type1/Name/F6/BaseFont/Courier-Oblique\
+		10 0 obj<</Type/Font/Subtype/Type1/Name/FNT6/BaseFont/Courier-Oblique\
 		/Encoding/StandardEncoding>>
 		endobj
-		11 0 obj<</Type/Font/Subtype/Type1/Name/F7/BaseFont/Helvetica-Bold\
+		11 0 obj<</Type/Font/Subtype/Type1/Name/FNT7/BaseFont/Helvetica-Bold\
 		/Encoding/StandardEncoding>>
 		endobj
-		12 0 obj<</Type/Font/Subtype/Type1/Name/F8/BaseFont/Helvetica-BoldOblique\
+		12 0 obj<</Type/Font/Subtype/Type1/Name/FNT8/BaseFont/Helvetica-BoldOblique\
 		/Encoding/StandardEncoding>>
 		endobj
-		13 0 obj<</Type/Font/Subtype/Type1/Name/F9/BaseFont/Helvetica-Oblique\
+		13 0 obj<</Type/Font/Subtype/Type1/Name/FNT9/BaseFont/Helvetica-Oblique\
 		/Encoding/StandardEncoding>>
 		endobj
-		14 0 obj<</Type/Font/Subtype/Type1/Name/F10/BaseFont/Symbol\
+		14 0 obj<</Type/Font/Subtype/Type1/Name/FNT10/BaseFont/Symbol\
 		/Encoding/StandardEncoding>>
 		endobj
-		15 0 obj<</Type/Font/Subtype/Type1/Name/F11/BaseFont/Times-BoldItalic\
+		15 0 obj<</Type/Font/Subtype/Type1/Name/FNT11/BaseFont/Times-BoldItalic\
 		/Encoding/StandardEncoding>>
 		endobj
-		16 0 obj<</Type/Font/Subtype/Type1/Name/F12/BaseFont/Times-Italic\
+		16 0 obj<</Type/Font/Subtype/Type1/Name/FNT12/BaseFont/Times-Italic\
 		/Encoding/StandardEncoding>>
 		endobj
-		17 0 obj<</Type/Font/Subtype/Type1/Name/F13/BaseFont/Times-Roman\
+		17 0 obj<</Type/Font/Subtype/Type1/Name/FNT13/BaseFont/Times-Roman\
 		/Encoding/StandardEncoding>>
 		endobj
-		18 0 obj<</Type/Font/Subtype/Type1/Name/F14/BaseFont/ZapfDingbats\
+		18 0 obj<</Type/Font/Subtype/Type1/Name/FNT14/BaseFont/ZapfDingbats\
 		/Encoding/StandardEncoding>>
 		endobj
 		xref
@@ -190,25 +190,25 @@ func SetFont(t *testing.T) {
 		0000000125 00000 n
 		0000000374 00000 n
 		0000002326 00000 n
-		0000002423 00000 n
-		0000002519 00000 n
-		0000002613 00000 n
-		0000002712 00000 n
-		0000002818 00000 n
-		0000002921 00000 n
-		0000003023 00000 n
-		0000003132 00000 n
-		0000003237 00000 n
-		0000003332 00000 n
-		0000003437 00000 n
-		0000003538 00000 n
-		0000003638 00000 n
+		0000002425 00000 n
+		0000002523 00000 n
+		0000002619 00000 n
+		0000002720 00000 n
+		0000002828 00000 n
+		0000002933 00000 n
+		0000003037 00000 n
+		0000003148 00000 n
+		0000003255 00000 n
+		0000003352 00000 n
+		0000003459 00000 n
+		0000003562 00000 n
+		0000003664 00000 n
 		trailer
 		<</Size 19/Root 1 0 R>>
 		startxref
-		3739
+		3767
 		%%EOF
-        `
+		`
 		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 		doc.SaveFile("```font_sample.pdf")
 	}()

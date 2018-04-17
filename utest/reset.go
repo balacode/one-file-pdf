@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-06 22:38:01 A5D705                               [utest/reset.go]
+// :v: 2018-04-17 23:15:55 107DED                               [utest/reset.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -38,13 +38,13 @@ func Reset(t *testing.T) {
 		endobj
 		4 0 obj <</Length 143>>stream
 		BT /FNT1 10 Tf ET
-		 0.000 0.420 0.235 rg
+		0.000 0.420 0.235 rg
 		0.000 0.420 0.235 RG
 		BT 0 700 Td (FIRST) Tj ET
 		BT 28 700 Td (SECOND) Tj ET
 		BT 141 700 Td (THIRD) Tj ET
 		endstream
-		5 0 obj<</Type/Font/Subtype/Type1/Name/F1/BaseFont/Helvetica-Bold\
+		5 0 obj<</Type/Font/Subtype/Type1/Name/FNT1/BaseFont/Helvetica-Bold\
 		/Encoding/StandardEncoding>>
 		endobj
 		xref
@@ -58,7 +58,7 @@ func Reset(t *testing.T) {
 		trailer
 		<</Size 6/Root 1 0 R>>
 		startxref
-		502
+		504
 		%%EOF
 		`
 		var result = doc.Bytes()

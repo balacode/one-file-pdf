@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-06 22:38:01 B9BCB7                  [utest/horizontal_scaling.go]
+// :v: 2018-04-17 23:15:55 CA44C7                  [utest/horizontal_scaling.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -100,10 +100,10 @@ func HorizontalScaling(t *testing.T) {
 		BT 250 Tz ET
 		BT 28 221 Td (Five hexing wizard bots jump quickly) Tj ET
 		endstream
-		5 0 obj<</Type/Font/Subtype/Type1/Name/F1/BaseFont/Times-Bold\
+		5 0 obj<</Type/Font/Subtype/Type1/Name/FNT1/BaseFont/Times-Bold\
 		/Encoding/StandardEncoding>>
 		endobj
-		6 0 obj<</Type/Font/Subtype/Type1/Name/F2/BaseFont/Helvetica\
+		6 0 obj<</Type/Font/Subtype/Type1/Name/FNT2/BaseFont/Helvetica\
 		/Encoding/StandardEncoding>>
 		endobj
 		xref
@@ -114,11 +114,11 @@ func HorizontalScaling(t *testing.T) {
 		0000000125 00000 n
 		0000000228 00000 n
 		0000001168 00000 n
-		0000001265 00000 n
+		0000001267 00000 n
 		trailer
 		<</Size 7/Root 1 0 R>>
 		startxref
-		1361
+		1365
 		%%EOF
         `
 		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
