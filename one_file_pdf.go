@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-18 02:51:50 13C0F1                              [one_file_pdf.go]
+// :v: 2018-04-18 22:33:54 471133                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -166,7 +166,7 @@ type PDF struct {
 	fonts        []pdfFont    // all the fonts used in this PDF
 	images       []pdfImage   // all the images used in this PDF
 	columnWidths []float64    // user-set column widths (like tab stops)
-	columnNo     int          // index of the current column
+	columnNo     int          // number of the current column
 	unitName     string       // name of active measurement unit
 	ptPerUnit    float64      // number of points per measurement unit
 	color        color.RGBA   // current drawing color
@@ -177,8 +177,8 @@ type PDF struct {
 	compression  bool         // enable stream compression?
 	content      bytes.Buffer // content buffer where PDF is written
 	writer       io.Writer    // writer to PDF buffer or current page's buffer
-	objOffsets   []int        // used by Bytes() and write..()
-	objNo        int          // used by Bytes() and write..()
+	objOffsets   []int        // object offsets used by Bytes() and write..()
+	objIndex     int          // object index used by Bytes() and write..()
 	errors       []error      // errors that occurred during method calls
 	isInit       bool         // has the PDF been initialized?
 	//
@@ -441,7 +441,7 @@ func (ob *PDF) Bytes() []byte {
 	ob.content.Reset()
 	ob.writer = &ob.content
 	ob.objOffsets = []int{}
-	ob.objNo = 0
+	ob.objIndex = 0
 	ob.write("%PDF-1.4\n").writeObj("/Catalog").write("/Pages 2 0 R", pdfENDOBJ)
 	//
 	//  write /Pages object (2 0 obj), page count, page size and the pages
@@ -1221,11 +1221,11 @@ func (ob *PDF) textWidthPt(s string) float64 {
 
 // nextObj increases the object serial no. and stores its offset in array
 func (ob *PDF) nextObj() int {
-	ob.objNo++
-	for len(ob.objOffsets) <= ob.objNo {
+	ob.objIndex++
+	for len(ob.objOffsets) <= ob.objIndex {
 		ob.objOffsets = append(ob.objOffsets, ob.content.Len())
 	}
-	return ob.objNo
+	return ob.objIndex
 } //                                                                     nextObj
 
 // write writes strings and numbers to the current page's content
@@ -1292,21 +1292,21 @@ func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
 		int(ob.paperSize.widthPt), " ", int(ob.paperSize.heightPt), "]")
 	//                                                        write page numbers
 	if len(ob.pages) > 0 {
-		var pageObjNo = pagesIndex
+		var pageIndex = pagesIndex
 		ob.write("/Kids[")
 		for i := range ob.pages {
 			if i > 0 {
 				ob.write(" ")
 			}
-			ob.write(pageObjNo, " 0 R")
-			pageObjNo += 2 //                           1 for page, 1 for stream
+			ob.write(pageIndex, " 0 R")
+			pageIndex += 2 //                           1 for page, 1 for stream
 		}
 		ob.write("]")
 	}
 	ob.write(pdfENDOBJ)
 	for _, pg := range ob.pages { //                             write each page
 		ob.writeObj("/Page").
-			write("/Parent 2 0 R/Contents ", ob.objNo+1, " 0 R")
+			write("/Parent 2 0 R/Contents ", ob.objIndex+1, " 0 R")
 		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
 			ob.write("/Resources<<")
 		}
@@ -1339,19 +1339,19 @@ func (ob *PDF) writeStream(ar []byte) *PDF {
 
 // writeStreamData writes a stream or image stream
 func (ob *PDF) writeStreamData(ar []byte) *PDF {
-	var flt string // filter
+	var filter string
 	if ob.compression {
 		var buf bytes.Buffer
 		var wr = zlib.NewWriter(&buf)
-		var _, err = wr.Write([]byte(ar))
+		var _, err = wr.Write(ar)
 		if err != nil {
 			return ob.putError(0xE782A2, "Failed compressing", err.Error())
 		}
 		wr.Close() // don't defer, close before reading Bytes()
 		ar = buf.Bytes()
-		flt = "/Filter/FlateDecode"
+		filter = "/Filter/FlateDecode"
 	}
-	return ob.write(flt, "/Length ", len(ar),
+	return ob.write(filter, "/Length ", len(ar),
 		">>stream\n", string(ar), "\nendstream\n")
 } //                                                             writeStreamData
 
