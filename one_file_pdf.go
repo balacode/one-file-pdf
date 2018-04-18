@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-17 23:15:54 46833D                              [one_file_pdf.go]
+// :v: 2018-04-18 02:51:50 13C0F1                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -145,6 +145,7 @@ import (
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png" // init image decoders
+	"io"
 	"io/ioutil"
 	"reflect"
 	"runtime"
@@ -158,28 +159,28 @@ import (
 
 // PDF is the main structure representing a PDF document.
 type PDF struct {
-	paperSize    pdfPaperSize  // paper size used in this PDF
-	pageNo       int           // current page number
-	ppage        *pdfPage      // pointer to the current page
-	pages        []pdfPage     // all the pages added to this PDF
-	fonts        []pdfFont     // all the fonts used in this PDF
-	images       []pdfImage    // all the images used in this PDF
-	columnWidths []float64     // user-set column widths (like tab stops)
-	columnNo     int           // index of the current column
-	unitName     string        // name of active measurement unit
-	ptPerUnit    float64       // number of points per measurement unit
-	color        color.RGBA    // current drawing color
-	lineWidth    float64       // current line width (in points)
-	fontName     string        // current font's name
-	fontSizePt   float64       // current font's size (in points)
-	horzScaling  uint16        // horizontal scaling factor (in %)
-	compression  bool          // enable stream compression?
-	content      bytes.Buffer  // content buffer where PDF is written
-	pbuf         *bytes.Buffer // pointer to PDF/current page's buffer
-	objOffsets   []int         // used by Bytes() and write..()
-	objNo        int           // used by Bytes() and write..()
-	errors       []error       // errors that occurred during method calls
-	isInit       bool          // has the PDF been initialized?
+	paperSize    pdfPaperSize // paper size used in this PDF
+	pageNo       int          // current page number
+	ppage        *pdfPage     // pointer to the current page
+	pages        []pdfPage    // all the pages added to this PDF
+	fonts        []pdfFont    // all the fonts used in this PDF
+	images       []pdfImage   // all the images used in this PDF
+	columnWidths []float64    // user-set column widths (like tab stops)
+	columnNo     int          // index of the current column
+	unitName     string       // name of active measurement unit
+	ptPerUnit    float64      // number of points per measurement unit
+	color        color.RGBA   // current drawing color
+	lineWidth    float64      // current line width (in points)
+	fontName     string       // current font's name
+	fontSizePt   float64      // current font's size (in points)
+	horzScaling  uint16       // horizontal scaling factor (in %)
+	compression  bool         // enable stream compression?
+	content      bytes.Buffer // content buffer where PDF is written
+	writer       io.Writer    // writer to PDF buffer or current page's buffer
+	objOffsets   []int        // used by Bytes() and write..()
+	objNo        int          // used by Bytes() and write..()
+	errors       []error      // errors that occurred during method calls
+	isInit       bool         // has the PDF been initialized?
 	//
 	// document metadata fields
 	docAuthor, docCreator, docKeywords, docSubject, docTitle string
@@ -421,7 +422,7 @@ func (ob *PDF) AddPage() *PDF {
 	})
 	ob.pageNo = len(ob.pages) - 1
 	ob.ppage = &ob.pages[ob.pageNo]
-	ob.pbuf = &ob.ppage.content
+	ob.writer = &ob.ppage.content
 	return ob
 } //                                                                     AddPage
 
@@ -436,9 +437,9 @@ func (ob *PDF) Bytes() []byte {
 	var fontsIndex = pagesIndex + len(ob.pages)*2
 	var imagesIndex = fontsIndex + len(ob.fonts)
 	var infoIndex int // set when metadata found
-	var prevBuf = ob.pbuf
+	var prevWriter = ob.writer
 	ob.content.Reset()
-	ob.pbuf = &ob.content
+	ob.writer = &ob.content
 	ob.objOffsets = []int{}
 	ob.objNo = 0
 	ob.write("%PDF-1.4\n").writeObj("/Catalog").write("/Pages 2 0 R", pdfENDOBJ)
@@ -498,7 +499,7 @@ func (ob *PDF) Bytes() []byte {
 		ob.write("/Info ", infoIndex, " 0 R") // optional reference to info
 	}
 	ob.write(">>\nstartxref\n", start, "\n", "%%EOF\n")
-	ob.pbuf = prevBuf
+	ob.writer = prevWriter
 	return ob.content.Bytes()
 } //                                                                       Bytes
 
@@ -683,7 +684,7 @@ func (ob *PDF) NextLine() *PDF {
 
 // Reset releases all resources and resets all variables, except paper size.
 func (ob *PDF) Reset() *PDF {
-	ob.ppage, ob.pbuf = nil, nil
+	ob.ppage, ob.writer = nil, nil
 	*ob = NewPDF(ob.paperSize.name)
 	return ob
 } //                                                                       Reset
@@ -1234,13 +1235,13 @@ func (ob *PDF) write(args ...interface{}) *PDF {
 	for _, any := range args {
 		switch val := any.(type) {
 		case string:
-			ob.pbuf.WriteString(val)
+			io.WriteString(ob.writer, val)
 		case float64:
-			ob.pbuf.WriteString(strconv.FormatFloat(val, 'f', 3, 64))
+			io.WriteString(ob.writer, strconv.FormatFloat(val, 'f', 3, 64))
 		case int:
-			ob.pbuf.WriteString(strconv.FormatInt(int64(val), 10))
+			io.WriteString(ob.writer, strconv.FormatInt(int64(val), 10))
 		case uint16:
-			ob.pbuf.WriteString(strconv.FormatInt(int64(val), 10))
+			io.WriteString(ob.writer, strconv.FormatInt(int64(val), 10))
 		default:
 			fmt.Printf("Invalid type %s = %v", reflect.TypeOf(val), val)
 		}
