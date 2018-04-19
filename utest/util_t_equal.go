@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 12:27:27 5754C0                        [utest/util_t_equal.go]
+// :v: 2018-04-19 23:30:56 093394                        [utest/util_t_equal.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -8,15 +8,22 @@ package utest
 // Provides a slightly-altered TEqual() function (and functions it uses)
 // from Zircon-Go lib: github.com/balacode/zr
 
-import "fmt"     // standard
-import "os"      // standard
-import "reflect" // standard
-import "runtime" // standard
-import "strings" // standard
-import "testing" // standard
-import "time"    // standard
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"reflect"
+	"runtime"
+	"strings"
+	"testing"
+	"time"
+)
 
-const showSourceFileNames = false
+const showFileNames = 1
+
+// 0 - Don't show file names
+// 1 - Show only file name
+// 2 - Show file name and path
 
 // PL is fmt.Println() but is used only for debugging.
 var PL = fmt.Println
@@ -107,10 +114,16 @@ mainLoop:
 				continue mainLoop
 			}
 		}
-		// let the file name's path use the right kind of OS path separator
-		// (by default, the file name contains '/' on all platforms)
-		if string(os.PathSeparator) != "/" {
-			filename = strings.Replace(filename, "/", string(os.PathSeparator), -1)
+		switch showFileNames {
+		case 1:
+			filename = filepath.Base(filename)
+		case 2:
+			// let the file name's path use the right kind of OS path separator
+			// (by default, the file name contains '/' on all platforms)
+			if string(os.PathSeparator) != "/" {
+				filename = strings.Replace(filename,
+					"/", string(os.PathSeparator), -1)
+			}
 		}
 		// remove parent module/function names
 		if index := strings.LastIndex(funcName, "/"); index != -1 {
@@ -125,12 +138,9 @@ mainLoop:
 				funcName = strings.Replace(funcName, find, "", -1)
 			}
 		}
-		var line string
-		if showSourceFileNames {
-			line = fmt.Sprintf("func:%-30s  ln:%4d  file:%-30s",
-				funcName, lineNo, filename)
-		} else {
-			line = fmt.Sprintf("%s:%d", funcName, lineNo)
+		var line = fmt.Sprintf(":%d %s()", lineNo, funcName)
+		if showFileNames > 0 {
+			line = filename + line
 		}
 		ret = append(ret, line)
 	}
@@ -139,13 +149,13 @@ mainLoop:
 
 // TCaller returns the name of the unit test function.
 func TCaller() string {
-	for _, funcName := range CallerList() {
-		if strings.HasPrefix(funcName, "utest.TCaller") ||
-			strings.HasPrefix(funcName, "utest.TEqual") ||
-			strings.HasPrefix(funcName, "utest.pdfCompare") {
+	for _, iter := range CallerList() {
+		if strings.HasPrefix(iter, "utest.TCaller") ||
+			strings.HasPrefix(iter, "utest.TEqual") ||
+			strings.HasPrefix(iter, "utest.pdfCompare") {
 			continue
 		}
-		return funcName
+		return iter
 	}
 	return "<no-caller>"
 } //                                                                     TCaller
