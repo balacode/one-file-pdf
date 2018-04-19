@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-18 22:33:54 471133                              [one_file_pdf.go]
+// :v: 2018-04-19 23:20:03 D07A5D                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -111,8 +111,8 @@ package pdf
 //   writeMode(optFill ...bool) (mode string)
 //   writeObj(objType string) *PDF
 //   writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF
-//   writeStream(ar []byte) *PDF
 //   writeStreamData(ar []byte) *PDF
+//   writeStreamObj(ar []byte) *PDF
 //
 // # Internal Functions (*PDF) - just attached to PDF, but not using its data
 //   escape(s string) string
@@ -1327,15 +1327,10 @@ func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
 		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
 			ob.write(">>")
 		}
-		ob.write(pdfENDOBJ).writeStream(pg.content.Bytes())
+		ob.write(pdfENDOBJ).writeStreamObj(pg.content.Bytes())
 	}
 	return ob
 } //                                                                  writePages
-
-// writeStream outputs a stream object to the document's main buffer
-func (ob *PDF) writeStream(ar []byte) *PDF {
-	return ob.write(ob.nextObj(), " 0 obj <<").writeStreamData(ar)
-} //                                                                 writeStream
 
 // writeStreamData writes a stream or image stream
 func (ob *PDF) writeStreamData(ar []byte) *PDF {
@@ -1354,6 +1349,11 @@ func (ob *PDF) writeStreamData(ar []byte) *PDF {
 	return ob.write(filter, "/Length ", len(ar),
 		">>stream\n", string(ar), "\nendstream\n")
 } //                                                             writeStreamData
+
+// writeStreamObj outputs a stream object to the document's main buffer
+func (ob *PDF) writeStreamObj(ar []byte) *PDF {
+	return ob.write(ob.nextObj(), " 0 obj <<").writeStreamData(ar)
+} //                                                              writeStreamObj
 
 // -----------------------------------------------------------------------------
 // # Internal Functions (just attached to PDF, but not using it)
