@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-19 23:20:03 D07A5D                              [one_file_pdf.go]
+// :v: 2018-04-20 23:23:19 26E35C                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -123,6 +123,7 @@ package pdf
 //   getPaperSize(name string) (pdfPaperSize, error)
 //   getPointsPerUnit(unitName string) (ret float64, err error)
 //   putError(id int, msg, val string) *PDF
+//   writeTo(wr io.Writer, args ...interface{}) (n int, err error)
 //
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // # Constants
@@ -1230,22 +1231,9 @@ func (ob *PDF) nextObj() int {
 
 // write writes strings and numbers to the current page's content
 // stream or to the final generated PDF, if there is no active page
-func (ob *PDF) write(args ...interface{}) *PDF {
+func (ob *PDF) write(a ...interface{}) *PDF {
 	ob.reservePage()
-	for _, any := range args {
-		switch val := any.(type) {
-		case string:
-			io.WriteString(ob.writer, val)
-		case float64:
-			io.WriteString(ob.writer, strconv.FormatFloat(val, 'f', 3, 64))
-		case int:
-			io.WriteString(ob.writer, strconv.FormatInt(int64(val), 10))
-		case uint16:
-			io.WriteString(ob.writer, strconv.FormatInt(int64(val), 10))
-		default:
-			fmt.Printf("Invalid type %s = %v", reflect.TypeOf(val), val)
-		}
-	}
+	ob.writeTo(ob.writer, a...)
 	return ob
 } //                                                                       write
 
@@ -1483,6 +1471,38 @@ func (ob *PDF) putError(id int, msg, val string) *PDF {
 	ob.errors = append(ob.errors, pdfError{id: id, src: fn, msg: msg, val: val})
 	return ob
 } //                                                                    putError
+
+// writeTo writes multiple strings and numbers specified in 'args' using
+// writer 'wr'. Returns total bytes written and the first error if any.
+func (*PDF) writeTo(wr io.Writer, args ...interface{}) (n int, err error) {
+	for _, any := range args {
+		var c, e = 0, error(nil)
+		switch v := any.(type) {
+		case string:
+			c, e = io.WriteString(wr, v)
+		case float64:
+			c, e = io.WriteString(wr, strconv.FormatFloat(v, 'f', 3, 64))
+		case int:
+			c, e = io.WriteString(wr, strconv.FormatInt(int64(v), 10))
+		case uint:
+			c, e = io.WriteString(wr, strconv.FormatInt(int64(v), 10))
+		case uint16:
+			c, e = io.WriteString(wr, strconv.FormatInt(int64(v), 10))
+		case *bytes.Buffer:
+			c, e = wr.Write(v.Bytes())
+		case []byte:
+			c, e = wr.Write(v)
+		default:
+			c, e = 0, fmt.Errorf("Invalid type %s = %v", reflect.TypeOf(v), v)
+		}
+		n += c
+		if e != nil {
+			err = e
+			break
+		}
+	}
+	return n, err
+} //                                                                     writeTo
 
 // -----------------------------------------------------------------------------
 // # Constants
