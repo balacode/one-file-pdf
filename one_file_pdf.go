@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-20 23:23:19 26E35C                              [one_file_pdf.go]
+// :v: 2018-04-20 23:36:31 25E095                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -162,7 +162,7 @@ import (
 type PDF struct {
 	paperSize    pdfPaperSize // paper size used in this PDF
 	pageNo       int          // current page number
-	ppage        *pdfPage     // pointer to the current page
+	page         *pdfPage     // pointer to the current page
 	pages        []pdfPage    // all the pages added to this PDF
 	fonts        []pdfFont    // all the fonts used in this PDF
 	images       []pdfImage   // all the images used in this PDF
@@ -387,24 +387,24 @@ func (ob *PDF) SetUnits(unitName string) *PDF {
 } //                                                                    SetUnits
 
 // X returns the X-coordinate of the current drawing position.
-func (ob *PDF) X() float64 { return ob.reservePage().ToUnits(ob.ppage.x) }
+func (ob *PDF) X() float64 { return ob.reservePage().ToUnits(ob.page.x) }
 
 // SetX changes the X-coordinate of the current drawing position.
 func (ob *PDF) SetX(x float64) *PDF {
 	ob.init().reservePage()
-	ob.ppage.x = x * ob.ptPerUnit
+	ob.page.x = x * ob.ptPerUnit
 	return ob
 } //                                                                        SetX
 
 // Y returns the Y-coordinate of the current drawing position.
 func (ob *PDF) Y() float64 {
-	return ob.reservePage().ToUnits(ob.paperSize.heightPt - ob.ppage.y)
+	return ob.reservePage().ToUnits(ob.paperSize.heightPt - ob.page.y)
 } //                                                                           Y
 
 // SetY changes the Y-coordinate of the current drawing position.
 func (ob *PDF) SetY(y float64) *PDF {
 	ob.init().reservePage()
-	ob.ppage.y = ob.paperSize.heightPt - y*ob.ptPerUnit
+	ob.page.y = ob.paperSize.heightPt - y*ob.ptPerUnit
 	return ob
 } //                                                                        SetY
 
@@ -422,8 +422,8 @@ func (ob *PDF) AddPage() *PDF {
 		fontSizePt: 10, horzScaling: 100,
 	})
 	ob.pageNo = len(ob.pages) - 1
-	ob.ppage = &ob.pages[ob.pageNo]
-	ob.writer = &ob.ppage.content
+	ob.page = &ob.pages[ob.pageNo]
+	ob.writer = &ob.page.content
 	return ob
 } //                                                                     AddPage
 
@@ -562,14 +562,14 @@ func (ob *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 		return ob.putError(0xE8F375, err.msg, err.val)
 	}
 	var found bool
-	for _, iter := range ob.ppage.imageNos {
+	for _, iter := range ob.page.imageNos {
 		if iter == idx {
 			found = true
 			break
 		}
 	}
 	if !found {
-		ob.ppage.imageNos = append(ob.ppage.imageNos, idx)
+		ob.page.imageNos = append(ob.page.imageNos, idx)
 	}
 	// draw the image
 	var h = height * ob.ptPerUnit
@@ -685,7 +685,7 @@ func (ob *PDF) NextLine() *PDF {
 
 // Reset releases all resources and resets all variables, except paper size.
 func (ob *PDF) Reset() *PDF {
-	ob.ppage, ob.writer = nil, nil
+	ob.page, ob.writer = nil, nil
 	*ob = NewPDF(ob.paperSize.name)
 	return ob
 } //                                                                       Reset
@@ -991,25 +991,25 @@ func (ob *PDF) applyFont() (handler pdfFontHandler, err error) {
 		font.id = 1 + len(ob.fonts)
 		ob.fonts = append(ob.fonts, font)
 	}
-	if ob.ppage.fontID == font.id &&
-		int(ob.ppage.fontSizePt*100) == int(ob.fontSizePt)*100 {
+	if ob.page.fontID == font.id &&
+		int(ob.page.fontSizePt*100) == int(ob.fontSizePt)*100 {
 		return handler, err
 	}
 	// add the font ID to the current page, if not already referenced
 	var alreadyUsedOnPage bool
-	for _, id := range ob.ppage.fontIDs {
+	for _, id := range ob.page.fontIDs {
 		if id == font.id {
 			alreadyUsedOnPage = true
 			break
 		}
 	}
 	if !alreadyUsedOnPage {
-		ob.ppage.fontIDs = append(ob.ppage.fontIDs, 0)
-		ob.ppage.fontIDs[len(ob.ppage.fontIDs)-1] = font.id
+		ob.page.fontIDs = append(ob.page.fontIDs, 0)
+		ob.page.fontIDs[len(ob.page.fontIDs)-1] = font.id
 	}
-	ob.ppage.fontID = font.id
-	ob.ppage.fontSizePt = ob.fontSizePt
-	ob.write("BT /FNT", ob.ppage.fontID, " ", int(ob.ppage.fontSizePt),
+	ob.page.fontID = font.id
+	ob.page.fontSizePt = ob.fontSizePt
+	ob.write("BT /FNT", ob.page.fontID, " ", int(ob.page.fontSizePt),
 		" Tf ET\n")
 	// BT: begin text   /FNT0 i0 Tf: set font to FNT0 index i0   ET: end text
 	return handler, err
@@ -1026,19 +1026,19 @@ func (ob *PDF) drawTextLine(s string) *PDF {
 	if err, isT := err.(pdfError); isT {
 		ob.putError(0xEAEAC4, err.msg, err.val)
 	}
-	if ob.ppage.horzScaling != ob.horzScaling {
-		ob.ppage.horzScaling = ob.horzScaling
-		ob.write("BT ", ob.ppage.horzScaling, " Tz ET\n")
+	if ob.page.horzScaling != ob.horzScaling {
+		ob.page.horzScaling = ob.horzScaling
+		ob.write("BT ", ob.page.horzScaling, " Tz ET\n")
 		// BT: begin text   n0 Tz: set horiz. text scaling to n0%   ET: end text
 	}
 	ob.writeMode(true) // fill/nonStroke
 	if handler == nil {
-		ob.write("BT ", int(ob.ppage.x), " ", int(ob.ppage.y),
+		ob.write("BT ", int(ob.page.x), " ", int(ob.page.y),
 			" Td (", ob.escape(s), ") Tj ET\n")
 		// BT: begin text   Td: move text position   Tj: show text   ET: end text
-		ob.ppage.x += ob.textWidthPt(s)
+		ob.page.x += ob.textWidthPt(s)
 	} else {
-		ob.ppage.x += handler.writeText(s)
+		ob.page.x += handler.writeText(s)
 	}
 	return ob
 } //                                                                drawTextLine
@@ -1087,7 +1087,7 @@ func (ob *PDF) drawTextBox(x, y, width, height float64,
 		} else {
 			off = width/2 - ob.textWidthPt(line)/2 //                     center
 		}
-		ob.ppage.x, ob.ppage.y = x+off, y
+		ob.page.x, ob.page.y = x+off, y
 		ob.drawTextLine(line)
 		y -= lineHeight
 	}
@@ -1207,7 +1207,7 @@ func (ob *PDF) textWidthPt(s string) float64 {
 				fmt.Sprintf("at %d = '%s'", i, string(r)))
 			break
 		}
-		var id = ob.fonts[ob.ppage.fontID-1].builtInIndex
+		var id = ob.fonts[ob.page.fontID-1].builtInIndex
 		if id >= 0 && id <= 9 {
 			w += float64(pdfFontWidths[r][id])
 		} else {
@@ -1251,18 +1251,18 @@ func (ob *PDF) writeMode(optFill ...bool) (mode string) {
 	mode = "S" // S: stroke path (for lines)
 	if len(optFill) > 0 && optFill[0] {
 		mode = "b" // b: fill / text
-		if pv := &ob.ppage.nonStrokeColor; *pv != ob.color {
+		if pv := &ob.page.nonStrokeColor; *pv != ob.color {
 			*pv = ob.color
 			ob.write(" ", float64(pv.R)/255, " ", float64(pv.G)/255, " ",
 				float64(pv.B)/255, " rg\n") // rg: set non-stroking/text color
 		}
 	}
-	if pv := &ob.ppage.strokeColor; *pv != ob.color {
+	if pv := &ob.page.strokeColor; *pv != ob.color {
 		*pv = ob.color
 		ob.write(float64(pv.R)/255, " ", float64(pv.G)/255,
 			" ", float64(pv.B)/255, " RG\n") // RG: set stroke (line) color
 	}
-	if pv := &ob.ppage.lineWidth; int(*pv*100) != int(ob.lineWidth*100) {
+	if pv := &ob.page.lineWidth; int(*pv*100) != int(ob.lineWidth*100) {
 		*pv = ob.lineWidth
 		ob.write(float64(*pv), " w\n") // n0 w: set line width to n0
 	}
