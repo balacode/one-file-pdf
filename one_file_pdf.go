@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-20 23:36:31 25E095                              [one_file_pdf.go]
+// :v: 2018-04-20 23:48:55 37B711                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -131,7 +131,6 @@ package pdf
 //
 // # Internal Constants
 //   pdfBlack = color.RGBA{A: 255}
-//   pdfENDOBJ = ">>\nendobj\n"
 //   pdfFontNames = []string
 //   pdfFontWidths = [][]int
 //   pdfStandardPaperSizes = map[string][2]int
@@ -443,7 +442,8 @@ func (ob *PDF) Bytes() []byte {
 	ob.writer = &ob.content
 	ob.objOffsets = []int{}
 	ob.objIndex = 0
-	ob.write("%PDF-1.4\n").writeObj("/Catalog").write("/Pages 2 0 R", pdfENDOBJ)
+	ob.write("%PDF-1.4\n").writeObj("/Catalog").
+		write("/Pages 2 0 R>>\n" + "endobj\n")
 	//
 	//  write /Pages object (2 0 obj), page count, page size and the pages
 	ob.writePages(pagesIndex, fontsIndex, imagesIndex)
@@ -453,8 +453,8 @@ func (ob *PDF) Bytes() []byte {
 		if iter.handler == nil {
 			ob.writeObj("/Font").
 				write("/Subtype/Type1/Name/FNT", iter.id,
-					"/BaseFont/", iter.name, "/Encoding/StandardEncoding")
-			ob.write(pdfENDOBJ)
+					"/BaseFont/", iter.name, "/Encoding/StandardEncoding"+
+						">>\n"+"endobj\n")
 		} else {
 			iter.handler.writeFont(&iter)
 		}
@@ -469,7 +469,7 @@ func (ob *PDF) Bytes() []byte {
 			write("/Subtype/Image",
 				"/Width ", iter.widthPx, "/Height ", iter.heightPx,
 				"/ColorSpace/", colorSpace, "/BitsPerComponent 8").
-			writeStreamData(iter.data).write("\nendobj\n")
+			writeStreamData(iter.data).write("\n" + "endobj\n")
 	}
 	// write info object
 	if ob.docTitle != "" || ob.docSubject != "" ||
@@ -486,20 +486,21 @@ func (ob *PDF) Bytes() []byte {
 				ob.write(iter[0], "(", ob.escape(iter[1]), ")")
 			}
 		}
-		ob.write(pdfENDOBJ)
+		ob.write(">>\n" + "endobj\n")
 	}
 	// write cross-reference table at end of document
 	var start = ob.content.Len()
-	ob.write("xref\n0 ", len(ob.objOffsets), "\n0000000000 65535 f \n")
+	ob.write("xref\n"+
+		"0 ", len(ob.objOffsets), "\n"+"0000000000 65535 f \n")
 	for _, offset := range ob.objOffsets[1:] {
 		ob.write(fmt.Sprintf("%010d 00000 n \n", offset))
 	}
 	// write the trailer
-	ob.write("trailer\n<</Size ", len(ob.objOffsets), "/Root 1 0 R")
+	ob.write("trailer\n"+"<</Size ", len(ob.objOffsets), "/Root 1 0 R")
 	if infoIndex > 0 {
 		ob.write("/Info ", infoIndex, " 0 R") // optional reference to info
 	}
-	ob.write(">>\nstartxref\n", start, "\n", "%%EOF\n")
+	ob.write(">>\n"+"startxref\n", start, "\n", "%%EOF\n")
 	ob.writer = prevWriter
 	return ob.content.Bytes()
 } //                                                                       Bytes
@@ -575,8 +576,8 @@ func (ob *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 	var h = height * ob.ptPerUnit
 	var w = float64(img.widthPx) / float64(img.heightPx) * h
 	x, y = x*ob.ptPerUnit, ob.paperSize.heightPt-y*ob.ptPerUnit-h
-	return ob.write(
-		"q\n ", w, " 0 0 ", h, " ", x, " ", y, " cm\n/IMG", idx, " Do\nQ\n")
+	return ob.write("q\n"+" ", w, " 0 0 ", h, " ", x, " ", y, " cm"+
+		"\n"+"/IMG", idx, " Do\n"+"Q\n")
 	//    q: save graphics state
 	//   cm: concatenate matrix to current transform matrix
 	//   Do: invoke named XObject (/IMGn)
@@ -1291,7 +1292,7 @@ func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
 		}
 		ob.write("]")
 	}
-	ob.write(pdfENDOBJ)
+	ob.write(">>\n" + "endobj\n")
 	for _, pg := range ob.pages { //                             write each page
 		ob.writeObj("/Page").
 			write("/Parent 2 0 R/Contents ", ob.objIndex+1, " 0 R")
@@ -1315,7 +1316,7 @@ func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
 		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
 			ob.write(">>")
 		}
-		ob.write(pdfENDOBJ).writeStreamObj(pg.content.Bytes())
+		ob.write(">>\n" + "endobj\n").writeStreamObj(pg.content.Bytes())
 	}
 	return ob
 } //                                                                  writePages
@@ -1335,7 +1336,7 @@ func (ob *PDF) writeStreamData(ar []byte) *PDF {
 		filter = "/Filter/FlateDecode"
 	}
 	return ob.write(filter, "/Length ", len(ar),
-		">>stream\n", string(ar), "\nendstream\n")
+		">>stream\n", string(ar), "\n"+"endstream\n")
 } //                                                             writeStreamData
 
 // writeStreamObj outputs a stream object to the document's main buffer
@@ -1661,8 +1662,6 @@ var PDFColorNames = map[string]color.RGBA{
 // # Internal Constants
 
 var pdfBlack = color.RGBA{A: 255}
-
-const pdfENDOBJ = ">>\nendobj\n"
 
 // pdfFontNames contains font names available on all PDF implementations
 var pdfFontNames = []string{
