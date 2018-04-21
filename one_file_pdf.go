@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-20 23:48:55 37B711                              [one_file_pdf.go]
+// :v: 2018-04-21 01:38:21 DE97FF                              [one_file_pdf.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -171,6 +171,7 @@ type PDF struct {
 	ptPerUnit    float64      // number of points per measurement unit
 	color        color.RGBA   // current drawing color
 	lineWidth    float64      // current line width (in points)
+	font         *pdfFont     // currently selected font
 	fontName     string       // current font's name
 	fontSizePt   float64      // current font's size (in points)
 	horzScaling  uint16       // horizontal scaling factor (in %)
@@ -211,14 +212,17 @@ var pdfNewFontHandler func() pdfFontHandler
 // pdfFontHandler interface provides methods to parse and embed TrueType fonts.
 type pdfFontHandler interface {
 	//
-	// loads a font from a file name, slice of bytes, or io.Reader
-	loadFont(owner *PDF, font interface{}) bool
+	// reads and parses a font from a file name, slice of bytes, or io.Reader
+	readFont(owner *PDF, font interface{}) bool
+	//
+	// returns the width of text 's' in points
+	textWidthPt(s string) float64
 	//
 	// writes text in the string 's' and returns its width in points
-	writeText(s string) float64
+	writeText(s string)
 	//
 	// writes the PDF objects that define the subset font (i.e. embeds font)
-	writeFont(font *pdfFont)
+	writeFontObjects(font *pdfFont)
 } //                                                              pdfFontHandler
 
 // -----------------------------------------------------------------------------
@@ -456,7 +460,7 @@ func (ob *PDF) Bytes() []byte {
 					"/BaseFont/", iter.name, "/Encoding/StandardEncoding"+
 						">>\n"+"endobj\n")
 		} else {
-			iter.handler.writeFont(&iter)
+			iter.handler.writeFontObjects(&iter)
 		}
 	}
 	// write images
@@ -971,7 +975,7 @@ func (ob *PDF) applyFont() (handler pdfFontHandler, err error) {
 	}
 	if !valid && pdfNewFontHandler != nil {
 		handler = pdfNewFontHandler()
-		valid = handler.loadFont(ob, ob.fontName)
+		valid = handler.readFont(ob, ob.fontName)
 		font.handler = handler
 	}
 	// if there is no selected font or it's invalid, use Helvetica
@@ -1037,10 +1041,10 @@ func (ob *PDF) drawTextLine(s string) *PDF {
 		ob.write("BT ", int(ob.page.x), " ", int(ob.page.y),
 			" Td (", ob.escape(s), ") Tj ET\n")
 		// BT: begin text   Td: move text position   Tj: show text   ET: end text
-		ob.page.x += ob.textWidthPt(s)
 	} else {
-		ob.page.x += handler.writeText(s)
+		handler.writeText(s)
 	}
+	ob.page.x += ob.textWidthPt(s)
 	return ob
 } //                                                                drawTextLine
 
@@ -1200,6 +1204,9 @@ func (ob *PDF) reservePage() *PDF {
 func (ob *PDF) textWidthPt(s string) float64 {
 	if s == "" {
 		return 0
+	}
+	if ob.font != nil && ob.font.handler != nil {
+		return ob.font.handler.textWidthPt(s)
 	}
 	var w = 0.0
 	for i, r := range s {
