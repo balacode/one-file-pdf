@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-19 23:30:56 093394                        [utest/util_t_equal.go]
+// :v: 2018-04-22 14:32:17 BA3DD6                        [utest/util_t_equal.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -69,7 +69,7 @@ func TEqual(t *testing.T, result interface{}, expect interface{}) bool {
 		return fmt.Sprintf("(type: %v value: %v)", reflect.TypeOf(val), val)
 	}
 	if makeStr(result) != makeStr(expect) {
-		t.Logf("\n LOCATION: %s \n EXPECTED: %s \n RETURNED: %s \n",
+		t.Logf("\n"+"LOCATION: %s\n"+"EXPECTED: %s\n"+"RETURNED: %s\n",
 			TCaller(), makeStr(expect), makeStr(result))
 		t.Fail()
 		return false
@@ -150,9 +150,9 @@ mainLoop:
 // TCaller returns the name of the unit test function.
 func TCaller() string {
 	for _, iter := range CallerList() {
-		if strings.HasPrefix(iter, "utest.TCaller") ||
-			strings.HasPrefix(iter, "utest.TEqual") ||
-			strings.HasPrefix(iter, "utest.pdfCompare") {
+		if strings.Contains(iter, "utest.TCaller") ||
+			strings.Contains(iter, "utest.TEqual") ||
+			strings.Contains(iter, "utest.pdfCompare") {
 			continue
 		}
 		return iter
