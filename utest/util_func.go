@@ -1,12 +1,13 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 22:04:39 6421B8                           [utest/util_func.go]
+// :v: 2018-04-22 14:30:55 E80EB4                           [utest/util_func.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
 import "bytes"   // standard
 import "fmt"     // standard
+import "strconv" // standard
 import "strings" // standard
 import "testing" // standard
 
@@ -56,14 +57,23 @@ func pdfCompare(t *testing.T, result []byte, expect string, sfmt pdfStreamFmt) {
 		if errCount > 5 {
 			break
 		}
-		t.Errorf("LOCATION: %s:\n"+
-			"MISMATCH: L%d:\n"+
-			"EXPECTED: %s\n"+
-			"PRODUCED: %s\n"+
-			"\n", TCaller(), i+1, expect, result)
+		t.Errorf("%s",
+			"\n"+
+				"/*\n"+
+				"LOCATION: "+TCaller()+":\n"+
+				"MISMATCH: L"+strconv.Itoa(i+1)+":\n"+
+				"EXPECTED: "+expect+"\n"+
+				"PRODUCED: "+result+"\n"+
+				"*/\n")
 	}
 	if mismatch {
-		t.Errorf("RETURNED >>>>>>> \n %s \n", strings.Join(results, "\n"))
+		t.Errorf("%s",
+			"\n"+
+				"// RETURNED-PDF:\n"+
+				"// "+TCaller()+"\n"+
+				"`\n"+
+				strings.Join(results, "\n")+"\n"+
+				"`\n")
 	}
 } //                                                                  pdfCompare
 
