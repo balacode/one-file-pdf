@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 18:56:20 0D51D1                            [utest/draw_box.go]
+// :v: 2018-04-23 11:32:14 063E00                            [utest/draw_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -28,16 +28,16 @@ func DrawBox(t *testing.T) {
 		SetColor("Red").DrawBox(x, y, 4, 4).
 		SetColor("DarkGreen").DrawBox(x, y, 9, 9).
 		SetColor("Blue").DrawBox(x, y, 16, 16)
-	//
+
 	var expect = `
 	%PDF-1.4
-	1 0 obj<</Type/Catalog/Pages 2 0 R>>
+	1 0 obj <</Type/Catalog/Pages 2 0 R>>
 	endobj
-	2 0 obj<</Type/Pages/Count 1/MediaBox[0 0 510 510]/Kids[3 0 R]>>
+	2 0 obj <</Type/Pages/Count 1/MediaBox[0 0 510 510]/Kids[3 0 R]>>
 	endobj
-	3 0 obj<</Type/Page/Parent 2 0 R/Contents 4 0 R>>
+	3 0 obj <</Type/Page/Parent 2 0 R/Contents 4 0 R>>
 	endobj
-	4 0 obj <</Length 255>>stream
+	4 0 obj <</Length 255>> stream
 	0.000 0.000 0.000 rg
 	0.000 0.000 0.000 RG
 	5.000 w
@@ -49,19 +49,21 @@ func DrawBox(t *testing.T) {
 	0.000 0.000 1.000 RG
 	28.346 28.346 453.543 453.543 re S
 	endstream
+	endobj
 	xref
 	0 5
 	0000000000 65535 f
-	0000000009 00000 n
-	0000000053 00000 n
-	0000000125 00000 n
-	0000000182 00000 n
+	0000000010 00000 n
+	0000000056 00000 n
+	0000000130 00000 n
+	0000000189 00000 n
 	trailer
 	<</Size 5/Root 1 0 R>>
 	startxref
-	478
+	495
 	%%EOF
 	`
+
 	pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 } //                                                                     DrawBox
 

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-28 03:14:14 08292D                          [utest/line_width.go]
+// :v: 2018-04-23 11:32:14 032D2C                          [utest/line_width.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -53,7 +53,7 @@ func LineWidth(t *testing.T) {
 		%%EOF
         `
 		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
-		doc.SaveFile("``test_line_width.pdf")
+		doc.SaveFile("~~test_line_width.pdf")
 	}()
 
 } //                                                                   LineWidth

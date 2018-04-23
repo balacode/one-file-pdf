@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-17 23:15:55 964292                           [utest/font_name.go]
+// :v: 2018-04-23 11:32:14 582516                           [utest/font_name.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -54,38 +54,42 @@ func FontName(t *testing.T) {
 			SetFont("Helvetica", 10).
 			SetFontName("TimesRoman").
 			DrawText("Hello World!")
+
 		var expect = `
 		%PDF-1.4
-		1 0 obj<</Type/Catalog/Pages 2 0 R>>
+		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
-		2 0 obj<</Type/Pages/Count 1/MediaBox[0 0 595 841]/Kids[3 0 R]>>
+		2 0 obj <</Type/Pages/Count 1/MediaBox[0 0 595 841]/Kids[3 0 R]>>
 		endobj
-		3 0 obj<</Type/Page/Parent 2 0 R/Contents 4 0 R\
-		/Resources<</Font <</FNT1 5 0 R>>>>>>
+		3 0 obj <</Type/Page/Parent 2 0 R/Contents 4 0 R
+		/Resources <</Font <</FNT1 5 0 R>> >> >>
 		endobj
-		4 0 obj <</Length 95>>stream
+		4 0 obj <</Length 95>> stream
 		BT /FNT1 10 Tf ET
 		0.000 0.000 0.000 rg
 		0.000 0.000 0.000 RG
 		BT 28 813 Td (Hello World!) Tj ET
 		endstream
-		5 0 obj<</Type/Font/Subtype/Type1/Name/FNT1/BaseFont/Times-Roman\
+		endobj
+		5 0 obj <</Type/Font/Subtype/Type1/Name/FNT1
+		/BaseFont/Times-Roman
 		/Encoding/StandardEncoding>>
 		endobj
 		xref
 		0 6
 		0000000000 65535 f
-		0000000009 00000 n
-		0000000053 00000 n
-		0000000125 00000 n
-		0000000217 00000 n
-		0000000352 00000 n
+		0000000010 00000 n
+		0000000056 00000 n
+		0000000130 00000 n
+		0000000228 00000 n
+		0000000373 00000 n
 		trailer
 		<</Size 6/Root 1 0 R>>
 		startxref
-		452
+		476
 		%%EOF
-        `
+		`
+
 		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 	}()
 

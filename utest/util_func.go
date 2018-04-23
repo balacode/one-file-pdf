@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-22 14:30:55 E80EB4                           [utest/util_func.go]
+// :v: 2018-04-23 11:32:14 303080                           [utest/util_func.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -134,7 +134,7 @@ func pdfFormatLines(s string, sfmt pdfStreamFmt) []string {
 // pdfFormatStreamsInHex formats content of all streams in s as hex strings
 func pdfFormatStreamsInHex(s string) string {
 	const (
-		STREAM    = ">>stream"
+		STREAM    = ">> stream"
 		ENDSTREAM = "endstream"
 		BPL       = 16 // bytes per line
 	)

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-17 23:15:55 D26E14                        [utest/draw_text_at.go]
+// :v: 2018-04-23 11:32:14 D4BFA0                        [utest/draw_text_at.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -29,17 +29,17 @@ func DrawTextAt(t *testing.T) {
 		FillBox(5, 5, 0.1, 0.1).
 		FillBox(10, 10, 0.1, 0.1).
 		FillBox(15, 15, 0.1, 0.1)
-	//
+
 	var expect = `
 	%PDF-1.4
-	1 0 obj<</Type/Catalog/Pages 2 0 R>>
+	1 0 obj <</Type/Catalog/Pages 2 0 R>>
 	endobj
-	2 0 obj<</Type/Pages/Count 1/MediaBox[0 0 595 841]/Kids[3 0 R]>>
+	2 0 obj <</Type/Pages/Count 1/MediaBox[0 0 595 841]/Kids[3 0 R]>>
 	endobj
-	3 0 obj<</Type/Page/Parent 2 0 R/Contents 4 0 R\
-	/Resources<</Font <</FNT1 5 0 R>>>>>>
+	3 0 obj <</Type/Page/Parent 2 0 R/Contents 4 0 R
+	/Resources <</Font <</FNT1 5 0 R>> >> >>
 	endobj
-	4 0 obj <</Length 297>>stream
+	4 0 obj <</Length 297>> stream
 	BT /FNT1 20 Tf ET
 	0.212 0.271 0.310 rg
 	0.212 0.271 0.310 RG
@@ -52,23 +52,26 @@ func DrawTextAt(t *testing.T) {
 	283.465 555.591 2.835 2.835 re b
 	425.197 413.858 2.835 2.835 re b
 	endstream
-	5 0 obj<</Type/Font/Subtype/Type1/Name/FNT1/BaseFont/Helvetica-Bold\
+	endobj
+	5 0 obj <</Type/Font/Subtype/Type1/Name/FNT1
+	/BaseFont/Helvetica-Bold
 	/Encoding/StandardEncoding>>
 	endobj
 	xref
 	0 6
 	0000000000 65535 f
-	0000000009 00000 n
-	0000000053 00000 n
-	0000000125 00000 n
-	0000000217 00000 n
-	0000000555 00000 n
+	0000000010 00000 n
+	0000000056 00000 n
+	0000000130 00000 n
+	0000000228 00000 n
+	0000000576 00000 n
 	trailer
 	<</Size 6/Root 1 0 R>>
 	startxref
-	658
+	682
 	%%EOF
 	`
+
 	pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 } //                                                                  DrawTextAt
 

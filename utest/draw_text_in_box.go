@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-17 23:15:55 111D46                    [utest/draw_text_in_box.go]
+// :v: 2018-04-23 11:32:14 239521                    [utest/draw_text_in_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -37,17 +37,17 @@ func DrawTextInBox(t *testing.T) {
 		SetColor("Black").
 		DrawTextInBox(5, 5, 3, 15, "C", ""). // no effect
 		DrawTextInBox(5, 5, 3, 15, "C", lorem)
-	//
+
 	var expect = `
 	%PDF-1.4
-	1 0 obj<</Type/Catalog/Pages 2 0 R>>
+	1 0 obj <</Type/Catalog/Pages 2 0 R>>
 	endobj
-	2 0 obj<</Type/Pages/Count 1/MediaBox[0 0 595 841]/Kids[3 0 R]>>
+	2 0 obj <</Type/Pages/Count 1/MediaBox[0 0 595 841]/Kids[3 0 R]>>
 	endobj
-	3 0 obj<</Type/Page/Parent 2 0 R/Contents 4 0 R\
-	/Resources<</Font <</FNT1 5 0 R>>>>>>
+	3 0 obj <</Type/Page/Parent 2 0 R/Contents 4 0 R
+	/Resources <</Font <</FNT1 5 0 R>> >> >>
 	endobj
-	4 0 obj <</Length 1275>>stream
+	4 0 obj <</Length 1275>> stream
 	0.827 0.827 0.827 rg
 	0.827 0.827 0.827 RG
 	141.732 274.961 85.039 425.197 re b
@@ -85,23 +85,26 @@ func DrawTextInBox(t *testing.T) {
 	BT 158 349 Td (anim id est ) Tj ET
 	BT 164 339 Td (laborum.) Tj ET
 	endstream
-	5 0 obj<</Type/Font/Subtype/Type1/Name/FNT1/BaseFont/Helvetica\
+	endobj
+	5 0 obj <</Type/Font/Subtype/Type1/Name/FNT1
+	/BaseFont/Helvetica
 	/Encoding/StandardEncoding>>
 	endobj
 	xref
 	0 6
 	0000000000 65535 f
-	0000000009 00000 n
-	0000000053 00000 n
-	0000000125 00000 n
-	0000000217 00000 n
-	0000001534 00000 n
+	0000000010 00000 n
+	0000000056 00000 n
+	0000000130 00000 n
+	0000000228 00000 n
+	0000001555 00000 n
 	trailer
 	<</Size 6/Root 1 0 R>>
 	startxref
-	1632
+	1656
 	%%EOF
 	`
+
 	pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 } //                                                               DrawTextInBox
 

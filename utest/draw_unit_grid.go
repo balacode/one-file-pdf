@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-17 23:15:55 0C76A0                      [utest/draw_unit_grid.go]
+// :v: 2018-04-23 11:32:14 6ED4E7                      [utest/draw_unit_grid.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -19,16 +19,17 @@ func DrawUnitGrid(t *testing.T) {
 		doc.SetCompression(false).SetUnits("cm").DrawUnitGrid()
 		return doc.Bytes()
 	}()
+
 	const expect = `
 	%PDF-1.4
-	1 0 obj<</Type/Catalog/Pages 2 0 R>>
+	1 0 obj <</Type/Catalog/Pages 2 0 R>>
 	endobj
-	2 0 obj<</Type/Pages/Count 1/MediaBox[0 0 595 841]/Kids[3 0 R]>>
+	2 0 obj <</Type/Pages/Count 1/MediaBox[0 0 595 841]/Kids[3 0 R]>>
 	endobj
-	3 0 obj<</Type/Page/Parent 2 0 R\
-		/Contents 4 0 R/Resources<</Font <</FNT1 5 0 R>>>>>>
+	3 0 obj <</Type/Page/Parent 2 0 R/Contents 4 0 R
+	/Resources <</Font <</FNT1 5 0 R>> >> >>
 	endobj
-	4 0 obj <</Length 7417>>stream
+	4 0 obj <</Length 7417>> stream
 	0.784 0.784 0.784 rg
 	0.784 0.784 0.784 RG
 	0.100 w
@@ -338,23 +339,26 @@ func DrawUnitGrid(t *testing.T) {
 	0.294 0.000 0.510 RG
 	BT 2 11 Td (29) Tj ET
 	endstream
-	5 0 obj<</Type/Font/Subtype/Type1/Name/FNT1/BaseFont/Helvetica\
+	endobj
+	5 0 obj <</Type/Font/Subtype/Type1/Name/FNT1
+	/BaseFont/Helvetica
 	/Encoding/StandardEncoding>>
 	endobj
 	xref
 	0 6
 	0000000000 65535 f
-	0000000009 00000 n
-	0000000053 00000 n
-	0000000125 00000 n
-	0000000217 00000 n
-	0000007676 00000 n
+	0000000010 00000 n
+	0000000056 00000 n
+	0000000130 00000 n
+	0000000228 00000 n
+	0000007697 00000 n
 	trailer
 	<</Size 6/Root 1 0 R>>
 	startxref
-	7774
+	7798
 	%%EOF
 	`
+
 	pdfCompare(t, result, expect, pdfStreamsInText)
 } //                                                                DrawUnitGrid
 

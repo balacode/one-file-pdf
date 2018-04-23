@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-17 23:15:55 107DED                               [utest/reset.go]
+// :v: 2018-04-23 11:32:14 9210BF                               [utest/reset.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -29,14 +29,14 @@ func Reset(t *testing.T) {
 			DrawText("THIRD")
 		var expect = `
 		%PDF-1.4
-		1 0 obj<</Type/Catalog/Pages 2 0 R>>
+		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
-		2 0 obj<</Type/Pages/Count 1/MediaBox[0 0 595 841]/Kids[3 0 R]>>
+		2 0 obj <</Type/Pages/Count 1/MediaBox[0 0 595 841]/Kids[3 0 R]>>
 		endobj
-		3 0 obj<</Type/Page/Parent 2 0 R/Contents 4 0 R\
-		/Resources<</Font <</FNT1 5 0 R>>>>>>
+		3 0 obj <</Type/Page/Parent 2 0 R/Contents 4 0 R
+		/Resources <</Font <</FNT1 5 0 R>> >> >>
 		endobj
-		4 0 obj <</Length 143>>stream
+		4 0 obj <</Length 143>> stream
 		BT /FNT1 10 Tf ET
 		0.000 0.420 0.235 rg
 		0.000 0.420 0.235 RG
@@ -44,21 +44,23 @@ func Reset(t *testing.T) {
 		BT 28 700 Td (SECOND) Tj ET
 		BT 141 700 Td (THIRD) Tj ET
 		endstream
-		5 0 obj<</Type/Font/Subtype/Type1/Name/FNT1/BaseFont/Helvetica-Bold\
+		endobj
+		5 0 obj <</Type/Font/Subtype/Type1/Name/FNT1
+		/BaseFont/Helvetica-Bold
 		/Encoding/StandardEncoding>>
 		endobj
 		xref
 		0 6
 		0000000000 65535 f
-		0000000009 00000 n
-		0000000053 00000 n
-		0000000125 00000 n
-		0000000217 00000 n
-		0000000401 00000 n
+		0000000010 00000 n
+		0000000056 00000 n
+		0000000130 00000 n
+		0000000228 00000 n
+		0000000422 00000 n
 		trailer
 		<</Size 6/Root 1 0 R>>
 		startxref
-		504
+		528
 		%%EOF
 		`
 		var result = doc.Bytes()
@@ -70,25 +72,26 @@ func Reset(t *testing.T) {
 		// after calling Reset(), the PDF should just be a blank page:
 		var expect = `
 		%PDF-1.4
-		1 0 obj<</Type/Catalog/Pages 2 0 R>>
+		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
-		2 0 obj<</Type/Pages/Count 1/MediaBox[0 0 595 841]/Kids[3 0 R]>>
+		2 0 obj <</Type/Pages/Count 1/MediaBox[0 0 595 841]/Kids[3 0 R]>>
 		endobj
-		3 0 obj<</Type/Page/Parent 2 0 R/Contents 4 0 R>>
+		3 0 obj <</Type/Page/Parent 2 0 R/Contents 4 0 R>>
 		endobj
-		4 0 obj <</Length 0>>stream
+		4 0 obj <</Length 0>> stream
 		endstream
+		endobj
 		xref
 		0 5
 		0000000000 65535 f
-		0000000009 00000 n
-		0000000053 00000 n
-		0000000125 00000 n
-		0000000182 00000 n
+		0000000010 00000 n
+		0000000056 00000 n
+		0000000130 00000 n
+		0000000189 00000 n
 		trailer
 		<</Size 5/Root 1 0 R>>
 		startxref
-		221
+		238
 		%%EOF
 		`
 		var result = doc.SetCompression(false).Bytes()

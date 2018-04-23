@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-27 22:10:13 CC42AD                        [utest/doc_keywords.go]
+// :v: 2018-04-23 11:32:14 58F999                        [utest/doc_keywords.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -49,32 +49,35 @@ func DocKeywords(t *testing.T) {
 	func() {
 		var doc = pdf.NewPDF("A4") // initialized PDF
 		doc.SetCompression(false).SetDocKeywords("'Keywords' metadata entry")
+
 		var expect = `
 		%PDF-1.4
-		1 0 obj<</Type/Catalog/Pages 2 0 R>>
+		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
-		2 0 obj<</Type/Pages/Count 1/MediaBox[0 0 595 841]/Kids[3 0 R]>>
+		2 0 obj <</Type/Pages/Count 1/MediaBox[0 0 595 841]/Kids[3 0 R]>>
 		endobj
-		3 0 obj<</Type/Page/Parent 2 0 R/Contents 4 0 R>>
+		3 0 obj <</Type/Page/Parent 2 0 R/Contents 4 0 R>>
 		endobj
-		4 0 obj <</Length 0>>stream
+		4 0 obj <</Length 0>> stream
 		endstream
-		5 0 obj<</Type/Info/Keywords ('Keywords' metadata entry)>>
+		endobj
+		5 0 obj <</Type/Info/Keywords ('Keywords' metadata entry)>>
 		endobj
 		xref
 		0 6
 		0000000000 65535 f
-		0000000009 00000 n
-		0000000053 00000 n
-		0000000125 00000 n
-		0000000182 00000 n
-		0000000221 00000 n
+		0000000010 00000 n
+		0000000056 00000 n
+		0000000130 00000 n
+		0000000189 00000 n
+		0000000238 00000 n
 		trailer
 		<</Size 6/Root 1 0 R/Info 5 0 R>>
 		startxref
-		287
+		306
 		%%EOF
-        `
+		`
+
 		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 	}()
 
