@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 58C4F0                               [public_test.go]
+// :v: 2018-04-23 12:33:29 899915                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -17,7 +17,10 @@ The test files are kept in a separate folder to avoid cluttering
 this root folder. Every unit test is in a separate file named
 after the tested method.
 
-To generate a test coverage report use:
+To test a single method or property, use:
+	go test --run Test_PDF_MethodName_
+
+To generate a test coverage report, use:
 	go test -coverprofile cover.out
 	go tool cover -html=cover.out
 */
@@ -27,162 +30,202 @@ import "testing" // standard
 import "github.com/balacode/one-file-pdf/utest"
 
 // Every tested public method must be added here, or it won't be tested:
-// go test --run TestPublicAPI
-func TestPublicAPI(t *testing.T) {
-	for _, fn := range []func(*testing.T){
 
-		// ---------------------------------------------------------------------
-		// # Constructor
+// -----------------------------------------------------------------------------
+// # Constructor
 
-		utest.NewPDF, // NewPDF(paperSize string) PDF
+// NewPDF(paperSize string) PDF
+func Test_NewPDF_(t *testing.T) { utest.NewPDF(t) }
 
-		// ---------------------------------------------------------------------
-		// # Read-Only Properties (ob *PDF)
+// -----------------------------------------------------------------------------
+// # Read-Only Properties (ob *PDF)
 
-		utest.CurrentPage, // CurrentPage() int
-		utest.PageHeight,  // PageHeight() float64
-		utest.PageWidth,   // PageWidth() float64
+// PageCount() int
+//TODO: func Test_PDF_PageCount_(t *testing.T) { utest.PageCount(t) }
 
-		// ---------------------------------------------------------------------
-		// # Properties
+// PageHeight() float64
+func Test_PDF_PageHeight_(t *testing.T) { utest.PageHeight(t) }
 
-		utest.Color,
-		// Color() color.RGBA
-		// SetColor(nameOrHTMLColor string) *PDF
-		// SetColorRGB(red, green, blue int) *PDF
+// PageWidth() float64
+func Test_PDF_PageWidth_(t *testing.T) { utest.PageWidth(t) }
 
-		utest.Compression,
-		// Compression() bool
-		// SetCompression(compress bool) *PDF
+// -----------------------------------------------------------------------------
+// # Properties
 
-		utest.DocAuthor,
-		// DocAuthor() string
-		// SetDocAuthor(s string) *PDF
+// Color() color.RGBA
+// SetColor(nameOrHTMLColor string) *PDF
+// SetColorRGB(r, g, b byte) *PDF
+func Test_PDF_Color_(t *testing.T) { utest.Color(t) }
 
-		utest.DocCreator,
-		// DocCreator() string
-		// SetDocCreator(s string) *PDF
+// Compression() bool
+// SetCompression(val bool) *PDF
+func Test_PDF_Compression_(t *testing.T) { utest.Compression(t) }
 
-		utest.DocKeywords,
-		// DocKeywords() string
-		// SetDocKeywords(s string) *PDF
+// CurrentPage() int
+// SetCurrentPage(pageNo int) *PDF
+func Test_PDF_CurrentPage_(t *testing.T) { utest.CurrentPage(t) }
 
-		utest.DocSubject,
-		// DocSubject() string
-		// SetDocSubject(s string) *PDF
+// DocAuthor() string
+// SetDocAuthor(s string) *PDF
+func Test_PDF_DocAuthor_(t *testing.T) { utest.DocAuthor(t) }
 
-		utest.DocTitle,
-		// DocTitle() string
-		// SetDocTitle(s string) *PDF
+// DocCreator() string
+// SetDocCreator(s string) *PDF
+func Test_PDF_DocCreator_(t *testing.T) { utest.DocCreator(t) }
 
-		utest.FontName,
-		// FontName() string
-		// SetFontName(name string) *PDF
+// DocKeywords() string
+// SetDocKeywords(s string) *PDF
+func Test_PDF_DocKeywords_(t *testing.T) { utest.DocKeywords(t) }
 
-		utest.SetFont, // SetFont(name string, points float64) *PDF
+// DocSubject() string
+// SetDocSubject(s string) *PDF
+func Test_PDF_DocSubject_(t *testing.T) { utest.DocSubject(t) }
 
-		//TODO: utest.FontSize,
-		// FontSize() float64
-		// SetFontSize(points float64) *PDF
+// DocTitle() string
+// SetDocTitle(s string) *PDF
+func Test_PDF_DocTitle_(t *testing.T) { utest.DocTitle(t) }
 
-		utest.HorizontalScaling,
-		// HorizontalScaling() uint16
-		// SetHorizontalScaling(percent uint16) *PDF
+// FontName() string
+// SetFontName(name string) *PDF
+func Test_PDF_FontName_(t *testing.T) { utest.FontName(t) }
 
-		utest.LineWidth,
-		// LineWidth() float64
-		// SetLineWidth(points float64) *PDF
+// TODO: func Test_PDF_FontSize_(t *testing.T) { utest.FontSize(t) }
+// FontSize() float64
+// SetFontSize(points float64) *PDF
 
-		utest.X,
-		// X() float64
-		// SetX(x float64) *PDF
+// SetFont(name string, points float64) *PDF
+func Test_PDF_SetFont_(t *testing.T) { utest.SetFont(t) }
 
-		//TODO: utest.SetXY, // SetXY(x, y float64) *PDF
+// HorizontalScaling() uint16
+// SetHorizontalScaling(percent uint16) *PDF
+func Test_PDF_HorizontalScaling_(t *testing.T) { utest.HorizontalScaling(t) }
 
-		utest.Y,
-		// Y() float64
-		// SetY(y float64) *PDF
+// LineWidth() float64
+// SetLineWidth(points float64) *PDF
+func Test_PDF_LineWidth_(t *testing.T) { utest.LineWidth(t) }
 
-		utest.Units,
-		// Units() string
-		// SetUnits(unitName string) *PDF
+// Units() string
+// SetUnits(unitName string) *PDF
+func Test_PDF_Units_(t *testing.T) { utest.Units(t) }
 
-		// ---------------------------------------------------------------------
-		// # Methods (ob *PDF)
+// X() float64
+// SetX(x float64) *PDF
+func Test_PDF_X_(t *testing.T) { utest.X(t) }
 
-		//TODO: utest.AddPage, // AddPage() *PDF
+// Y() float64
+// SetY(y float64) *PDF
+func Test_PDF_Y_(t *testing.T) { utest.Y(t) }
 
-		//TODO: utest.Bytes, // Bytes() []byte
+//TODO: func Test_PDF_SetXY_(t *testing.T) { utest.SetXY(t) }
+// SetXY(x, y float64) *PDF
 
-		utest.DrawBox,
-		// DrawBox(x, y, width, height float64, fill ...bool) *PDF
+// -----------------------------------------------------------------------------
+// # Methods (ob *PDF)
 
-		utest.DrawCircle, // DrawCircle(x, y, radius float64, fill ...bool) *PDF
+// AddPage() *PDF
+//TODO: func Test_PDF_AddPage_(t *testing.T) { utest.AddPage(t) }
 
-		//TODO: utest.DrawEllipse,
-		// DrawEllipse(x, y, xRadius, yRadius float64, fill ...bool) *PDF
+// Bytes() []byte
+//TODO: func Test_PDF_Bytes_(t *testing.T) { utest.Bytes(t) }
 
-		utest.DrawImage,
-		// DrawImage(x, y, height float64, fileNameOrBytes interface{},
-		//     backColor ...string) *PDF
+// DrawBox(x, y, width, height float64, optFill ...bool) *PDF
+func Test_PDF_DrawBox_(t *testing.T) { utest.DrawBox(t) }
 
-		//TODO: utest.DrawLine, // DrawLine(x1, y1, x2, y2 float64) *PDF
+// DrawCircle(x, y, radius float64, optFill ...bool) *PDF
+func Test_PDF_DrawCircle_(t *testing.T) { utest.DrawCircle(t) }
 
-		utest.DrawText, // DrawText(s string) *PDF
+// DrawEllipse(x, y, xRadius, yRadius float64,
+//     optFill ...bool) *PDF
+//TODO: func Test_PDF_DrawEllipse_(t *testing.T) { utest.DrawEllipse(t) }
 
-		//TODO: utest.DrawTextAlignedToBox,
-		// DrawTextAlignedToBox(
-		//     x, y, width, height float64, align, text string) *PDF
+// DrawImage(x, y, height float64, fileNameOrBytes interface{},
+//     backColor ...string) *PDF
+func Test_PDF_DrawImage_(t *testing.T) { utest.DrawImage(t) }
 
-		utest.DrawTextAt, // DrawTextAt(x, y float64, text string) *PDF
+// DrawLine(x1, y1, x2, y2 float64) *PDF
+//TODO: func Test_PDF_DrawLine_(t *testing.T) { utest.DrawLine(t) }
 
-		utest.DrawTextInBox,
-		// DrawTextInBox(
-		//     x, y, width, height float64, align, text string ) *PDF
+// DrawText(s string) *PDF
+func Test_PDF_DrawText_(t *testing.T) { utest.DrawText(t) }
 
-		utest.DrawUnitGrid, // DrawUnitGrid() *PDF
-		utest.FillBox,      // FillBox(x, y, width, height float64) *PDF
-		utest.FillCircle,   // FillCircle(x, y, radius float64) *PDF
+// DrawTextAlignedToBox(
+//     x, y, width, height float64, align, text string) *PDF
+//TODO: func Test_PDF_DrawTextAlignedToBox_(t *testing.T) {
+//          utest.DrawTextAlignedToBox(t)
+//      }
 
-		//TODO: utest.FillEllipse,
-		// FillEllipse(x, y, xRadius, yRadius float64) *PDF
+// DrawTextAt(x, y float64, text string) *PDF
+func Test_PDF_DrawTextAt_(t *testing.T) { utest.DrawTextAt(t) }
 
-		//TODO: utest.NextLine, // NextLine() *PDF
+// DrawTextInBox(
+//     x, y, width, height float64, align, text string) *PDF
+func Test_PDF_DrawTextInBox_(t *testing.T) { utest.DrawTextInBox(t) }
 
-		utest.Reset, // Reset() *PDF
+// DrawUnitGrid() *PDF
+func Test_PDF_DrawUnitGrid_(t *testing.T) { utest.DrawUnitGrid(t) }
 
-		//TODO: utest.SaveFile, // SaveFile(filename string) error
+// FillBox(x, y, width, height float64) *PDF
+func Test_PDF_FillBox_(t *testing.T) { utest.FillBox(t) }
 
-		//TODO: utest.SetColumnWidths,
-		// SetColumnWidths(widths ...float64) *PDF
+// FillCircle(x, y, radius float64) *PDF
+func Test_PDF_FillCircle_(t *testing.T) { utest.FillCircle(t) }
 
-		// ---------------------------------------------------------------------
-		// # Metrics Methods (ob *PDF)
+// FillEllipse(x, y, xRadius, yRadius float64) *PDF
+//TODO: func Test_PDF_FillEllipse_(t *testing.T) { utest.FillEllipse(t) }
 
-		//TODO: utest.TextWidth, // TextWidth(s string) float64
+// NextLine() *PDF
+//TODO: func Test_PDF_NextLine_(t *testing.T) { utest.NextLine(t) }
 
-		utest.ToColorT1,
-		utest.ToColorT2,
-		// ToColor(nameOrHTMLColor string) (color.RGBA, error)
+// Reset() *PDF
+func Test_PDF_Reset_(t *testing.T) { utest.Reset(t) }
 
-		// ---------------------------------------------------------------------
-		// # Metrics Methods (ob *PDF)
+// SaveFile(filename string) error
+//TODO: func Test_PDF_SaveFile_(t *testing.T) { utest.SaveFile(t) }
 
-		utest.ToPoints, // ToPoints(numberAndUnit string) (float64, error)
-		utest.ToUnits,  // ToUnits(points float64) float64
+// SetColumnWidths(widths ...float64) *PDF
+//TODO: func Test_PDF_SetColumnWidths_(t *testing.T) {
+//          utest.SetColumnWidths(t)
+//      }
 
-		//TODO: utest.WrapTextLines,
-		// WrapTextLines(width float64, text string) (ret []string)
+// -----------------------------------------------------------------------------
+// # Metrics Methods (ob *PDF)
 
-		// ---------------------------------------------------------------------
-		// # Error Handling Methods (ob *PDF)
+// TextWidth(s string) float64
+//TODO: func Test_PDF_TextWidth_(t *testing.T) { utest.TextWidth(t) }
 
-		utest.Clean,     // Clean() *PDF
-		utest.Errors,    // Errors() []error
-		utest.PullError, // PullError() error
-	} {
-		fn(t)
-	}
-} //                                                               TestPublicAPI
+// ToColor(nameOrHTMLColor string) (color.RGBA, error)
+func Test_PDF_ToColorT1_(t *testing.T) { utest.ToColorT1(t) }
+func Test_PDF_ToColorT2_(t *testing.T) { utest.ToColorT2(t) }
+
+// -----------------------------------------------------------------------------
+// # Metrics Methods (ob *PDF)
+
+// ToPoints(numberAndUnit string) (float64, error)
+func Test_PDF_ToPoints_(t *testing.T) { utest.ToPoints(t) }
+
+// ToUnits(points float64) float64
+func Test_PDF_ToUnits_(t *testing.T) { utest.ToUnits(t) }
+
+// WrapTextLines(width float64, text string) (ret []string)
+//TODO: func Test_PDF_WrapTextLines_(t *testing.T) {
+//          utest.WrapTextLines(t)
+//      }
+
+// -----------------------------------------------------------------------------
+// # Error Handling Methods (ob *PDF)
+
+// Clean() *PDF
+func Test_PDF_Clean_(t *testing.T) { utest.Clean(t) }
+
+// ErrorInfo(err error) (ret struct {
+//     ID            int
+//     Msg, Src, Val string
+// })
+
+// Errors() []error
+func Test_PDF_Errors_(t *testing.T) { utest.Errors(t) }
+
+// PullError() error
+func Test_PDF_PullError_(t *testing.T) { utest.PullError(t) }
 
 //end
