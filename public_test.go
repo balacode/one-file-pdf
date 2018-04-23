@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-28 03:16:48 896DE3                               [public_test.go]
+// :v: 2018-04-23 11:32:14 58C4F0                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -27,7 +27,7 @@ import "testing" // standard
 import "github.com/balacode/one-file-pdf/utest"
 
 // Every tested public method must be added here, or it won't be tested:
-// go  test --run Test_<name>_
+// go test --run TestPublicAPI
 func TestPublicAPI(t *testing.T) {
 	for _, fn := range []func(*testing.T){
 

@@ -15,6 +15,7 @@ demo/demo
 *.repl
 *`*
 __*
+~~*
 
 # logfiles and batch files
 *.log
