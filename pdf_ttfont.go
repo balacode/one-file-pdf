@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-24 00:53:39 9EAB5D                                [pdf_ttfont.go]
+// :v: 2018-04-25 15:04:06 7B3E1C                                [pdf_ttfont.go]
 // -----------------------------------------------------------------------------
 
 // THIS FILE IS A WORK IN PROGRESS
@@ -29,6 +29,7 @@ import (
 // pdfTTFont __
 type pdfTTFont struct {
 	Name string
+	Data []byte
 	Err  error
 	HEAD struct { //              font header table: general info about the font
 		UnitsPerEm uint16
@@ -158,5 +159,165 @@ func (ob *pdfTTFont) writeFontObjects(font *pdfFont) {
 		ob.pdf.putError(0xED2CDF, ob.Err.Error(), "")
 	}
 } //                                                            writeFontObjects
+
+// -----------------------------------------------------------------------------
+// # TTF Parsing Methods (ob *pdfTTFont)
+
+// readTTF __
+func (ob *pdfTTFont) readTTF(reader io.Reader) {
+	if ob.Err != nil {
+		return
+	}
+	var err error
+	ob.Data, err = ioutil.ReadAll(reader)
+	if err != nil {
+		ob.Err = err
+		return
+	}
+	var rd = bytes.NewReader(ob.Data)
+	var ver = ob.read(rd, 4)
+	if !bytes.Equal(ver, []byte{0, 1, 0, 0}) {
+		//TODO: 0xE0E9AE: error
+		return
+	}
+	for _, fn := range []func(*bytes.Reader){
+		ob.readHEAD, ob.readHHEA, ob.readMAXP, ob.readHMTX, ob.readCMAP,
+		ob.readNAME, ob.readOS2, ob.readPOST, ob.readLOCA} {
+		if ob.Err != nil {
+			/// 0xE2257E: log error
+			break
+		}
+		fn(rd)
+	}
+} //                                                                     readTTF
+
+// readHEAD __
+func (ob *pdfTTFont) readHEAD(rd *bytes.Reader) {
+	if ob.Err != nil {
+		return
+	}
+	//TODO: implement
+} //                                                                    readHEAD
+
+// readHHEA __
+func (ob *pdfTTFont) readHHEA(rd *bytes.Reader) {
+	if ob.Err != nil {
+		return
+	}
+	//TODO: implement
+} //                                                                    readHHEA
+
+// readMAXP __
+func (ob *pdfTTFont) readMAXP(rd *bytes.Reader) {
+	if ob.Err != nil {
+		return
+	}
+	//TODO: implement
+} //                                                                    readMAXP
+
+// readHMTX __
+func (ob *pdfTTFont) readHMTX(rd *bytes.Reader) {
+	if ob.Err != nil {
+		return
+	}
+	//TODO: implement
+} //                                                                    readHMTX
+
+// readCMAP __
+func (ob *pdfTTFont) readCMAP(rd *bytes.Reader) {
+	if ob.Err != nil {
+		return
+	}
+	//TODO: implement
+} //                                                                    readCMAP
+
+// readNAME __
+func (ob *pdfTTFont) readNAME(rd *bytes.Reader) {
+	if ob.Err != nil {
+		return
+	}
+	//TODO: implement
+} //                                                                    readNAME
+
+// readOS2 __
+func (ob *pdfTTFont) readOS2(rd *bytes.Reader) {
+	if ob.Err != nil {
+		return
+	}
+	//TODO: implement
+} //                                                                     readOS2
+
+// readPOST __
+func (ob *pdfTTFont) readPOST(rd *bytes.Reader) {
+	if ob.Err != nil {
+		return
+	}
+	//TODO: implement
+} //                                                                    readPOST
+
+// readLOCA __
+func (ob *pdfTTFont) readLOCA(rd *bytes.Reader) {
+	if ob.Err != nil {
+		return
+	}
+	//TODO: implement
+} //                                                                    readLOCA
+
+// read __
+func (ob *pdfTTFont) read(rd *bytes.Reader, size int, useData ...bool) []byte {
+	if ob.Err != nil {
+		return nil
+	}
+	if len(useData) > 0 && useData[0] == false {
+		_, err := rd.Seek(int64(size), 1)
+		if err != nil {
+			ob.Err = err
+		}
+		return nil
+	}
+	var ret = make([]byte, size)
+	var n, err = rd.Read(ret)
+	if err != nil {
+		ob.Err = err
+		return nil
+	}
+	if n != size {
+		/// 0xE9B50D: error "END OF FILE DURING READING"
+		return nil
+	}
+	return ret
+} //                                                                        read
+
+// readI16 __
+func (ob *pdfTTFont) readI16(rd *bytes.Reader) int16 {
+	var ar = ob.read(rd, 2)
+	if ob.Err != nil {
+		return 0
+	}
+	var ret = int(uint16(ar[0])<<8 | uint16(ar[1]))
+	if ret >= 32768 {
+		ret -= 65536
+	}
+	return int16(ret)
+} //                                                                     readI16
+
+// readUI16 __
+func (ob *pdfTTFont) readUI16(rd *bytes.Reader) uint16 {
+	var ar = ob.read(rd, 2)
+	if ob.Err != nil {
+		return 0
+	}
+	return uint16(ar[0])<<8 | uint16(ar[1])
+} //                                                                    readUI16
+
+// readUI32 __
+func (ob *pdfTTFont) readUI32(rd *bytes.Reader) uint32 {
+	var ar = ob.read(rd, 4)
+	if ob.Err != nil {
+		return 0
+	}
+	return uint32(ar[0])<<24 | uint32(ar[1])<<16 |
+		uint32(ar[2])<<8 | uint32(ar[3])
+} //                                                                    readUI32
 
 //end
