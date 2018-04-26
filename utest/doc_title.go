@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 02D7B4                           [utest/doc_title.go]
+// :v: 2018-04-26 22:42:44 40EF21                           [utest/doc_title.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,13 +10,13 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// DocTitle is the unit test for
-func DocTitle(t *testing.T) {
+// Test_PDF_DocTitle_ is the unit test for
+func Test_PDF_DocTitle_(t *testing.T) {
 
 	// -------------------------------------------------------------------------
 	// (ob *PDF) DocTitle() string
 	//
-	fmt.Println("utest.DocTitle")
+	fmt.Println("Test PDF.DocTitle()")
 
 	func() {
 		var doc pdf.PDF // uninitialized PDF
@@ -31,7 +31,7 @@ func DocTitle(t *testing.T) {
 	// -------------------------------------------------------------------------
 	// (ob *PDF) SetDocTitle(s string) *PDF
 	//
-	fmt.Println("utest.SetDocTitle")
+	fmt.Println("Test PDF.SetDocTitle()")
 
 	func() {
 		var doc pdf.PDF // uninitialized PDF
@@ -81,6 +81,6 @@ func DocTitle(t *testing.T) {
 		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 	}()
 
-} //                                                                    DocTitle
+} //                                                          Test_PDF_DocTitle_
 
 //end

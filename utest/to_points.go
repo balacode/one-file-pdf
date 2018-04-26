@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-28 03:14:14 A23481                           [utest/to_points.go]
+// :v: 2018-04-26 22:42:44 F978BA                           [utest/to_points.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,9 +10,9 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// ToPoints is the unit test for PDF.ToPoints()
-func ToPoints(t *testing.T) {
-	fmt.Println("utest.ToPoints")
+// Test_PDF_ToPoints_ is the unit test for PDF.ToPoints()
+func Test_PDF_ToPoints_(t *testing.T) {
+	fmt.Println("Test PDF.ToPoints()")
 	//
 	var test = func(
 		expectVal float64, expectErr error, inputParts ...[]string,
@@ -75,6 +75,6 @@ func ToPoints(t *testing.T) {
 	// test some bad units
 	test(0, fmt.Errorf(`Unknown unit name "km"`), []string{"1km"})
 	test(0, fmt.Errorf(`Invalid number "1.0.1"`), []string{"1.0.1mm"})
-} //                                                                    ToPoints
+} //                                                          Test_PDF_ToPoints_
 
 //end

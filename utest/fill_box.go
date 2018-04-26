@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 53644D                            [utest/fill_box.go]
+// :v: 2018-04-26 22:42:44 03DC5C                            [utest/fill_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,12 +10,12 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// FillBox is the unit test for
+// Test_PDF_FillBox_ is the unit test for
 // PDF.FillBox(x, y, width, height float64) *PDF
 //
 // Runs the test by filling the shape of a Monolith from 2001 Space Odyssey
-func FillBox(t *testing.T) {
-	fmt.Println("utest.FillBox")
+func Test_PDF_FillBox_(t *testing.T) {
+	fmt.Println("Test PDF.FillBox()")
 	var (
 		doc    = pdf.NewPDF("A4")
 		x      = 6.5
@@ -57,6 +57,6 @@ func FillBox(t *testing.T) {
 	`
 
 	pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
-} //                                                                     FillBox
+} //                                                           Test_PDF_FillBox_
 
 //end

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 18:56:20 C8FE22                          [utest/pull_error.go]
+// :v: 2018-04-26 22:42:44 9BB7CB                          [utest/pull_error.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,10 +10,9 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// PullError is the unit test for PullError() error
-func PullError(t *testing.T) {
-
-	fmt.Println("utest.PullError")
+// Test_PDF_PullError_ is the unit test for PullError() error
+func Test_PDF_PullError_(t *testing.T) {
+	fmt.Println("Test PDF.PullError()")
 
 	func() {
 		var doc = pdf.NewPDF("Papyrus")
@@ -34,6 +33,6 @@ func PullError(t *testing.T) {
 		TEqual(t, err, nil)
 	}()
 
-} //                                                                   PullError
+} //                                                         Test_PDF_PullError_
 
 //end

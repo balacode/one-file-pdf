@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 58F999                        [utest/doc_keywords.go]
+// :v: 2018-04-26 22:42:44 7A65A6                        [utest/doc_keywords.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,13 +10,13 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// DocKeywords is the unit test for
-func DocKeywords(t *testing.T) {
+// Test_PDF_DocKeywords_ is the unit test for
+func Test_PDF_DocKeywords_(t *testing.T) {
 
 	// -------------------------------------------------------------------------
 	// (ob *PDF) DocKeywords() string
 	//
-	fmt.Println("utest.DocKeywords")
+	fmt.Println("Test PDF.DocKeywords()")
 
 	func() {
 		var doc pdf.PDF // uninitialized PDF
@@ -31,7 +31,7 @@ func DocKeywords(t *testing.T) {
 	// -------------------------------------------------------------------------
 	// (ob *PDF) SetDocKeywords(s string) *PDF
 	//
-	fmt.Println("utest.SetDocKeywords")
+	fmt.Println("Test PDF.SetDocKeywords()")
 
 	func() {
 		var doc pdf.PDF // uninitialized PDF
@@ -81,6 +81,6 @@ func DocKeywords(t *testing.T) {
 		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 	}()
 
-} //                                                                 DocKeywords
+} //                                                       Test_PDF_DocKeywords_
 
 //end

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 5BA321                  [utest/horizontal_scaling.go]
+// :v: 2018-04-26 22:42:44 5A4239                  [utest/horizontal_scaling.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,9 +10,9 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// HorizontalScaling is the unit test for PDF.HorizontalScaling()
-func HorizontalScaling(t *testing.T) {
-	fmt.Println("utest.HorizontalScaling")
+// Test_PDF_HorizontalScaling_ is the unit test for PDF.HorizontalScaling()
+func Test_PDF_HorizontalScaling_(t *testing.T) {
+	fmt.Println("Test PDF.HorizontalScaling()")
 	//
 	// Horizontal Scaling of new PDF must be 100
 	func() {
@@ -132,6 +132,6 @@ func HorizontalScaling(t *testing.T) {
 		doc.SaveFile("~~test_horizontal_scaling.pdf")
 	}()
 
-} //                                                           HorizontalScaling
+} //                                                 Test_PDF_HorizontalScaling_
 
 //end

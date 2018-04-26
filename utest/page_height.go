@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 12:23:48 18B081                         [utest/page_height.go]
+// :v: 2018-04-26 22:42:44 9B705F                         [utest/page_height.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,9 +10,9 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// PageHeight tests PDF.PageHeight()
-func PageHeight(t *testing.T) {
-	fmt.Println("utest.PageHeight")
+// Test_PDF_PageHeight_ tests PDF.PageHeight()
+func Test_PDF_PageHeight_(t *testing.T) {
+	fmt.Println("Test PDF.PageHeight()")
 
 	func() {
 		var doc pdf.PDF // uninitialized PDF
@@ -36,6 +36,6 @@ func PageHeight(t *testing.T) {
 		// LETTER = 216mm width x 279mm height = 790.8661417322835 points
 	}()
 
-} //                                                                  PageHeight
+} //                                                        Test_PDF_PageHeight_
 
 //end

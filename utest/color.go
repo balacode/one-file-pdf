@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-27 22:10:13 FB0CFA                               [utest/color.go]
+// :v: 2018-04-26 22:42:44 E26F93                               [utest/color.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -11,13 +11,13 @@ import "image/color" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// Color tests PDF.Color() and SetColor()
-func Color(t *testing.T) {
+// Test_PDF_Color_ tests PDF.Color() and SetColor()
+func Test_PDF_Color_(t *testing.T) {
 
 	// -------------------------------------------------------------------------
 	// (ob *PDF) Color() color.RGBA
 	//
-	fmt.Println("utest.Color")
+	fmt.Println("Test PDF.Color()")
 
 	func() {
 		var doc pdf.PDF // uninitialized PDF
@@ -39,7 +39,7 @@ func Color(t *testing.T) {
 	// TODO: test case-insensitivity
 	// TODO: test ignoring '-' and '_'
 
-	fmt.Println("utest.SetColor")
+	fmt.Println("Test PDF.SetColor()")
 	for _, name := range permuteStrings(
 		[]string{"", " ", "  "},
 		[]string{"red", "Red", "RED"},
@@ -87,7 +87,7 @@ func Color(t *testing.T) {
 	// -------------------------------------------------------------------------
 	// SetColorRGB(red, green, blue int) *PDF
 	//
-	fmt.Println("utest.SetColorRGB")
+	fmt.Println("Test PDF.SetColorRGB()")
 
 	func() {
 		// red
@@ -113,6 +113,6 @@ func Color(t *testing.T) {
 		TEqual(t, &a, b)
 	}()
 
-} //                                                                       Color
+} //                                                             Test_PDF_Color_
 
 //end

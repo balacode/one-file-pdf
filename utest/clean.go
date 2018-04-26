@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 18:56:20 438C56                               [utest/clean.go]
+// :v: 2018-04-26 22:42:44 2FF3CC                               [utest/clean.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,9 +10,9 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// Clean is the unit test for PDF.Clean()
-func Clean(t *testing.T) {
-	fmt.Println("utest.Clean")
+// Test_PDF_Clean_ is the unit test for PDF.Clean()
+func Test_PDF_Clean_(t *testing.T) {
+	fmt.Println("Test PDF.Clean()")
 
 	// calling Clean() multiple times on a non-initialized PDF:
 	// (you should not do this normally, use NewPDF() to create a PDF)
@@ -53,6 +53,6 @@ func Clean(t *testing.T) {
 		TEqual(t, doc.Errors(), []error{})
 	}()
 
-} //                                                                       Clean
+} //                                                             Test_PDF_Clean_
 
 //end

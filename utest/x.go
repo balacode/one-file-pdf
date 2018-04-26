@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-28 03:14:14 C3366F                                   [utest/x.go]
+// :v: 2018-04-26 22:42:44 973980                                   [utest/x.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,9 +10,9 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// X is the unit test for PDF.X()
-func X(t *testing.T) {
-	fmt.Println("utest.X")
+// Test_PDF_X_ is the unit test for PDF.X()
+func Test_PDF_X_(t *testing.T) {
+	fmt.Println("Test PDF.X()")
 	//
 	// X of new PDF must be -1
 	func() {
@@ -55,6 +55,6 @@ func X(t *testing.T) {
 		doc.SaveFile("``test_x.pdf")
 	}()
 
-} //                                                                           X
+} //                                                                 Test_PDF_X_
 
 //end

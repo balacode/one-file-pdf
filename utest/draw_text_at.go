@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 D4BFA0                        [utest/draw_text_at.go]
+// :v: 2018-04-26 22:42:44 A5EA07                        [utest/draw_text_at.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,10 +10,11 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// DrawTextAt is the unit test for
+// Test_PDF_DrawTextAt_ is the unit test for
 // DrawTextAt(x, y float64, text string) *PDF
-func DrawTextAt(t *testing.T) {
-	fmt.Println("utest.DrawTextAt")
+func Test_PDF_DrawTextAt_(t *testing.T) {
+	fmt.Println("Test PDF.DrawTextAt()")
+	//
 	var doc = pdf.NewPDF("A4")
 	doc.SetCompression(false).
 		SetUnits("cm").
@@ -73,6 +74,6 @@ func DrawTextAt(t *testing.T) {
 	`
 
 	pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
-} //                                                                  DrawTextAt
+} //                                                        Test_PDF_DrawTextAt_
 
 //end

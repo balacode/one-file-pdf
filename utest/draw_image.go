@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 A026E5                          [utest/draw_image.go]
+// :v: 2018-04-26 22:42:44 D20D01                          [utest/draw_image.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,15 +10,15 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// DrawImage is the unit test for
+// Test_PDF_DrawImage_ is the unit test for
 // PDF.DrawImage(x, y, height float64, fileNameOrBytes interface{},
 //     backColor ...string) *PDF
 //
 // Runs the test by drawing rgbw64.png:
 // a small 64 x 64 PNG split into pure red, green, blue
 // and transparent gradient squares
-func DrawImage(t *testing.T) {
-	fmt.Println("utest.DrawImage")
+func Test_PDF_DrawImage_(t *testing.T) {
+	fmt.Println("Test PDF.DrawImage()")
 	var (
 		x       = 5.0
 		y       = 5.0
@@ -335,6 +335,6 @@ func DrawImage(t *testing.T) {
 		}
 	}()
 
-} //                                                                   DrawImage
+} //                                                         Test_PDF_DrawImage_
 
 //end

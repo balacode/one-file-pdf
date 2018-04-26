@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 740100                         [utest/fill_circle.go]
+// :v: 2018-04-26 22:42:44 FB5FA0                         [utest/fill_circle.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,12 +10,12 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// FillCircle is the unit test for
+// Test_PDF_FillCircle_ is the unit test for
 // PDF.FillCircle(x, y, radius float64, fill ...bool) *PDF
 //
 // Runs the test by drawing the flag of Japan using correct proportions
-func FillCircle(t *testing.T) {
-	fmt.Println("utest.FillCircle")
+func Test_PDF_FillCircle_(t *testing.T) {
+	fmt.Println("Test PDF.FillCircle()")
 	var (
 		doc    = pdf.NewPDF("30cm x 20cm")
 		x, y   = 15.0, 10.0         // center of page
@@ -60,6 +60,6 @@ func FillCircle(t *testing.T) {
 	`
 
 	pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
-} //                                                                  FillCircle
+} //                                                        Test_PDF_FillCircle_
 
 //end

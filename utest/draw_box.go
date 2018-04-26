@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 063E00                            [utest/draw_box.go]
+// :v: 2018-04-26 22:42:44 365204                            [utest/draw_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,12 +10,12 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// DrawBox is the unit test for
+// Test_PDF_DrawBox_ is the unit test for
 // PDF.DrawBox(x, y, width, height float64, fill ...bool) *PDF
 //
 // Runs the test by drawing three rectangles and one filled rectangle
-func DrawBox(t *testing.T) {
-	fmt.Println("utest.DrawBox")
+func Test_PDF_DrawBox_(t *testing.T) {
+	fmt.Println("Test PDF.DrawBox()")
 	var (
 		doc = pdf.NewPDF("18cm x 18cm")
 		x   = 1.0
@@ -65,6 +65,6 @@ func DrawBox(t *testing.T) {
 	`
 
 	pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
-} //                                                                     DrawBox
+} //                                                           Test_PDF_DrawBox_
 
 //end

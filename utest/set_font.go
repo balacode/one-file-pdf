@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 61961B                            [utest/set_font.go]
+// :v: 2018-04-26 22:42:44 03B075                            [utest/set_font.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,9 +10,9 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// SetFont is the unit test for PDF.SetFont()
-func SetFont(t *testing.T) {
-	fmt.Println("utest.SetFont")
+// Test_PDF_SetFont_ is the unit test for PDF.SetFont()
+func Test_PDF_SetFont_(t *testing.T) {
+	fmt.Println("Test PDF.SetFont()")
 	//
 	// setting font on uninitialized pdf
 	for _, tc := range []struct {
@@ -241,6 +241,6 @@ func SetFont(t *testing.T) {
 		doc.SaveFile("~~font_sample.pdf")
 	}()
 
-} //                                                                     SetFont
+} //                                                           Test_PDF_SetFont_
 
 //end

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 18:56:20 931001                            [utest/to_units.go]
+// :v: 2018-04-26 22:42:44 37AD48                            [utest/to_units.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,10 +10,10 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// ToUnits is the unit test for
+// Test_PDF_ToUnits_ is the unit test for
 // ToUnits(points float64) float64
-func ToUnits(t *testing.T) {
-	fmt.Println("utest.ToUnits")
+func Test_PDF_ToUnits_(t *testing.T) {
+	fmt.Println("Test PDF.ToUnits()")
 
 	func() {
 		var doc pdf.PDF
@@ -21,6 +21,6 @@ func ToUnits(t *testing.T) {
 		//TODO: add test cases for ToUnits()
 	}()
 
-} //                                                                     ToUnits
+} //                                                           Test_PDF_ToUnits_
 
 //end

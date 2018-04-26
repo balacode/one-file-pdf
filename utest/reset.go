@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 9210BF                               [utest/reset.go]
+// :v: 2018-04-26 22:42:44 09F4D4                               [utest/reset.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,9 +10,9 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// Reset tests PDF.Reset()
-func Reset(t *testing.T) {
-	fmt.Println("utest.Reset")
+// Test_PDF_Reset_ tests PDF.Reset()
+func Test_PDF_Reset_(t *testing.T) {
+	fmt.Println("Test PDF.Reset()")
 	//
 	// prepare a test PDF before calling Reset()
 	var doc = pdf.NewPDF("A4")
@@ -98,6 +98,6 @@ func Reset(t *testing.T) {
 		pdfCompare(t, result, expect, pdfStreamsInText)
 	}
 	// TODO: add more test cases, test each property's state
-} //                                                                       Reset
+} //                                                             Test_PDF_Reset_
 
 //end

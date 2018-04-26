@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 192723                             [utest/new_pdf.go]
+// :v: 2018-04-26 22:42:44 E16BB6                             [utest/new_pdf.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,9 +10,9 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// NewPDF is the unit test for PDF.NewPDF
-func NewPDF(t *testing.T) {
-	fmt.Println("utest.NewPDF")
+// Test_NewPDF_ is the unit test for PDF.NewPDF
+func Test_NewPDF_(t *testing.T) {
+	fmt.Println("Test NewPDF()")
 
 	var expect = `
 	%PDF-1.4
@@ -53,6 +53,6 @@ func NewPDF(t *testing.T) {
 		pdfCompare(t, result, expect, pdfStreamsInText)
 	}()
 
-} //                                                                      NewPDF
+} //                                                                Test_NewPDF_
 
 //end

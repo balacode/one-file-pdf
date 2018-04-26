@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 12:23:48 087D54                          [utest/page_width.go]
+// :v: 2018-04-26 22:42:44 B96581                          [utest/page_width.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,9 +10,9 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// PageWidth tests PDF.PageWidth()
-func PageWidth(t *testing.T) {
-	fmt.Println("utest.PageWidth")
+// Test_PDF_PageWidth_ tests PDF.PageWidth()
+func Test_PDF_PageWidth_(t *testing.T) {
+	fmt.Println("Test PDF.PageWidth()")
 
 	func() {
 		var doc pdf.PDF // uninitialized PDF
@@ -36,6 +36,6 @@ func PageWidth(t *testing.T) {
 		// LETTER = 216mm width x 279mm height = 612.2834645669291 points
 	}()
 
-} //                                                                   PageWidth
+} //                                                         Test_PDF_PageWidth_
 
 //end

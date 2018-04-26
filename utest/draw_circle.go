@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 151C3A                         [utest/draw_circle.go]
+// :v: 2018-04-26 22:42:44 CEBFFA                         [utest/draw_circle.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,13 +10,13 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// DrawCircle is the unit test for
+// Test_PDF_DrawCircle_ is the unit test for
 // PDF.DrawCircle(x, y, radius float64, fill ...bool) *PDF
 //
 // Runs the test by drawing three concentric
 // circles and one small filled circle
-func DrawCircle(t *testing.T) {
-	fmt.Println("utest.DrawCircle")
+func Test_PDF_DrawCircle_(t *testing.T) {
+	fmt.Println("Test PDF.DrawCircle()")
 	var (
 		doc  = pdf.NewPDF("20cm x 20cm")
 		x, y = 10.0, 10.0 // center of page
@@ -85,6 +85,6 @@ func DrawCircle(t *testing.T) {
 	`
 
 	pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
-} //                                                                  DrawCircle
+} //                                                        Test_PDF_DrawCircle_
 
 //end

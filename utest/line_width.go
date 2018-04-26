@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 032D2C                          [utest/line_width.go]
+// :v: 2018-04-26 22:42:44 FF6555                          [utest/line_width.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,9 +10,9 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// LineWidth is the unit test for PDF.LineWidth()
-func LineWidth(t *testing.T) {
-	fmt.Println("utest.LineWidth")
+// Test_PDF_LineWidth_ is the unit test for PDF.LineWidth()
+func Test_PDF_LineWidth_(t *testing.T) {
+	fmt.Println("Test PDF.LineWidth()")
 	//
 	// LineWidth of new PDF must be 1 point
 	func() {
@@ -56,6 +56,6 @@ func LineWidth(t *testing.T) {
 		doc.SaveFile("~~test_line_width.pdf")
 	}()
 
-} //                                                                   LineWidth
+} //                                                         Test_PDF_LineWidth_
 
 //end

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 621464                          [utest/doc_author.go]
+// :v: 2018-04-26 22:42:44 07932F                          [utest/doc_author.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,13 +10,13 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// DocAuthor is the unit test for
-func DocAuthor(t *testing.T) {
+// Test_PDF_DocAuthor_ is the unit test for
+func Test_PDF_DocAuthor_(t *testing.T) {
 
 	// -------------------------------------------------------------------------
 	// (ob *PDF) DocAuthor() string
 	//
-	fmt.Println("utest.DocAuthor")
+	fmt.Println("Test PDF.DocAuthor()")
 
 	func() {
 		var doc pdf.PDF // uninitialized PDF
@@ -31,7 +31,7 @@ func DocAuthor(t *testing.T) {
 	// -------------------------------------------------------------------------
 	// (ob *PDF) SetDocAuthor(s string) *PDF
 	//
-	fmt.Println("utest.SetDocAuthor")
+	fmt.Println("Test PDF.SetDocAuthor()")
 
 	func() {
 		var doc pdf.PDF // uninitialized PDF
@@ -81,6 +81,6 @@ func DocAuthor(t *testing.T) {
 		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 	}()
 
-} //                                                                   DocAuthor
+} //                                                         Test_PDF_DocAuthor_
 
 //end

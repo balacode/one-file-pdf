@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 582516                           [utest/font_name.go]
+// :v: 2018-04-26 22:42:44 E3DD86                           [utest/font_name.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,13 +10,13 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// FontName is the unit test for
-func FontName(t *testing.T) {
+// Test_PDF_FontName_ is the unit test for
+func Test_PDF_FontName_(t *testing.T) {
 
 	// -------------------------------------------------------------------------
 	// (ob *PDF) FontName() string
 	//
-	fmt.Println("utest.FontName")
+	fmt.Println("Test PDF.FontName()")
 
 	func() {
 		var doc pdf.PDF // uninitialized PDF
@@ -31,7 +31,7 @@ func FontName(t *testing.T) {
 	// -------------------------------------------------------------------------
 	// (ob *PDF) SetFontName(name string) *PDF
 	//
-	fmt.Println("utest.SetFontName")
+	fmt.Println("Test PDF.SetFontName()")
 
 	func() {
 		var doc pdf.PDF // uninitialized PDF
@@ -93,6 +93,6 @@ func FontName(t *testing.T) {
 		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 	}()
 
-} //                                                                    FontName
+} //                                                          Test_PDF_FontName_
 
 //end

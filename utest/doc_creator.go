@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 B0BA70                         [utest/doc_creator.go]
+// :v: 2018-04-26 22:42:44 649932                         [utest/doc_creator.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,13 +10,13 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// DocCreator is the unit test for
-func DocCreator(t *testing.T) {
+// Test_PDF_DocCreator_ is the unit test for
+func Test_PDF_DocCreator_(t *testing.T) {
 
 	// -------------------------------------------------------------------------
 	// (ob *PDF) DocCreator() string
 	//
-	fmt.Println("utest.DocCreator")
+	fmt.Println("Test PDF.DocCreator()")
 
 	func() {
 		var doc pdf.PDF // uninitialized PDF
@@ -31,7 +31,7 @@ func DocCreator(t *testing.T) {
 	// -------------------------------------------------------------------------
 	// (ob *PDF) SetDocCreator(s string) *PDF
 	//
-	fmt.Println("utest.SetDocCreator")
+	fmt.Println("Test PDF.SetDocCreator()")
 
 	func() {
 		var doc pdf.PDF // uninitialized PDF
@@ -81,6 +81,6 @@ func DocCreator(t *testing.T) {
 		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 	}()
 
-} //                                                                  DocCreator
+} //                                                        Test_PDF_DocCreator_
 
 //end

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 6ED4E7                      [utest/draw_unit_grid.go]
+// :v: 2018-04-26 22:42:44 3B7F01                      [utest/draw_unit_grid.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,9 +10,9 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// DrawUnitGrid is the unit test for PDF.DrawUnitGrid()
-func DrawUnitGrid(t *testing.T) {
-	fmt.Println("utest.DrawUnitGrid")
+// Test_PDF_DrawUnitGrid_ is the unit test for PDF.DrawUnitGrid()
+func Test_PDF_DrawUnitGrid_(t *testing.T) {
+	fmt.Println("Test PDF.DrawUnitGrid()")
 	//
 	var result = func() []byte {
 		var doc = pdf.NewPDF("A4")
@@ -360,6 +360,6 @@ func DrawUnitGrid(t *testing.T) {
 	`
 
 	pdfCompare(t, result, expect, pdfStreamsInText)
-} //                                                                DrawUnitGrid
+} //                                                      Test_PDF_DrawUnitGrid_
 
 //end

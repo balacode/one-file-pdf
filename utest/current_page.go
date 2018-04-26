@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 12:23:48 4726B1                        [utest/current_page.go]
+// :v: 2018-04-26 22:42:44 F50185                        [utest/current_page.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,9 +10,9 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// CurrentPage tests PDF.CurrentPage()
-func CurrentPage(t *testing.T) {
-	fmt.Println("utest.CurrentPage")
+// Test_PDF_CurrentPage_ tests PDF.CurrentPage()
+func Test_PDF_CurrentPage_(t *testing.T) {
+	fmt.Println("Test PDF.CurrentPage()")
 
 	func() {
 		var doc pdf.PDF // uninitialized PDF
@@ -58,6 +58,6 @@ func CurrentPage(t *testing.T) {
 		TEqual(t, doc.CurrentPage(), 4)
 	}()
 
-} //                                                                 CurrentPage
+} //                                                       Test_PDF_CurrentPage_
 
 //end

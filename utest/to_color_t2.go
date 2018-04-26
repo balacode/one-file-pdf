@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) markaum@gmail.com                                            License: MIT
-// :v: 2018-03-26 12:39:11 FDC5D0                         [utest/to_color_t2.go]
+// :v: 2018-04-26 22:42:44 E196A8                         [utest/to_color_t2.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -13,9 +13,9 @@ import (
 	pdf "github.com/balacode/one-file-pdf"
 )
 
-// ToColorT2 is the second unit test for PDF.ToColor()
-func ToColorT2(t *testing.T) {
-	fmt.Println("utest.ToColorT2")
+// Test_PDF_ToColor_2_ is the second unit test for PDF.ToColor()
+func Test_PDF_ToColor_2_(t *testing.T) {
+	fmt.Println("Test PDF.ToColor() [2]")
 	testCases := []struct {
 		description string
 		input       string
@@ -84,6 +84,6 @@ func ToColorT2(t *testing.T) {
 			}
 		})
 	}
-} //                                                                   ToColorT2
+} //                                                         Test_PDF_ToColor_2_
 
 //end

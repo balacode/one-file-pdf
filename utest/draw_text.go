@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 D4B39D                           [utest/draw_text.go]
+// :v: 2018-04-26 22:42:44 5EEB04                           [utest/draw_text.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,10 +10,10 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// DrawText is the unit test for
+// Test_PDF_DrawText_ is the unit test for
 // DrawText(s string) *PDF
-func DrawText(t *testing.T) {
-	fmt.Println("utest.DrawText")
+func Test_PDF_DrawText_(t *testing.T) {
+	fmt.Println("Test PDF.DrawText()")
 	//
 	func() {
 		var doc = pdf.NewPDF("A4")
@@ -119,6 +119,6 @@ func DrawText(t *testing.T) {
 			fmt.Errorf(`Invalid font "Ye-Olde-Scriptte" @DrawText`))
 	}()
 
-} //                                                                    DrawText
+} //                                                          Test_PDF_DrawText_
 
 //end

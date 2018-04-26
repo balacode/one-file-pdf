@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-26 12:23:48 B5E099                              [utest/errors.go]
+// :v: 2018-04-26 22:42:44 7B8BC9                              [utest/errors.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,9 +10,9 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// Errors tests PDF.Errors()
-func Errors(t *testing.T) {
-	fmt.Println("utest.Errors")
+// Test_PDF_Errors_ tests PDF.Errors()
+func Test_PDF_Errors_(t *testing.T) {
+	fmt.Println("Test PDF.Errors()")
 
 	// Errors() should be []error{} on a non-initialized PDF:
 	func() {
@@ -31,6 +31,6 @@ func Errors(t *testing.T) {
 		TEqual(t, doc.Errors(), []error{})
 	}()
 
-} //                                                                      Errors
+} //                                                            Test_PDF_Errors_
 
 //end

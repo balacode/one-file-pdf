@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 239521                    [utest/draw_text_in_box.go]
+// :v: 2018-04-26 22:42:44 88DF55                    [utest/draw_text_in_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,11 +10,11 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// DrawTextInBox is the unit test for
+// Test_PDF_DrawTextInBox_ is the unit test for
 // DrawTextInBox(
 //     x, y, width, height float64, align, text string) *PDF
-func DrawTextInBox(t *testing.T) {
-	fmt.Println("utest.DrawTextInBox")
+func Test_PDF_DrawTextInBox_(t *testing.T) {
+	fmt.Println("Test PDF.DrawTextInBox()")
 	//
 	const lorem = "Lorem ipsum dolor sit amet," +
 		" consectetur adipiscing elit," +
@@ -106,7 +106,7 @@ func DrawTextInBox(t *testing.T) {
 	`
 
 	pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
-} //                                                               DrawTextInBox
+} //                                                     Test_PDF_DrawTextInBox_
 
 //TODO: add test for Courier font
 //TDOO: Courier font metrics are not correct

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 6D6A87                         [utest/compression.go]
+// :v: 2018-04-26 22:42:44 9DC683                         [utest/compression.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,9 +10,9 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// Compression tests PDF.Compression() and SetCompression()
-func Compression(t *testing.T) {
-	fmt.Println("utest.Compression")
+// Test_PDF_Compression_ tests PDF.Compression() and SetCompression()
+func Test_PDF_Compression_(t *testing.T) {
+	fmt.Println("Test PDF.Compression()")
 
 	var draw = func(doc *pdf.PDF) {
 		doc.SetUnits("cm").
@@ -124,6 +124,6 @@ func Compression(t *testing.T) {
 		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 	}()
 
-} //                                                                 Compression
+} //                                                       Test_PDF_Compression_
 
 //end

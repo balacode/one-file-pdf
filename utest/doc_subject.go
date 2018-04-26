@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 EA1CD9                         [utest/doc_subject.go]
+// :v: 2018-04-26 22:42:44 F86560                         [utest/doc_subject.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -10,13 +10,13 @@ import "testing" // standard
 
 import "github.com/balacode/one-file-pdf"
 
-// DocSubject is the unit test for
-func DocSubject(t *testing.T) {
+// Test_PDF_DocSubject_ is the unit test for
+func Test_PDF_DocSubject_(t *testing.T) {
 
 	// -------------------------------------------------------------------------
 	// (ob *PDF) DocSubject() string
 	//
-	fmt.Println("utest.DocSubject")
+	fmt.Println("Test PDF.DocSubject()")
 
 	func() {
 		var doc pdf.PDF // uninitialized PDF
@@ -31,7 +31,7 @@ func DocSubject(t *testing.T) {
 	// -------------------------------------------------------------------------
 	// (ob *PDF) SetDocSubject(s string) *PDF
 	//
-	fmt.Println("utest.SetDocSubject")
+	fmt.Println("Test PDF.SetDocSubject()")
 
 	func() {
 		var doc pdf.PDF // uninitialized PDF
@@ -80,6 +80,6 @@ func DocSubject(t *testing.T) {
 		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
 	}()
 
-} //                                                                  DocSubject
+} //                                                        Test_PDF_DocSubject_
 
 //end
