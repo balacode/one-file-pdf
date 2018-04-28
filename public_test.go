@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-26 22:42:44 E1046E                               [public_test.go]
+// :v: 2018-04-28 22:37:48 8D8BC7                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -107,7 +107,7 @@ func Test_PDF_HorizontalScaling_(t *testing.T) {
 func Test_PDF_LineWidth_(t *testing.T) { utest.Test_PDF_LineWidth_(t) }
 
 // Units() string
-// SetUnits(unitName string) *PDF
+// SetUnits(units string) *PDF
 func Test_PDF_Units_(t *testing.T) { utest.Test_PDF_Units_(t) }
 
 // X() float64

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-26 22:42:44 612A50                               [utest/units.go]
+// :v: 2018-04-28 22:37:48 FA8DD6                               [utest/units.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -26,7 +26,7 @@ func Test_PDF_Units_(t *testing.T) {
 		TEqual(t, doc.Units(), "POINT")
 	}()
 
-	// (ob *PDF) SetUnits(unitName string) *PDF
+	// (ob *PDF) SetUnits(units string) *PDF
 	//
 	fmt.Println("Test PDF.SetUnits()")
 
@@ -48,6 +48,7 @@ func Test_PDF_Units_(t *testing.T) {
 			TEqual(t,
 				doc.Errors()[0],
 				fmt.Errorf(`Unknown unit name "fathoms" @SetUnits`))
+			//TODO: rename 'unit name' in message
 		}
 		TEqual(t, doc.Units(), "POINT")
 	}()

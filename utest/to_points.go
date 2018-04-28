@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-26 22:42:44 F978BA                           [utest/to_points.go]
+// :v: 2018-04-28 22:37:48 31C825                           [utest/to_points.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -74,6 +74,7 @@ func Test_PDF_ToPoints_(t *testing.T) {
 	//
 	// test some bad units
 	test(0, fmt.Errorf(`Unknown unit name "km"`), []string{"1km"})
+	//TODO: rename 'unit name' in message
 	test(0, fmt.Errorf(`Invalid number "1.0.1"`), []string{"1.0.1mm"})
 } //                                                          Test_PDF_ToPoints_
 

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-24 00:39:07 4598DA                                  [pdf_core.go]
+// :v: 2018-04-28 22:37:48 1AD53D                                  [pdf_core.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -37,7 +37,7 @@ package pdf
 //                                  SetFont(name string, points float64) *PDF
 //   HorizontalScaling() uint16     SetHorizontalScaling(percent uint16) *PDF
 //   LineWidth() float64            SetLineWidth(points float64) *PDF
-//   Units() string                 SetUnits(unitName string) *PDF
+//   Units() string                 SetUnits(units string) *PDF
 //   X() float64                    SetX(x float64) *PDF
 //   Y() float64                    SetY(y float64) *PDF
 //                                  SetXY(x, y float64) *PDF
@@ -121,7 +121,7 @@ package pdf
 //   toUpperLettersDigits(s, extras string) string
 //   (ob *PDF):
 //   getPaperSize(name string) (pdfPaperSize, error)
-//   getPointsPerUnit(unitName string) (ret float64, err error)
+//   getPointsPerUnit(units string) (ret float64, err error)
 //   putError(id int, msg, val string) *PDF
 //   writeTo(wr io.Writer, args ...interface{}) (n int, err error)
 //
@@ -167,7 +167,7 @@ type PDF struct {
 	images       []pdfImage   // all the images used in this PDF
 	columnWidths []float64    // user-set column widths (like tab stops)
 	columnNo     int          // number of the current column
-	unitName     string       // name of active measurement unit
+	units        string       // name of active measurement unit
 	ptPerUnit    float64      // number of points per measurement unit
 	color        color.RGBA   // current drawing color
 	lineWidth    float64      // current line width (in points)
@@ -376,16 +376,16 @@ func (ob *PDF) SetLineWidth(points float64) *PDF {
 
 // Units returns the currently selected measurement units.
 // E.g.: mm cm " in inch inches tw twip twips pt point points
-func (ob *PDF) Units() string { ob.init(); return ob.unitName }
+func (ob *PDF) Units() string { ob.init(); return ob.units }
 
 // SetUnits changes the current measurement units:
 // mm cm " in inch inches tw twip twips pt point points (can be in any case)
-func (ob *PDF) SetUnits(unitName string) *PDF {
-	var ppu, err = ob.init().getPointsPerUnit(unitName)
+func (ob *PDF) SetUnits(units string) *PDF {
+	var ppu, err = ob.init().getPointsPerUnit(units)
 	if err, isT := err.(pdfError); isT {
-		return ob.putError(0xEB4AAA, err.msg, unitName)
+		return ob.putError(0xEB4AAA, err.msg, units)
 	}
-	ob.ptPerUnit, ob.unitName = ppu, ob.toUpperLettersDigits(unitName, "")
+	ob.ptPerUnit, ob.units = ppu, ob.toUpperLettersDigits(units, "")
 	return ob
 } //                                                                    SetUnits
 
@@ -1104,9 +1104,9 @@ func (ob *PDF) init() *PDF {
 	if ob.isInit {
 		return ob
 	}
-	ob.unitName = "POINT"
+	ob.units = "POINT"
 	ob.paperSize, _ = ob.getPaperSize("A4")
-	ob.ptPerUnit, _ = ob.getPointsPerUnit(ob.unitName)
+	ob.ptPerUnit, _ = ob.getPointsPerUnit(ob.units)
 	ob.color, ob.lineWidth = pdfBlack, 1 // point
 	ob.fontName, ob.fontSizePt = "Helvetica", 10
 	ob.horzScaling, ob.compression = 100, true
@@ -1455,8 +1455,8 @@ func (ob *PDF) getPaperSize(name string) (pdfPaperSize, error) {
 } //                                                                getPaperSize
 
 // getPointsPerUnit returns number of points per named measurement unit
-func (ob *PDF) getPointsPerUnit(unitName string) (ret float64, err error) {
-	switch ob.toUpperLettersDigits(unitName, `"`) {
+func (ob *PDF) getPointsPerUnit(units string) (ret float64, err error) {
+	switch ob.toUpperLettersDigits(units, `"`) {
 	case "CM":
 		ret = 28.3464566929134 //          " / 2.54cm per " * 72 points per inch
 	case "IN", "INCH", "INCHES", `"`:
@@ -1468,7 +1468,8 @@ func (ob *PDF) getPointsPerUnit(unitName string) (ret float64, err error) {
 	case "TW", "TWIP", "TWIPS":
 		ret = 0.05 //                               1 point / 20 twips per point
 	default:
-		err = pdfError{id: 0xEE34DA, msg: "Unknown unit name", val: unitName}
+		err = pdfError{id: 0xEE34DA, msg: "Unknown unit name", val: units}
+		//TODO: rename 'unit name' in message
 	}
 	return ret, err
 } //                                                            getPointsPerUnit
