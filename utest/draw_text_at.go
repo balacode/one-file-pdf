@@ -1,14 +1,16 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-26 22:42:44 A5EA07                        [utest/draw_text_at.go]
+// :v: 2018-04-29 23:42:24 898C88                        [utest/draw_text_at.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
-import "fmt"     // standard
-import "testing" // standard
+import (
+	"fmt"
+	"testing"
 
-import "github.com/balacode/one-file-pdf"
+	"github.com/balacode/one-file-pdf"
+)
 
 // Test_PDF_DrawTextAt_ is the unit test for
 // DrawTextAt(x, y float64, text string) *PDF

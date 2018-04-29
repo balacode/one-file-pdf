@@ -1,14 +1,16 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-26 22:42:44 07932F                          [utest/doc_author.go]
+// :v: 2018-04-29 23:42:24 62EF36                          [utest/doc_author.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
-import "fmt"     // standard
-import "testing" // standard
+import (
+	"fmt"
+	"testing"
 
-import "github.com/balacode/one-file-pdf"
+	"github.com/balacode/one-file-pdf"
+)
 
 // Test_PDF_DocAuthor_ is the unit test for
 func Test_PDF_DocAuthor_(t *testing.T) {

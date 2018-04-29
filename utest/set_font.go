@@ -1,14 +1,16 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-26 22:42:44 03B075                            [utest/set_font.go]
+// :v: 2018-04-29 23:42:24 EAD07F                            [utest/set_font.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
-import "fmt"     // standard
-import "testing" // standard
+import (
+	"fmt"
+	"testing"
 
-import "github.com/balacode/one-file-pdf"
+	"github.com/balacode/one-file-pdf"
+)
 
 // Test_PDF_SetFont_ is the unit test for PDF.SetFont()
 func Test_PDF_SetFont_(t *testing.T) {

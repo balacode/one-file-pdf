@@ -1,16 +1,16 @@
 // -----------------------------------------------------------------------------
 // (c) markaum@gmail.com                                            License: MIT
-// :v: 2018-04-26 22:42:44 E196A8                         [utest/to_color_t2.go]
+// :v: 2018-04-29 23:42:24 3BF4C5                         [utest/to_color_t2.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
 import (
-	"fmt"         // standard
-	"image/color" // standard
-	"testing"     // standard
+	"fmt"
+	"image/color"
+	"testing"
 
-	pdf "github.com/balacode/one-file-pdf"
+	"github.com/balacode/one-file-pdf"
 )
 
 // Test_PDF_ToColor_2_ is the second unit test for PDF.ToColor()

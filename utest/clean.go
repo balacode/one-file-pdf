@@ -1,14 +1,16 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-26 22:42:44 2FF3CC                               [utest/clean.go]
+// :v: 2018-04-29 23:42:24 01B284                               [utest/clean.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
-import "fmt"     // standard
-import "testing" // standard
+import (
+	"fmt"
+	"testing"
 
-import "github.com/balacode/one-file-pdf"
+	"github.com/balacode/one-file-pdf"
+)
 
 // Test_PDF_Clean_ is the unit test for PDF.Clean()
 func Test_PDF_Clean_(t *testing.T) {

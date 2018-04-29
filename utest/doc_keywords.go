@@ -1,14 +1,16 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-26 22:42:44 7A65A6                        [utest/doc_keywords.go]
+// :v: 2018-04-29 23:42:24 2873AE                        [utest/doc_keywords.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
-import "fmt"     // standard
-import "testing" // standard
+import (
+	"fmt"
+	"testing"
 
-import "github.com/balacode/one-file-pdf"
+	"github.com/balacode/one-file-pdf"
+)
 
 // Test_PDF_DocKeywords_ is the unit test for
 func Test_PDF_DocKeywords_(t *testing.T) {

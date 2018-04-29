@@ -1,17 +1,19 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 303080                           [utest/util_func.go]
+// :v: 2018-04-29 23:42:24 4E5F90                           [utest/util_func.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
-import "bytes"   // standard
-import "fmt"     // standard
-import "strconv" // standard
-import "strings" // standard
-import "testing" // standard
+import (
+	"bytes"
+	"fmt"
+	"strconv"
+	"strings"
+	"testing"
 
-import "github.com/balacode/one-file-pdf"
+	"github.com/balacode/one-file-pdf"
+)
 
 type pdfStreamFmt int
 

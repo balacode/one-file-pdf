@@ -1,14 +1,16 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-26 22:42:44 9BB7CB                          [utest/pull_error.go]
+// :v: 2018-04-29 23:42:24 6B5F65                          [utest/pull_error.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
-import "fmt"     // standard
-import "testing" // standard
+import (
+	"fmt"
+	"testing"
 
-import "github.com/balacode/one-file-pdf"
+	"github.com/balacode/one-file-pdf"
+)
 
 // Test_PDF_PullError_ is the unit test for PullError() error
 func Test_PDF_PullError_(t *testing.T) {

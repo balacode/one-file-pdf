@@ -1,14 +1,16 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-26 22:42:44 0F8AA2                                   [utest/y.go]
+// :v: 2018-04-29 23:43:39 5D8663                                   [utest/y.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
-import "fmt"     // standard
-import "testing" // standard
+import (
+	"fmt"
+	"testing"
 
-import "github.com/balacode/one-file-pdf"
+	"github.com/balacode/one-file-pdf"
+)
 
 // Test_PDF_Y_ is the unit test for PDF.Y()
 func Test_PDF_Y_(t *testing.T) {

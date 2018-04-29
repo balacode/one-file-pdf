@@ -1,14 +1,16 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-26 22:42:44 9B705F                         [utest/page_height.go]
+// :v: 2018-04-29 23:42:24 F1A2C9                         [utest/page_height.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
-import "fmt"     // standard
-import "testing" // standard
+import (
+	"fmt"
+	"testing"
 
-import "github.com/balacode/one-file-pdf"
+	"github.com/balacode/one-file-pdf"
+)
 
 // Test_PDF_PageHeight_ tests PDF.PageHeight()
 func Test_PDF_PageHeight_(t *testing.T) {

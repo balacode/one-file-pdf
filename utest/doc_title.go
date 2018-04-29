@@ -1,14 +1,16 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-26 22:42:44 40EF21                           [utest/doc_title.go]
+// :v: 2018-04-29 23:42:24 9F24C2                           [utest/doc_title.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
-import "fmt"     // standard
-import "testing" // standard
+import (
+	"fmt"
+	"testing"
 
-import "github.com/balacode/one-file-pdf"
+	"github.com/balacode/one-file-pdf"
+)
 
 // Test_PDF_DocTitle_ is the unit test for
 func Test_PDF_DocTitle_(t *testing.T) {

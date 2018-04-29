@@ -1,12 +1,14 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-12 22:27:16 83825C                           [utest/warn_test.go]
+// :v: 2018-04-29 23:42:24 D142EE                           [utest/warn_test.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
-import "fmt"     // standard
-import "testing" // standard
+import (
+	"fmt"
+	"testing"
+)
 
 // TestWarning gets displayed if someone tries to run 'go test' from 'utest'.
 func TestWarning(t *testing.T) {

@@ -1,14 +1,16 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-28 22:37:48 31C825                           [utest/to_points.go]
+// :v: 2018-04-29 23:42:24 EC43D6                           [utest/to_points.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
-import "fmt"     // standard
-import "testing" // standard
+import (
+	"fmt"
+	"testing"
 
-import "github.com/balacode/one-file-pdf"
+	"github.com/balacode/one-file-pdf"
+)
 
 // Test_PDF_ToPoints_ is the unit test for PDF.ToPoints()
 func Test_PDF_ToPoints_(t *testing.T) {

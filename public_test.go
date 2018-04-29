@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-28 22:37:48 8D8BC7                               [public_test.go]
+// :v: 2018-04-29 23:45:39 1D9060                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -25,9 +25,11 @@ To generate a test coverage report, use:
 	go tool cover -html=cover.out
 */
 
-import "testing" // standard
+import (
+	"testing"
 
-import "github.com/balacode/one-file-pdf/utest"
+	"github.com/balacode/one-file-pdf/utest"
+)
 
 // Every tested public method must be added here, or it won't be tested:
 

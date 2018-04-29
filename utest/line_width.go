@@ -1,15 +1,17 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-27 23:41:04 8C3220                          [utest/line_width.go]
+// :v: 2018-04-29 23:42:24 E2ACAE                          [utest/line_width.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
-import "fmt"     // standard
-import "strconv" // standard
-import "testing" // standard
+import (
+	"fmt"
+	"strconv"
+	"testing"
 
-import "github.com/balacode/one-file-pdf"
+	"github.com/balacode/one-file-pdf"
+)
 
 // Test_PDF_LineWidth_ is the unit test for PDF.LineWidth()
 // go test --run Test_PDF_LineWidth_

@@ -1,11 +1,13 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-03-24 22:04:39 DF4DFF               [utest/util_format_pdf_lines.go]
+// :v: 2018-04-29 23:42:24 5D3636               [utest/util_format_pdf_lines.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
-import "bytes" // standard
+import (
+	"bytes"
+)
 
 // permuteStrings returns all combinations of strings in 'parts'
 func permuteStrings(parts ...[]string) (ret []string) {

@@ -1,15 +1,17 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-26 22:42:44 E26F93                               [utest/color.go]
+// :v: 2018-04-29 23:43:39 220C7B                               [utest/color.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
-import "fmt"         // standard
-import "testing"     // standard
-import "image/color" // standard
+import (
+	"fmt"
+	"image/color"
+	"testing"
 
-import "github.com/balacode/one-file-pdf"
+	"github.com/balacode/one-file-pdf"
+)
 
 // Test_PDF_Color_ tests PDF.Color() and SetColor()
 func Test_PDF_Color_(t *testing.T) {

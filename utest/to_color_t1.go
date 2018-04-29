@@ -1,15 +1,17 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-26 22:42:44 3650E7                         [utest/to_color_t1.go]
+// :v: 2018-04-29 23:42:24 88A7EE                         [utest/to_color_t1.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
-import "fmt"         // standard
-import "image/color" // standard
-import "testing"     // standard
+import (
+	"fmt"
+	"image/color"
+	"testing"
 
-import "github.com/balacode/one-file-pdf"
+	"github.com/balacode/one-file-pdf"
+)
 
 // Test_PDF_ToColor_1_ is the unit test for
 // (ob *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error)

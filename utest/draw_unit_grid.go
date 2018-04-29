@@ -1,14 +1,16 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-26 22:42:44 3B7F01                      [utest/draw_unit_grid.go]
+// :v: 2018-04-29 23:42:24 85D483                      [utest/draw_unit_grid.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
-import "fmt"     // standard
-import "testing" // standard
+import (
+	"fmt"
+	"testing"
 
-import "github.com/balacode/one-file-pdf"
+	"github.com/balacode/one-file-pdf"
+)
 
 // Test_PDF_DrawUnitGrid_ is the unit test for PDF.DrawUnitGrid()
 func Test_PDF_DrawUnitGrid_(t *testing.T) {

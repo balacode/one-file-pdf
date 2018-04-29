@@ -1,14 +1,16 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-28 22:37:48 FA8DD6                               [utest/units.go]
+// :v: 2018-04-29 23:42:24 53F3F1                               [utest/units.go]
 // -----------------------------------------------------------------------------
 
 package utest
 
-import "fmt"     // standard
-import "testing" // standard
+import (
+	"fmt"
+	"testing"
 
-import "github.com/balacode/one-file-pdf"
+	"github.com/balacode/one-file-pdf"
+)
 
 // Test_PDF_Units_ tests PDF.Units() and SetUnits()
 func Test_PDF_Units_(t *testing.T) {

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-23 11:32:14 C6A3A1                              [private_test.go]
+// :v: 2018-04-29 23:45:39 D9CFB1                              [private_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -13,11 +13,13 @@ To generate a test coverage report use:
 	go tool cover -html=cover.out
 */
 
-import "fmt"           // standard
-import "runtime"       // standard
-import "strings"       // standard
-import "testing"       // standard
-import "path/filepath" // standard
+import (
+	"fmt"
+	"path/filepath"
+	"runtime"
+	"strings"
+	"testing"
+)
 
 // go test --run Test_getPapreSize_
 func Test_getPapreSize_(t *testing.T) {
