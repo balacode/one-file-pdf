@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-28 22:37:48 1AD53D                                  [pdf_core.go]
+// :v: 2018-05-01 19:34:45 102303                                  [pdf_core.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -1468,8 +1468,8 @@ func (ob *PDF) getPointsPerUnit(units string) (ret float64, err error) {
 	case "TW", "TWIP", "TWIPS":
 		ret = 0.05 //                               1 point / 20 twips per point
 	default:
-		err = pdfError{id: 0xEE34DA, msg: "Unknown unit name", val: units}
-		//TODO: rename 'unit name' in message
+		err = pdfError{id: 0xEE34DA, msg: "Unknown measurement units",
+			val: units}
 	}
 	return ret, err
 } //                                                            getPointsPerUnit

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-29 23:42:24 53F3F1                               [utest/units.go]
+// :v: 2018-05-01 19:33:24 9A6ED2                               [utest/units.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -49,8 +49,7 @@ func Test_PDF_Units_(t *testing.T) {
 		if len(doc.Errors()) == 1 {
 			TEqual(t,
 				doc.Errors()[0],
-				fmt.Errorf(`Unknown unit name "fathoms" @SetUnits`))
-			//TODO: rename 'unit name' in message
+				fmt.Errorf(`Unknown measurement units "fathoms" @SetUnits`))
 		}
 		TEqual(t, doc.Units(), "POINT")
 	}()
