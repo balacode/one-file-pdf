@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-22 14:32:17 BA3DD6                        [utest/util_t_equal.go]
+// :v: 2018-05-03 23:05:37 2F0FE9                        [utest/util_t_equal.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -43,7 +43,7 @@ func TEqual(t *testing.T, result interface{}, expect interface{}) bool {
 			uint, uint8, uint16, uint32, uint64, uintptr:
 			return fmt.Sprintf("%d", val)
 		case float32, float64:
-			var s = fmt.Sprintf("%f", val)
+			var s = fmt.Sprintf("%.4f", val)
 			if strings.Contains(s, ".") {
 				for strings.HasSuffix(s, "0") {
 					s = s[:len(s)-1]
