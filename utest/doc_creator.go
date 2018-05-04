@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-29 23:42:24 32D4FB                         [utest/doc_creator.go]
+// :v: 2018-05-04 23:51:59 BE5AEA                         [utest/doc_creator.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -80,7 +80,7 @@ func Test_PDF_DocCreator_(t *testing.T) {
 		%%EOF
 		`
 
-		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
+		ComparePDF(t, doc.Bytes(), expect, StreamsInText)
 	}()
 
 } //                                                        Test_PDF_DocCreator_

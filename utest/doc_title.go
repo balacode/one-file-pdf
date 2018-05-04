@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-29 23:42:24 9F24C2                           [utest/doc_title.go]
+// :v: 2018-05-04 23:51:59 56F565                           [utest/doc_title.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -80,7 +80,7 @@ func Test_PDF_DocTitle_(t *testing.T) {
 		%%EOF
 		`
 
-		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
+		ComparePDF(t, doc.Bytes(), expect, StreamsInText)
 	}()
 
 } //                                                          Test_PDF_DocTitle_

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-29 23:42:24 62EF36                          [utest/doc_author.go]
+// :v: 2018-05-04 23:51:59 2770D3                          [utest/doc_author.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -80,7 +80,7 @@ func Test_PDF_DocAuthor_(t *testing.T) {
 		%%EOF
 		`
 
-		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
+		ComparePDF(t, doc.Bytes(), expect, StreamsInText)
 	}()
 
 } //                                                         Test_PDF_DocAuthor_

@@ -1,16 +1,16 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-29 23:42:24 5D3636               [utest/util_format_pdf_lines.go]
+// :v: 2018-05-04 23:53:15 26AD8A                [utest/util/permute_strings.go]
 // -----------------------------------------------------------------------------
 
-package utest
+package util
 
 import (
 	"bytes"
 )
 
-// permuteStrings returns all combinations of strings in 'parts'
-func permuteStrings(parts ...[]string) (ret []string) {
+// PermuteStrings returns all combinations of strings in 'parts'
+func PermuteStrings(parts ...[]string) (ret []string) {
 	{
 		var n = 1
 		for _, ar := range parts {
@@ -44,6 +44,6 @@ loop:
 		at[len(parts)-1]++
 	}
 	return ret
-} //                                                              permuteStrings
+} //                                                              PermuteStrings
 
 //end

@@ -1,9 +1,9 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-29 23:42:24 4E5F90                           [utest/util_func.go]
+// :v: 2018-05-04 23:54:06 9AB1B2                           [utest/util/func.go]
 // -----------------------------------------------------------------------------
 
-package utest
+package util
 
 import (
 	"bytes"
@@ -15,22 +15,22 @@ import (
 	"github.com/balacode/one-file-pdf"
 )
 
-type pdfStreamFmt int
+type StreamFormat int
 
 const (
-	pdfStreamsInText = iota
-	pdfStreamsInHex  = iota
+	StreamsInText = iota
+	StreamsInHex  = iota
 )
 
-// pdfCompare compares generated result bytes to the expected PDF content:
+// ComparePDF compares generated result bytes to the expected PDF content:
 // - convert result to a string
 // - format both result and expected string using pdfFormatLines()
 // - compare result and expected lines
 // - raise an error if there are diffs (report up to 5 differences)
-func pdfCompare(t *testing.T, result []byte, expect string, sfmt pdfStreamFmt) {
+func ComparePDF(t *testing.T, result []byte, expect string, sfmt StreamFormat) {
 	//
 	var results = pdfFormatLines(string(result), sfmt)
-	var expects = pdfFormatLines(expect, pdfStreamsInText)
+	var expects = pdfFormatLines(expect, StreamsInText)
 	var lenResults = len(results)
 	var lenExpects = len(expects)
 	var errCount = 0
@@ -77,10 +77,10 @@ func pdfCompare(t *testing.T, result []byte, expect string, sfmt pdfStreamFmt) {
 				strings.Join(results, "\n")+"\n"+
 				"`\n")
 	}
-} //                                                                  pdfCompare
+} //                                                                  ComparePDF
 
-// pdfFailIfErrors raises a test failure if the supplied PDF has errors
-func pdfFailIfErrors(t *testing.T, doc *pdf.PDF) {
+// FailIfHasErrors raises a test failure if the supplied PDF has errors
+func FailIfHasErrors(t *testing.T, doc *pdf.PDF) {
 	if len(doc.Errors()) == 0 {
 		return
 	}
@@ -88,12 +88,12 @@ func pdfFailIfErrors(t *testing.T, doc *pdf.PDF) {
 		t.Errorf("ERROR %d: %s\n\n", i+1, err)
 	}
 	t.Fail()
-} //                                                             pdfFailIfErrors
+} //                                                             FailIfHasErrors
 
 // pdfFormatLines accepts an uncompressed PDF document as a string,
 // and returns an array of trimmed, non-empty lines
-func pdfFormatLines(s string, sfmt pdfStreamFmt) []string {
-	if sfmt == pdfStreamsInHex {
+func pdfFormatLines(s string, sfmt StreamFormat) []string {
+	if sfmt == StreamsInHex {
 		s = pdfFormatStreamsInHex(s)
 	}
 	// change all newlines to "\n"

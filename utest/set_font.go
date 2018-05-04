@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-29 23:42:24 EAD07F                            [utest/set_font.go]
+// :v: 2018-05-04 23:51:59 0F7013                            [utest/set_font.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -239,7 +239,7 @@ func Test_PDF_SetFont_(t *testing.T) {
 		%%EOF
 		`
 
-		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
+		ComparePDF(t, doc.Bytes(), expect, StreamsInText)
 		doc.SaveFile("~~font_sample.pdf")
 	}()
 

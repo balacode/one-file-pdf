@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-29 23:42:24 260610                  [utest/horizontal_scaling.go]
+// :v: 2018-05-04 23:51:59 FCAFDC                  [utest/horizontal_scaling.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -130,7 +130,7 @@ func Test_PDF_HorizontalScaling_(t *testing.T) {
 		%%EOF
 		`
 
-		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
+		ComparePDF(t, doc.Bytes(), expect, StreamsInText)
 		doc.SaveFile("~~test_horizontal_scaling.pdf")
 	}()
 

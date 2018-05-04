@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-02 23:01:56 F612B3                    [utest/draw_text_in_box.go]
+// :v: 2018-05-04 23:51:59 F87BFC                    [utest/draw_text_in_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -108,7 +108,7 @@ func Test_PDF_DrawTextInBox_(t *testing.T) {
 		%%EOF
 		`
 
-		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
+		ComparePDF(t, doc.Bytes(), expect, StreamsInText)
 	}()
 
 	func() {
@@ -199,7 +199,7 @@ func Test_PDF_DrawTextInBox_(t *testing.T) {
 		%%EOF
 		`
 
-		pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
+		ComparePDF(t, doc.Bytes(), expect, StreamsInText)
 	}()
 
 } //                                                     Test_PDF_DrawTextInBox_

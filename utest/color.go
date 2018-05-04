@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-30 23:18:23 78E469                               [utest/color.go]
+// :v: 2018-05-04 23:53:15 569DA8                               [utest/color.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -228,7 +228,7 @@ func Test_PDF_Color_(t *testing.T) {
 		}
 	}
 	// test color names with trimming and case insensitivity
-	for _, name := range permuteStrings(
+	for _, name := range PermuteStrings(
 		[]string{"", " ", "  "},
 		[]string{"red", "Red", "RED"},
 		[]string{"", " ", "  "},

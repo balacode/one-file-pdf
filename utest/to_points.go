@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-01 19:33:24 44D43A                           [utest/to_points.go]
+// :v: 2018-05-04 23:53:15 AD6884                           [utest/to_points.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -19,7 +19,7 @@ func Test_PDF_ToPoints_(t *testing.T) {
 	var test = func(
 		expectVal float64, expectErr error, inputParts ...[]string,
 	) {
-		for _, s := range permuteStrings(inputParts...) {
+		for _, s := range PermuteStrings(inputParts...) {
 			var doc pdf.PDF // uninitialized PDF
 			var gotVal, gotErr = doc.ToPoints(s)
 			TEqual(t,

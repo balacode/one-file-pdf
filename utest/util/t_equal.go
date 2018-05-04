@@ -1,9 +1,9 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-03 23:05:37 2F0FE9                        [utest/util_t_equal.go]
+// :v: 2018-05-04 23:51:59 B20A7E                        [utest/util/t_equal.go]
 // -----------------------------------------------------------------------------
 
-package utest
+package util
 
 // Provides a slightly-altered TEqual() function (and functions it uses)
 // from Zircon-Go lib: github.com/balacode/zr
@@ -150,9 +150,9 @@ mainLoop:
 // TCaller returns the name of the unit test function.
 func TCaller() string {
 	for _, iter := range CallerList() {
-		if strings.Contains(iter, "utest.TCaller") ||
-			strings.Contains(iter, "utest.TEqual") ||
-			strings.Contains(iter, "utest.pdfCompare") {
+		if strings.Contains(iter, "util.TCaller") ||
+			strings.Contains(iter, "util.TEqual") ||
+			strings.Contains(iter, "util.ComparePDF") {
 			continue
 		}
 		return iter

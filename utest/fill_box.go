@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-29 23:42:24 558C89                            [utest/fill_box.go]
+// :v: 2018-05-04 23:51:59 7AB65F                            [utest/fill_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -58,7 +58,7 @@ func Test_PDF_FillBox_(t *testing.T) {
 	%%EOF
 	`
 
-	pdfCompare(t, doc.Bytes(), expect, pdfStreamsInText)
+	ComparePDF(t, doc.Bytes(), expect, StreamsInText)
 } //                                                           Test_PDF_FillBox_
 
 //end
