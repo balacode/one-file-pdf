@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-04 23:54:06 9AB1B2                           [utest/util/func.go]
+// :v: 2018-05-05 01:20:53 8DCBC7                           [utest/util/func.go]
 // -----------------------------------------------------------------------------
 
 package util
@@ -24,13 +24,13 @@ const (
 
 // ComparePDF compares generated result bytes to the expected PDF content:
 // - convert result to a string
-// - format both result and expected string using pdfFormatLines()
+// - format both result and expected string using formatLines()
 // - compare result and expected lines
 // - raise an error if there are diffs (report up to 5 differences)
 func ComparePDF(t *testing.T, result []byte, expect string, sfmt StreamFormat) {
 	//
-	var results = pdfFormatLines(string(result), sfmt)
-	var expects = pdfFormatLines(expect, StreamsInText)
+	var results = formatLines(string(result), sfmt)
+	var expects = formatLines(expect, StreamsInText)
 	var lenResults = len(results)
 	var lenExpects = len(expects)
 	var errCount = 0
@@ -90,9 +90,9 @@ func FailIfHasErrors(t *testing.T, doc *pdf.PDF) {
 	t.Fail()
 } //                                                             FailIfHasErrors
 
-// pdfFormatLines accepts an uncompressed PDF document as a string,
+// formatLines accepts an uncompressed PDF document as a string,
 // and returns an array of trimmed, non-empty lines
-func pdfFormatLines(s string, sfmt StreamFormat) []string {
+func formatLines(s string, sfmt StreamFormat) []string {
 	if sfmt == StreamsInHex {
 		s = pdfFormatStreamsInHex(s)
 	}
@@ -131,7 +131,7 @@ func pdfFormatLines(s string, sfmt StreamFormat) []string {
 		ret = append(ret, line)
 	}
 	return ret
-} //                                                              pdfFormatLines
+} //                                                                 formatLines
 
 // pdfFormatStreamsInHex formats content of all streams in s as hex strings
 func pdfFormatStreamsInHex(s string) string {
