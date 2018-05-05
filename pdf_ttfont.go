@@ -1,11 +1,13 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-25 15:04:06 7B3E1C                                [pdf_ttfont.go]
+// :v: 2018-05-05 01:22:38 C5B904                                [pdf_ttfont.go]
 // -----------------------------------------------------------------------------
 
 // THIS FILE IS A WORK IN PROGRESS
 
 // This file contains a TTF font parser and PDF font-related functionality.
+// It augments PDF in pdf_core.go to support Unicode and font embedding,
+// but is not required for basic PDF functionality.
 
 // # Module Initialization
 //   init()

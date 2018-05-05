@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-04 23:53:15 CF59A8                              [utest/module.go]
+// :v: 2018-05-05 01:22:38 B9B037                              [utest/module.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -9,8 +9,8 @@ import (
 	"github.com/balacode/one-file-pdf/utest/util"
 )
 
-const StreamsInText = util.StreamsInText
 const StreamsInHex = util.StreamsInHex
+const StreamsInText = util.StreamsInText
 
 var ComparePDF = util.ComparePDF
 var FailIfHasErrors = util.FailIfHasErrors
