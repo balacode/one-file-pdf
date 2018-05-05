@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-05 01:20:53 8DCBC7                           [utest/util/func.go]
+// :v: 2018-05-05 12:23:38 9B43B6                           [utest/util/func.go]
 // -----------------------------------------------------------------------------
 
 package util
@@ -11,8 +11,6 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-
-	"github.com/balacode/one-file-pdf"
 )
 
 type StreamFormat int
@@ -80,11 +78,11 @@ func ComparePDF(t *testing.T, result []byte, expect string, sfmt StreamFormat) {
 } //                                                                  ComparePDF
 
 // FailIfHasErrors raises a test failure if the supplied PDF has errors
-func FailIfHasErrors(t *testing.T, doc *pdf.PDF) {
-	if len(doc.Errors()) == 0 {
+func FailIfHasErrors(t *testing.T, errors func() []error) {
+	if len(errors()) == 0 {
 		return
 	}
-	for i, err := range doc.Errors() {
+	for i, err := range errors() {
 		t.Errorf("ERROR %d: %s\n\n", i+1, err)
 	}
 	t.Fail()

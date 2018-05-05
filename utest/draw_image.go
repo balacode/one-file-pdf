@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-04 23:54:06 7AF666                          [utest/draw_image.go]
+// :v: 2018-05-05 12:23:38 14666E                          [utest/draw_image.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -110,7 +110,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 		doc.SetCompression(true).
 			SetUnits("cm").
 			DrawImage(x, y, height, pngData)
-		FailIfHasErrors(t, &doc)
+		FailIfHasErrors(t, doc.Errors)
 		ComparePDF(t, doc.Bytes(), expectOpaque, StreamsInHex)
 	}()
 
@@ -120,7 +120,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 		doc.SetCompression(true).
 			SetUnits("cm").
 			DrawImage(x, y, height, "./image/rgbw64.png")
-		FailIfHasErrors(t, &doc)
+		FailIfHasErrors(t, doc.Errors)
 		ComparePDF(t, doc.Bytes(), expectOpaque, StreamsInHex)
 	}()
 
@@ -289,7 +289,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 			SetUnits("cm").
 			DrawImage(x, y, height, "./image/rgbt64.png", "Yellow").
 			DrawImage(x, y+height+1, height, "./image/rgbt64.png", "Cyan")
-		FailIfHasErrors(t, &doc)
+		FailIfHasErrors(t, doc.Errors)
 		ComparePDF(t, doc.Bytes(), expectTransparent, StreamsInHex)
 	}()
 

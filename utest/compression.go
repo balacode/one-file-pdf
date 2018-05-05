@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-04 23:54:06 A4F136                         [utest/compression.go]
+// :v: 2018-05-05 12:23:38 A37BFB                         [utest/compression.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -26,13 +26,13 @@ func Test_PDF_Compression_(t *testing.T) {
 	func() {
 		var doc pdf.PDF // uninitialized PDF
 		TEqual(t, doc.Compression(), true)
-		FailIfHasErrors(t, &doc)
+		FailIfHasErrors(t, doc.Errors)
 	}()
 
 	func() {
 		var doc = pdf.NewPDF("A4") // initialized PDF
 		TEqual(t, doc.Compression(), true)
-		FailIfHasErrors(t, &doc)
+		FailIfHasErrors(t, doc.Errors)
 	}()
 
 	// generate a simple PDF with compression turned on
@@ -78,7 +78,7 @@ func Test_PDF_Compression_(t *testing.T) {
 		var doc = pdf.NewPDF("A4") // initialized PDF
 		doc.SetCompression(true)
 		draw(&doc)
-		FailIfHasErrors(t, &doc)
+		FailIfHasErrors(t, doc.Errors)
 		ComparePDF(t, doc.Bytes(), expect, StreamsInHex)
 	}()
 
@@ -122,7 +122,7 @@ func Test_PDF_Compression_(t *testing.T) {
 		var doc = pdf.NewPDF("A4") // initialized PDF
 		doc.SetCompression(false)
 		draw(&doc)
-		FailIfHasErrors(t, &doc)
+		FailIfHasErrors(t, doc.Errors)
 		ComparePDF(t, doc.Bytes(), expect, StreamsInText)
 	}()
 
