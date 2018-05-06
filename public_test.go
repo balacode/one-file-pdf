@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-29 23:45:39 1D9060                               [public_test.go]
+// :v: 2018-05-06 20:18:41 473C49                               [public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -43,7 +43,7 @@ func Test_NewPDF_(t *testing.T) { utest.Test_NewPDF_(t) }
 // # Read-Only Properties (ob *PDF)
 
 // PageCount() int
-//TODO: func Test_PDF_PageCount_(t *testing.T) { utest.Test_PDF_PageCount_(t) }
+func Test_PDF_PageCount_(t *testing.T) { utest.Test_PDF_PageCount_(t) }
 
 // PageHeight() float64
 func Test_PDF_PageHeight_(t *testing.T) { utest.Test_PDF_PageHeight_(t) }

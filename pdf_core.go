@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-01 19:34:45 102303                                  [pdf_core.go]
+// :v: 2018-05-06 20:18:41 F770A2                                  [pdf_core.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -229,7 +229,7 @@ type pdfFontHandler interface {
 // # Read-Only Properties (ob *PDF)
 
 // PageCount returns the total number of pages in the document.
-func (ob *PDF) PageCount() int { return len(ob.pages) }
+func (ob *PDF) PageCount() int { ob.reservePage(); return len(ob.pages) }
 
 // PageHeight returns the height of the current page in selected units.
 func (ob *PDF) PageHeight() float64 { return ob.ToUnits(ob.paperSize.heightPt) }
