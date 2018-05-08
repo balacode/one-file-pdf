@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-06 20:18:41 F770A2                                  [pdf_core.go]
+// :v: 2018-05-08 23:49:49 8ED148                                  [pdf_core.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -421,7 +421,8 @@ func (ob *PDF) SetXY(x, y float64) *PDF { return ob.SetX(x).SetY(y) }
 func (ob *PDF) AddPage() *PDF {
 	var COLOR = color.RGBA{1, 0, 1, 0x01} // unlikely default color
 	ob.pages = append(ob.pages, pdfPage{
-		x: -1, y: -1, lineWidth: 1, strokeColor: COLOR, nonStrokeColor: COLOR,
+		x: -1, y: ob.paperSize.heightPt + 1, lineWidth: 1,
+		strokeColor: COLOR, nonStrokeColor: COLOR,
 		fontSizePt: 10, horzScaling: 100,
 	})
 	ob.pageNo = len(ob.pages) - 1
