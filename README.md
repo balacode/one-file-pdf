@@ -48,8 +48,10 @@ The only type you need to use is PDF, while PDFColorNames are left public for re
 ```go
 package main 
 
-import "fmt"
-import "github.com/balacode/one-file-pdf"
+import (
+	"fmt"
+	"github.com/balacode/one-file-pdf"
+)
 
 func main() {
     fmt.Println(`Generating a "Hello World" PDF...`)
