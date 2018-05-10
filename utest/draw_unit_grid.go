@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-04 23:51:59 A985B5                      [utest/draw_unit_grid.go]
+// :v: 2018-05-10 22:50:31 4EEC06                      [utest/draw_unit_grid.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -361,7 +361,7 @@ func Test_PDF_DrawUnitGrid_(t *testing.T) {
 	%%EOF
 	`
 
-	ComparePDF(t, result, expect, StreamsInText)
+	ComparePDF(t, result, expect)
 } //                                                      Test_PDF_DrawUnitGrid_
 
 //end

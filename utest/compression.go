@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-05 12:23:38 A37BFB                         [utest/compression.go]
+// :v: 2018-05-10 22:50:31 88CEEC                         [utest/compression.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -79,7 +79,7 @@ func Test_PDF_Compression_(t *testing.T) {
 		doc.SetCompression(true)
 		draw(&doc)
 		FailIfHasErrors(t, doc.Errors)
-		ComparePDF(t, doc.Bytes(), expect, StreamsInHex)
+		ComparePDF(t, doc.Bytes(), expect)
 	}()
 
 	// generate a simple PDF with compression turned off
@@ -123,7 +123,7 @@ func Test_PDF_Compression_(t *testing.T) {
 		doc.SetCompression(false)
 		draw(&doc)
 		FailIfHasErrors(t, doc.Errors)
-		ComparePDF(t, doc.Bytes(), expect, StreamsInText)
+		ComparePDF(t, doc.Bytes(), expect)
 	}()
 
 } //                                                       Test_PDF_Compression_

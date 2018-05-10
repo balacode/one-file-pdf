@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-05 12:23:38 9B43B6                           [utest/util/func.go]
+// :v: 2018-05-10 22:50:31 8ECF75                           [utest/util/func.go]
 // -----------------------------------------------------------------------------
 
 package util
@@ -13,22 +13,16 @@ import (
 	"testing"
 )
 
-type StreamFormat int
-
-const (
-	StreamsInText = iota
-	StreamsInHex  = iota
-)
-
 // ComparePDF compares generated result bytes to the expected PDF content:
 // - convert result to a string
 // - format both result and expected string using formatLines()
 // - compare result and expected lines
 // - raise an error if there are diffs (report up to 5 differences)
-func ComparePDF(t *testing.T, result []byte, expect string, sfmt StreamFormat) {
+func ComparePDF(t *testing.T, result []byte, expect string) {
 	//
-	var results = formatLines(string(result), sfmt)
-	var expects = formatLines(expect, StreamsInText)
+	const formatStreams = true
+	var results = formatLines(string(result), formatStreams)
+	var expects = formatLines(expect, !formatStreams)
 	var lenResults = len(results)
 	var lenExpects = len(expects)
 	var errCount = 0
@@ -90,10 +84,13 @@ func FailIfHasErrors(t *testing.T, errors func() []error) {
 
 // formatLines accepts an uncompressed PDF document as a string,
 // and returns an array of trimmed, non-empty lines
-func formatLines(s string, sfmt StreamFormat) []string {
-	if sfmt == StreamsInHex {
-		s = pdfFormatStreamsInHex(s)
+func formatLines(s string, formatStreams bool) []string {
+	//
+	// format streams
+	if formatStreams {
+		s = pdfFormatStreams(s)
 	}
+	//
 	// change all newlines to "\n"
 	s = strings.Replace(s, "\r\n", "\n", -1)
 	s = strings.Replace(s, "\r", "\n", -1)
@@ -131,26 +128,32 @@ func formatLines(s string, sfmt StreamFormat) []string {
 	return ret
 } //                                                                 formatLines
 
-// pdfFormatStreamsInHex formats content of all streams in s as hex strings
-func pdfFormatStreamsInHex(s string) string {
+// pdfFormatStreams formats content of all streams in s as hex strings
+func pdfFormatStreams(s string) string {
 	const (
 		STREAM    = ">> stream"
 		ENDSTREAM = "endstream"
 		BPL       = 16 // bytes per line
 	)
 	var buf = bytes.NewBuffer(make([]byte, 0, len(s)))
-	for {
-		// exit if there are no more streams
+	for part, s := range strings.Split(s, " obj ") {
+		if part > 0 {
+			buf.WriteString(" obj ")
+		}
+		// write the stream as-is if not compressed/image
 		var i = strings.Index(s, STREAM)
-		if i == -1 {
-			break
+		if i == -1 ||
+			(!strings.Contains(s[:i], "/FlateDecode") &&
+				!strings.Contains(s[:i], "/Image")) {
+			buf.WriteString(s)
+			continue
 		}
 		// write the part before stream's data without changing it
 		i += len(STREAM)
 		buf.WriteString(s[:i])
 		s = s[i:]
 		//
-		// write the stream data as hex bytes (in BPL columns of bytes)
+		// write the stream's data as hex numbers (each line with BPL columns)
 		buf.WriteString("\n")
 		var n = strings.Index(s, ENDSTREAM)
 		if n == -1 {
@@ -167,13 +170,13 @@ func pdfFormatStreamsInHex(s string) string {
 		}
 		buf.WriteString("\n")
 		//
-		// advance to next position
+		// write the part after the stream's data
 		s = s[n:]
-	}
-	if len(s) > 0 {
-		buf.WriteString(s)
+		if len(s) > 0 {
+			buf.WriteString(s)
+		}
 	}
 	return buf.String()
-} //                                                       pdfFormatStreamsInHex
+} //                                                            pdfFormatStreams
 
 //end

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-04 23:51:59 E9F635                        [utest/draw_text_at.go]
+// :v: 2018-05-10 22:50:31 16DA26                        [utest/draw_text_at.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -75,7 +75,7 @@ func Test_PDF_DrawTextAt_(t *testing.T) {
 	%%EOF
 	`
 
-	ComparePDF(t, doc.Bytes(), expect, StreamsInText)
+	ComparePDF(t, doc.Bytes(), expect)
 } //                                                        Test_PDF_DrawTextAt_
 
 //end

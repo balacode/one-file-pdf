@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-04 23:51:59 B7CE36                         [utest/draw_circle.go]
+// :v: 2018-05-10 22:50:31 09CBB2                         [utest/draw_circle.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -86,7 +86,7 @@ func Test_PDF_DrawCircle_(t *testing.T) {
 	%%EOF
 	`
 
-	ComparePDF(t, doc.Bytes(), expect, StreamsInText)
+	ComparePDF(t, doc.Bytes(), expect)
 } //                                                        Test_PDF_DrawCircle_
 
 //end

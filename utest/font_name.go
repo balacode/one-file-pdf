@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-04 23:51:59 29D149                           [utest/font_name.go]
+// :v: 2018-05-10 22:50:31 FE32D9                           [utest/font_name.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -92,7 +92,7 @@ func Test_PDF_FontName_(t *testing.T) {
 		%%EOF
 		`
 
-		ComparePDF(t, doc.Bytes(), expect, StreamsInText)
+		ComparePDF(t, doc.Bytes(), expect)
 	}()
 
 } //                                                          Test_PDF_FontName_

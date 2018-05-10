@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-04 23:51:59 23D951                           [utest/draw_text.go]
+// :v: 2018-05-10 22:50:31 8FFC62                           [utest/draw_text.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -67,7 +67,7 @@ func Test_PDF_DrawText_(t *testing.T) {
 		%%EOF
 		`
 
-		ComparePDF(t, doc.Bytes(), expect, StreamsInText)
+		ComparePDF(t, doc.Bytes(), expect)
 	}()
 
 	func() {
@@ -115,7 +115,7 @@ func Test_PDF_DrawText_(t *testing.T) {
 		%%EOF
 		`
 
-		ComparePDF(t, doc.Bytes(), expect, StreamsInText)
+		ComparePDF(t, doc.Bytes(), expect)
 		TEqual(t, len(doc.Errors()), 1)
 		TEqual(t, doc.PullError(),
 			fmt.Errorf(`Invalid font "Ye-Olde-Scriptte" @DrawText`))

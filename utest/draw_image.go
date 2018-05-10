@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-05 12:23:38 14666E                          [utest/draw_image.go]
+// :v: 2018-05-10 22:50:31 79603B                          [utest/draw_image.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -111,7 +111,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 			SetUnits("cm").
 			DrawImage(x, y, height, pngData)
 		FailIfHasErrors(t, doc.Errors)
-		ComparePDF(t, doc.Bytes(), expectOpaque, StreamsInHex)
+		ComparePDF(t, doc.Bytes(), expectOpaque)
 	}()
 
 	// the same test, but reading direcly from PNG file
@@ -121,7 +121,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 			SetUnits("cm").
 			DrawImage(x, y, height, "./image/rgbw64.png")
 		FailIfHasErrors(t, doc.Errors)
-		ComparePDF(t, doc.Bytes(), expectOpaque, StreamsInHex)
+		ComparePDF(t, doc.Bytes(), expectOpaque)
 	}()
 
 	// PNG transparency test
@@ -290,7 +290,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 			DrawImage(x, y, height, "./image/rgbt64.png", "Yellow").
 			DrawImage(x, y+height+1, height, "./image/rgbt64.png", "Cyan")
 		FailIfHasErrors(t, doc.Errors)
-		ComparePDF(t, doc.Bytes(), expectTransparent, StreamsInHex)
+		ComparePDF(t, doc.Bytes(), expectTransparent)
 	}()
 
 	// wrong argument in fileNameOrBytes
@@ -327,7 +327,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 		doc.SetCompression(true).
 			SetUnits("cm").
 			DrawImage(x, y, height, fileNameOrBytes)
-		ComparePDF(t, doc.Bytes(), expect, StreamsInHex)
+		ComparePDF(t, doc.Bytes(), expect)
 		//
 		TEqual(t, len(doc.Errors()), 1)
 		if len(doc.Errors()) > 0 {

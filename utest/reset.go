@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-04 23:51:59 6109DB                               [utest/reset.go]
+// :v: 2018-05-10 22:50:31 DD8066                               [utest/reset.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -66,7 +66,7 @@ func Test_PDF_Reset_(t *testing.T) {
 		%%EOF
 		`
 		var result = doc.Bytes()
-		ComparePDF(t, result, expect, StreamsInText)
+		ComparePDF(t, result, expect)
 	}
 	{
 		doc.Reset()
@@ -97,7 +97,7 @@ func Test_PDF_Reset_(t *testing.T) {
 		%%EOF
 		`
 		var result = doc.SetCompression(false).Bytes()
-		ComparePDF(t, result, expect, StreamsInText)
+		ComparePDF(t, result, expect)
 	}
 	// TODO: add more test cases, test each property's state
 } //                                                             Test_PDF_Reset_

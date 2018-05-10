@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-04 23:51:59 D8B452                        [utest/doc_keywords.go]
+// :v: 2018-05-10 22:50:31 7B3089                        [utest/doc_keywords.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -80,7 +80,7 @@ func Test_PDF_DocKeywords_(t *testing.T) {
 		%%EOF
 		`
 
-		ComparePDF(t, doc.Bytes(), expect, StreamsInText)
+		ComparePDF(t, doc.Bytes(), expect)
 	}()
 
 } //                                                       Test_PDF_DocKeywords_

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-08 23:51:09 D75338                                   [utest/y.go]
+// :v: 2018-05-10 22:50:31 6E1FF7                                   [utest/y.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -79,7 +79,7 @@ func Test_PDF_Y_(t *testing.T) {
 		471
 		%%EOF
 		`
-		ComparePDF(t, doc.Bytes(), expect, StreamsInText)
+		ComparePDF(t, doc.Bytes(), expect)
 		// doc.SaveFile("~~Test_PDF_Y_.pdf")
 	}()
 } //                                                                 Test_PDF_Y_

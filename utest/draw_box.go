@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-04 23:51:59 FA531F                            [utest/draw_box.go]
+// :v: 2018-05-10 22:50:31 FE02D6                            [utest/draw_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -66,7 +66,7 @@ func Test_PDF_DrawBox_(t *testing.T) {
 	%%EOF
 	`
 
-	ComparePDF(t, doc.Bytes(), expect, StreamsInText)
+	ComparePDF(t, doc.Bytes(), expect)
 } //                                                           Test_PDF_DrawBox_
 
 //end
