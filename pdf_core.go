@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-08 23:49:49 8ED148                                  [pdf_core.go]
+// :v: 2018-05-11 21:24:05 D22BA6                                  [pdf_core.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -470,11 +470,14 @@ func (ob *PDF) Bytes() []byte {
 		if iter.isGray {
 			colorSpace = "DeviceGray"
 		}
+		var old = ob.compression
+		ob.compression = true
 		ob.writeObj("/XObject").
 			write("/Subtype/Image\n",
 				"/Width ", iter.widthPx, "/Height ", iter.heightPx,
 				"/ColorSpace/", colorSpace, "/BitsPerComponent 8\n").
 			writeStreamData(iter.data).write("\n" + "endobj\n\n")
+		ob.compression = old
 	}
 	// write info object
 	if ob.docTitle != "" || ob.docSubject != "" ||
