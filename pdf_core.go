@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-11 21:24:05 D22BA6                                  [pdf_core.go]
+// :v: 2018-05-12 01:14:40 DE542F                                  [pdf_core.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -571,14 +571,14 @@ func (ob *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 		return ob.putError(0xE8F375, err.msg, err.val)
 	}
 	var found bool
-	for _, iter := range ob.page.imageNos {
+	for _, iter := range ob.page.imageIDs {
 		if iter == idx {
 			found = true
 			break
 		}
 	}
 	if !found {
-		ob.page.imageNos = append(ob.page.imageNos, idx)
+		ob.page.imageIDs = append(ob.page.imageIDs, idx)
 	}
 	// draw the image
 	var h = height * ob.ptPerUnit
@@ -923,7 +923,7 @@ type pdfImage struct {
 
 // pdfPage holds references, state and the stream buffer for each page
 type pdfPage struct {
-	fontIDs, imageNos           []int        // references to fonts and images
+	fontIDs, imageIDs           []int        // references to fonts and images
 	x, y, lineWidth, fontSizePt float64      // current drawing state
 	strokeColor, nonStrokeColor color.RGBA   // "
 	fontID                      int          // "
@@ -1308,7 +1308,7 @@ func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
 	for _, pg := range ob.pages { //                             write each page
 		ob.writeObj("/Page").
 			write("/Parent 2 0 R/Contents ", ob.objIndex+1, " 0 R")
-		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
+		if len(pg.fontIDs) > 0 || len(pg.imageIDs) > 0 {
 			ob.write("\n" + "/Resources <<")
 		}
 		if len(pg.fontIDs) > 0 {
@@ -1321,17 +1321,17 @@ func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
 			}
 			ob.write(">> ")
 		}
-		if len(pg.imageNos) > 0 {
+		if len(pg.imageIDs) > 0 {
 			ob.write("/XObject <<")
-			for imageNo := range pg.imageNos {
-				if len(pg.imageNos) > 1 {
+			for imageID := range pg.imageIDs {
+				if len(pg.imageIDs) > 1 {
 					ob.write("\n")
 				}
-				ob.write("/IMG", imageNo, " ", imagesIndex+imageNo, " 0 R")
+				ob.write("/IMG", imageID, " ", imagesIndex+imageID, " 0 R")
 			}
 			ob.write(">> ")
 		}
-		if len(pg.fontIDs) > 0 || len(pg.imageNos) > 0 {
+		if len(pg.fontIDs) > 0 || len(pg.imageIDs) > 0 {
 			ob.write(">> ")
 		}
 		ob.write(">>\n" + "endobj\n\n")       // write page object
