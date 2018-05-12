@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-12 01:14:40 DE542F                                  [pdf_core.go]
+// :v: 2018-05-12 02:52:36 74342D                                  [pdf_core.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -1323,11 +1323,11 @@ func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
 		}
 		if len(pg.imageIDs) > 0 {
 			ob.write("/XObject <<")
-			for imageID := range pg.imageIDs {
+			for _, id := range pg.imageIDs {
 				if len(pg.imageIDs) > 1 {
 					ob.write("\n")
 				}
-				ob.write("/IMG", imageID, " ", imagesIndex+imageID, " 0 R")
+				ob.write("/IMG", id, " ", imagesIndex+id, " 0 R")
 			}
 			ob.write(">> ")
 		}

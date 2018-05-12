@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-10 22:50:31 79603B                          [utest/draw_image.go]
+// :v: 2018-05-12 02:53:28 EC5A0C                          [utest/draw_image.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -335,6 +335,90 @@ func Test_PDF_DrawImage_(t *testing.T) {
 				`Invalid type in fileNameOrBytes`+
 					` "[]int = [2989 2989 2989]" @DrawImage`))
 		}
+	}()
+
+	// drawing an image on one page and another image on second page should work
+	// (catch bug where image name in '/XObject' and '/IMG Do' do not match)
+	func() {
+
+		const expect = `
+		%PDF-1.4
+		1 0 obj <</Type/Catalog/Pages 2 0 R>>
+		endobj
+		2 0 obj <</Type/Pages/Count 2/MediaBox[0 0 566 566]/Kids[3 0 R 5 0 R]>>
+		endobj
+		3 0 obj <</Type/Page/Parent 2 0 R/Contents 4 0 R
+		/Resources <</XObject <</IMG0 7 0 R>> >> >>
+		endobj
+		4 0 obj <</Length 52>> stream
+		q
+		283.465 0 0 283.465 141.732 141.732 cm
+		/IMG0 Do
+		Q
+		endstream
+		endobj
+		5 0 obj <</Type/Page/Parent 2 0 R/Contents 6 0 R
+		/Resources <</XObject <</IMG1 8 0 R>> >> >>
+		endobj
+		6 0 obj <</Length 52>> stream
+		q
+		283.465 0 0 283.465 141.732 141.732 cm
+		/IMG1 Do
+		Q
+		endstream
+		endobj
+		7 0 obj <</Type/XObject/Subtype/Image
+		/Width 64/Height 64/ColorSpace/DeviceRGB/BitsPerComponent 8
+		/Filter/FlateDecode/Length 89>> stream
+		0A 78 9C EC CE B1 0D 00 30 08 C4 40 F6 5F 9A 0C
+		90 DA 05 D2 BD A8 CD ED 4C 7A 6D 7D EB 3C 3F 3F
+		3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F
+		3F 3F 3F FF 49 7F FD A0 1E 3F 3F 3F 3F 3F 3F 3F
+		3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F FF
+		BF 17 00 00 FF FF 93 C7 E9 5A 0A
+		endstream
+		endobj
+		8 0 obj <</Type/XObject/Subtype/Image
+		/Width 64/Height 64/ColorSpace/DeviceRGB/BitsPerComponent 8
+		/Filter/FlateDecode/Length 89>> stream
+		0A 78 9C EC CE B1 0D 00 30 08 C4 40 F6 5F 9A 0C
+		90 DA 05 D2 BD A8 CD ED 4C 7A 6D 7D EB 3C 3F 3F
+		3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F
+		3F 3F 3F FF 49 7F FD A0 1E 3F 3F 3F 3F 3F 3F 3F
+		3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F 3F FF
+		BF 17 00 00 FF FF 93 C7 E9 5A 0A
+		endstream
+		endobj
+		xref
+		0 9
+		0000000000 65535 f
+		0000000010 00000 n
+		0000000056 00000 n
+		0000000136 00000 n
+		0000000237 00000 n
+		0000000339 00000 n
+		0000000440 00000 n
+		0000000542 00000 n
+		0000000788 00000 n
+		trailer
+		<</Size 9/Root 1 0 R>>
+		startxref
+		1034
+		%%EOF
+		`
+
+		// create two slightly-different images by appending a byte to each
+		var pngData1 = append(pngData, 1)
+		var pngData2 = append(pngData, 2)
+		//
+		var doc = pdf.NewPDF("20cm x 20cm")
+		doc.SetCompression(false).
+			SetUnits("cm").
+			DrawImage(x, y, height, pngData1).
+			AddPage().
+			DrawImage(x, y, height, pngData2)
+		FailIfHasErrors(t, doc.Errors)
+		ComparePDF(t, doc.Bytes(), expect)
 	}()
 
 } //                                                         Test_PDF_DrawImage_
