@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-10 22:50:31 B718DE                         [utest/fill_circle.go]
+// :v: 2018-05-13 01:54:23 930E8D                         [utest/fill_circle.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -28,7 +28,7 @@ func Test_PDF_FillCircle_(t *testing.T) {
 		SetColor("#BC002D (close to #BE0032 CrimsonGlory)").
 		FillCircle(x, y, radius)
 
-	var expect = `
+	const expect = `
 	%PDF-1.4
 	1 0 obj <</Type/Catalog/Pages 2 0 R>>
 	endobj

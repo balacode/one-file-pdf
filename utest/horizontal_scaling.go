@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-10 22:50:31 559967                  [utest/horizontal_scaling.go]
+// :v: 2018-05-13 01:54:23 935F4E                  [utest/horizontal_scaling.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -61,7 +61,7 @@ func Test_PDF_HorizontalScaling_(t *testing.T) {
 				DrawText("Five hexing wizard bots jump quickly")
 		}
 
-		var expect = `
+		const expect = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj

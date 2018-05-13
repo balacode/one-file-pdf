@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-10 22:50:31 6E1FF7                                   [utest/y.go]
+// :v: 2018-05-13 01:54:23 57FF6D                                   [utest/y.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -45,7 +45,7 @@ func Test_PDF_Y_(t *testing.T) {
 			SetXY(1, 10).
 			SetFont("Times-Bold", 20).
 			DrawText("X=1 Y=10")
-		var expect = `
+		const expect = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-12 02:53:28 EC5A0C                          [utest/draw_image.go]
+// :v: 2018-05-13 01:54:23 CECCAA                          [utest/draw_image.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -62,7 +62,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 		}
 	)
 
-	var expectOpaque = `
+	const expectOpaque = `
 	%PDF-1.4
 	1 0 obj <</Type/Catalog/Pages 2 0 R>>
 	endobj
@@ -130,7 +130,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 		var y = 5.0
 		var height = 5.0
 
-		var expectTransparent = `
+		const expectTransparent = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj

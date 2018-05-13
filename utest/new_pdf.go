@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-10 22:50:31 9D0E58                             [utest/new_pdf.go]
+// :v: 2018-05-13 01:54:23 B03BB1                             [utest/new_pdf.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -16,7 +16,7 @@ import (
 func Test_NewPDF_(t *testing.T) {
 	fmt.Println("Test NewPDF()")
 
-	var expect = `
+	const expect = `
 	%PDF-1.4
 	1 0 obj <</Type/Catalog/Pages 2 0 R>>
 	endobj

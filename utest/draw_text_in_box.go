@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-10 22:50:31 129E64                    [utest/draw_text_in_box.go]
+// :v: 2018-05-13 01:54:23 38AFF8                    [utest/draw_text_in_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -41,7 +41,7 @@ func Test_PDF_DrawTextInBox_(t *testing.T) {
 			DrawTextInBox(5, 5, 3, 15, "C", ""). // no effect
 			DrawTextInBox(5, 5, 3, 15, "C", lorem)
 
-		var expect = `
+		const expect = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -122,7 +122,7 @@ func Test_PDF_DrawTextInBox_(t *testing.T) {
 			DrawTextInBox(5, 5, 3, 15, "C", ""). // no effect
 			DrawTextInBox(5, 5, 3, 15, "C", lorem)
 
-		var expect = `
+		const expect = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj

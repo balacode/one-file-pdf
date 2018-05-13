@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-10 22:50:31 FE02D6                            [utest/draw_box.go]
+// :v: 2018-05-13 01:54:23 0E0913                            [utest/draw_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -31,7 +31,7 @@ func Test_PDF_DrawBox_(t *testing.T) {
 		SetColor("DarkGreen").DrawBox(x, y, 9, 9).
 		SetColor("Blue").DrawBox(x, y, 16, 16)
 
-	var expect = `
+	const expect = `
 	%PDF-1.4
 	1 0 obj <</Type/Catalog/Pages 2 0 R>>
 	endobj

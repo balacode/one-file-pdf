@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-10 22:50:31 7B3089                        [utest/doc_keywords.go]
+// :v: 2018-05-13 01:54:23 75BE7E                        [utest/doc_keywords.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -52,7 +52,7 @@ func Test_PDF_DocKeywords_(t *testing.T) {
 		var doc = pdf.NewPDF("A4") // initialized PDF
 		doc.SetCompression(false).SetDocKeywords("'Keywords' metadata entry")
 
-		var expect = `
+		const expect = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj

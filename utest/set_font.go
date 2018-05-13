@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-10 22:50:31 9315A6                            [utest/set_font.go]
+// :v: 2018-05-13 01:54:23 03EA1C                            [utest/set_font.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -69,7 +69,7 @@ func Test_PDF_SetFont_(t *testing.T) {
 
 		}
 
-		var expect = `
+		const expect = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj

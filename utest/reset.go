@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-10 22:50:31 DD8066                               [utest/reset.go]
+// :v: 2018-05-13 01:54:23 0D1A92                               [utest/reset.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -29,7 +29,7 @@ func Test_PDF_Reset_(t *testing.T) {
 			DrawText("FIRST").
 			DrawText("SECOND").
 			DrawText("THIRD")
-		var expect = `
+		const expect = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -72,7 +72,7 @@ func Test_PDF_Reset_(t *testing.T) {
 		doc.Reset()
 		//
 		// after calling Reset(), the PDF should just be a blank page:
-		var expect = `
+		const expect = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj

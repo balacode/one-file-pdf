@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-10 22:50:31 8FFC62                           [utest/draw_text.go]
+// :v: 2018-05-13 01:54:23 046F0A                           [utest/draw_text.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -30,7 +30,7 @@ func Test_PDF_DrawText_(t *testing.T) {
 			DrawText("SECOND").
 			DrawText("THIRD")
 
-		var expect = `
+		const expect = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -79,7 +79,7 @@ func Test_PDF_DrawText_(t *testing.T) {
 			SetHorizontalScaling(150).
 			DrawText("Ye-Olde-Scriptte")
 
-		var expect = `
+		const expect = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj

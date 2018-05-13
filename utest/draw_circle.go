@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-10 22:50:31 09CBB2                         [utest/draw_circle.go]
+// :v: 2018-05-13 01:54:23 65D14F                         [utest/draw_circle.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -31,7 +31,7 @@ func Test_PDF_DrawCircle_(t *testing.T) {
 		SetColor("DarkGreen").DrawCircle(x, y, 4.5).
 		SetColor("Blue").DrawCircle(x, y, 8.5)
 
-	var expect = `
+	const expect = `
 	%PDF-1.4
 	1 0 obj <</Type/Catalog/Pages 2 0 R>>
 	endobj

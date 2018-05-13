@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-10 22:50:31 B8F322                           [utest/doc_title.go]
+// :v: 2018-05-13 01:54:23 816051                           [utest/doc_title.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -52,7 +52,7 @@ func Test_PDF_DocTitle_(t *testing.T) {
 		var doc = pdf.NewPDF("A4")
 		doc.SetCompression(false).SetDocTitle("'Title' metadata entry")
 
-		var expect = `
+		const expect = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj

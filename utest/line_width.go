@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-10 22:50:31 47930D                          [utest/line_width.go]
+// :v: 2018-05-13 01:54:23 8C04BD                          [utest/line_width.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -61,7 +61,7 @@ func Test_PDF_LineWidth_(t *testing.T) {
 				SetColor("Indigo").SetLineWidth(w).DrawLine(4, y, 15, y)
 			y += 1
 		}
-		var expect = `
+		const expect = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
