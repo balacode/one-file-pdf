@@ -1,12 +1,12 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-10 17:21:11 B4F377                                      [demo.go]
+// :v: 2018-05-25 19:26:11 DC0E55                                      [demo.go]
 // -----------------------------------------------------------------------------
 
 package main
 
 // This demo generates the sample PDF files
-// and demonstrates the API of One-File-PDF
+// and demonstrates the API of PDF
 
 import (
 	"fmt"

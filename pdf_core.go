@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-12 02:52:36 74342D                                  [pdf_core.go]
+// :v: 2018-05-25 19:26:11 240D6E                                  [pdf_core.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -1496,36 +1496,38 @@ func (ob *PDF) putError(id int, msg, val string) *PDF {
 
 // writeTo writes multiple strings and numbers specified in 'args' using
 // writer 'wr'. Returns total bytes written and the first error if any.
-func (*PDF) writeTo(wr io.Writer, args ...interface{}) (n int, err error) {
+func (*PDF) writeTo(wr io.Writer, args ...interface{}) (count int, err error) {
 	for _, any := range args {
-		var c, e = 0, error(nil)
-		switch v := any.(type) {
+		var n, err = 0, error(nil)
+		switch val := any.(type) {
 		case string:
-			c, e = io.WriteString(wr, v)
+			n, err = io.WriteString(wr, val)
 		case float64:
-			c, e = io.WriteString(wr, strconv.FormatFloat(v, 'f', 3, 64))
+			n, err = io.WriteString(wr, strconv.FormatFloat(val, 'f', 3, 64))
 		case int:
-			c, e = io.WriteString(wr, strconv.FormatInt(int64(v), 10))
+			n, err = io.WriteString(wr, strconv.FormatInt(int64(val), 10))
 		case int16:
-			c, e = io.WriteString(wr, strconv.FormatInt(int64(v), 10))
+			n, err = io.WriteString(wr, strconv.FormatInt(int64(val), 10))
 		case uint:
-			c, e = io.WriteString(wr, strconv.FormatInt(int64(v), 10))
+			n, err = io.WriteString(wr, strconv.FormatInt(int64(val), 10))
 		case uint16:
-			c, e = io.WriteString(wr, strconv.FormatInt(int64(v), 10))
+			n, err = io.WriteString(wr, strconv.FormatInt(int64(val), 10))
 		case *bytes.Buffer:
-			c, e = wr.Write(v.Bytes())
+			if val != nil {
+				n, err = wr.Write(val.Bytes())
+			}
 		case []byte:
-			c, e = wr.Write(v)
+			n, err = wr.Write(val)
 		default:
-			c, e = 0, fmt.Errorf("Invalid type %s = %v", reflect.TypeOf(v), v)
+			n, err = 0,
+				fmt.Errorf("Invalid type %s = %v", reflect.TypeOf(val), val)
 		}
-		n += c
-		if e != nil {
-			err = e
-			break
+		count += n
+		if err != nil {
+			return count, err
 		}
 	}
-	return n, err
+	return count, nil
 } //                                                                     writeTo
 
 // -----------------------------------------------------------------------------
