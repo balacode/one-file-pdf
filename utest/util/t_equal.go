@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-04 23:51:59 B20A7E                        [utest/util/t_equal.go]
+// :v: 2018-05-29 07:41:55 085BF0                        [utest/util/t_equal.go]
 // -----------------------------------------------------------------------------
 
 package util
@@ -14,7 +14,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"runtime"
-	"strings"
+	str "strings"
 	"testing"
 	"time"
 )
@@ -44,11 +44,11 @@ func TEqual(t *testing.T, result interface{}, expect interface{}) bool {
 			return fmt.Sprintf("%d", val)
 		case float32, float64:
 			var s = fmt.Sprintf("%.4f", val)
-			if strings.Contains(s, ".") {
-				for strings.HasSuffix(s, "0") {
+			if str.Contains(s, ".") {
+				for str.HasSuffix(s, "0") {
 					s = s[:len(s)-1]
 				}
-				for strings.HasSuffix(s, ".") {
+				for str.HasSuffix(s, ".") {
 					s = s[:len(s)-1]
 				}
 			}
@@ -59,7 +59,7 @@ func TEqual(t *testing.T, result interface{}, expect interface{}) bool {
 			return val
 		case time.Time: // use date part without time and time zone
 			var s = val.Format(time.RFC3339)[:19] // "2006-01-02T15:04:05Z07:00"
-			if strings.HasSuffix(s, "T00:00:00") {
+			if str.HasSuffix(s, "T00:00:00") {
 				s = s[:10]
 			}
 			return s
@@ -102,7 +102,7 @@ mainLoop:
 				break mainLoop
 			}
 		}
-		if strings.Contains(funcName, "HandlerFunc.ServeHTTP") {
+		if str.Contains(funcName, "HandlerFunc.ServeHTTP") {
 			break
 		}
 		// skip runtime/syscall functions, but continue the loop
@@ -110,7 +110,7 @@ mainLoop:
 			".Callers", ".CallerList", ".Error", ".Log", ".logAsync",
 			"mismatch", "runtime.", "syscall.",
 		} {
-			if strings.Contains(funcName, s) {
+			if str.Contains(funcName, s) {
 				continue mainLoop
 			}
 		}
@@ -121,21 +121,21 @@ mainLoop:
 			// let the file name's path use the right kind of OS path separator
 			// (by default, the file name contains '/' on all platforms)
 			if string(os.PathSeparator) != "/" {
-				filename = strings.Replace(filename,
+				filename = str.Replace(filename,
 					"/", string(os.PathSeparator), -1)
 			}
 		}
 		// remove parent module/function names
-		if index := strings.LastIndex(funcName, "/"); index != -1 {
+		if index := str.LastIndex(funcName, "/"); index != -1 {
 			funcName = funcName[index+1:]
 		}
-		if strings.Count(funcName, ".") > 1 {
-			funcName = funcName[strings.Index(funcName, ".")+1:]
+		if str.Count(funcName, ".") > 1 {
+			funcName = funcName[str.Index(funcName, ".")+1:]
 		}
 		// remove unneeded punctuation from function names
 		for _, find := range []string{"(", ")", "*"} {
-			if strings.Contains(funcName, find) {
-				funcName = strings.Replace(funcName, find, "", -1)
+			if str.Contains(funcName, find) {
+				funcName = str.Replace(funcName, find, "", -1)
 			}
 		}
 		var line = fmt.Sprintf(":%d %s()", lineNo, funcName)
@@ -150,9 +150,9 @@ mainLoop:
 // TCaller returns the name of the unit test function.
 func TCaller() string {
 	for _, iter := range CallerList() {
-		if strings.Contains(iter, "util.TCaller") ||
-			strings.Contains(iter, "util.TEqual") ||
-			strings.Contains(iter, "util.ComparePDF") {
+		if str.Contains(iter, "util.TCaller") ||
+			str.Contains(iter, "util.TEqual") ||
+			str.Contains(iter, "util.ComparePDF") {
 			continue
 		}
 		return iter

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-10 22:50:31 8ECF75                           [utest/util/func.go]
+// :v: 2018-05-29 07:41:55 F0C7D4                           [utest/util/func.go]
 // -----------------------------------------------------------------------------
 
 package util
@@ -9,7 +9,7 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
-	"strings"
+	str "strings"
 	"testing"
 )
 
@@ -66,7 +66,7 @@ func ComparePDF(t *testing.T, result []byte, expect string) {
 				"// RETURNED-PDF:\n"+
 				"// "+TCaller()+"\n"+
 				"`\n"+
-				strings.Join(results, "\n")+"\n"+
+				str.Join(results, "\n")+"\n"+
 				"`\n")
 	}
 } //                                                                  ComparePDF
@@ -92,24 +92,24 @@ func formatLines(s string, formatStreams bool) []string {
 	}
 	//
 	// change all newlines to "\n"
-	s = strings.Replace(s, "\r\n", "\n", -1)
-	s = strings.Replace(s, "\r", "\n", -1)
+	s = str.Replace(s, "\r\n", "\n", -1)
+	s = str.Replace(s, "\r", "\n", -1)
 	//
 	// change all other white-spaces to spaces
 	for _, space := range "\a\b\f\t\v" {
-		s = strings.Replace(s, string(space), " ", -1)
+		s = str.Replace(s, string(space), " ", -1)
 	}
 	// remove all repeated spaces
-	for strings.Contains(s, "  ") {
-		s = strings.Replace(s, "  ", " ", -1)
+	for str.Contains(s, "  ") {
+		s = str.Replace(s, "  ", " ", -1)
 	}
 	// trim and copy non-blank lines to result
 	// also, continue lines that end with '\'
-	var ar = strings.Split(s, "\n")
+	var ar = str.Split(s, "\n")
 	var ret = make([]string, 0, len(ar))
 	var prev = ""
 	for _, line := range ar {
-		line = strings.Trim(line, " \a\b\f\n\r\t\v")
+		line = str.Trim(line, " \a\b\f\n\r\t\v")
 		if line == "" {
 			continue
 		}
@@ -117,8 +117,8 @@ func formatLines(s string, formatStreams bool) []string {
 		if prev != "" {
 			line = prev + line
 		}
-		if strings.HasSuffix(line, "\\") {
-			prev = strings.TrimRight(line, "\\")
+		if str.HasSuffix(line, "\\") {
+			prev = str.TrimRight(line, "\\")
 			continue
 		}
 		// append line to result
@@ -136,15 +136,15 @@ func pdfFormatStreams(s string) string {
 		BPL       = 16 // bytes per line
 	)
 	var buf = bytes.NewBuffer(make([]byte, 0, len(s)))
-	for part, s := range strings.Split(s, " obj ") {
+	for part, s := range str.Split(s, " obj ") {
 		if part > 0 {
 			buf.WriteString(" obj ")
 		}
 		// write the stream as-is if not compressed/image
-		var i = strings.Index(s, STREAM)
+		var i = str.Index(s, STREAM)
 		if i == -1 ||
-			(!strings.Contains(s[:i], "/FlateDecode") &&
-				!strings.Contains(s[:i], "/Image")) {
+			(!str.Contains(s[:i], "/FlateDecode") &&
+				!str.Contains(s[:i], "/Image")) {
 			buf.WriteString(s)
 			continue
 		}
@@ -155,7 +155,7 @@ func pdfFormatStreams(s string) string {
 		//
 		// write the stream's data as hex numbers (each line with BPL columns)
 		buf.WriteString("\n")
-		var n = strings.Index(s, ENDSTREAM)
+		var n = str.Index(s, ENDSTREAM)
 		if n == -1 {
 			n = len(s)
 		}

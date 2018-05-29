@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-04 23:53:15 569DA8                               [utest/color.go]
+// :v: 2018-05-28 13:59:12 FC09D6                               [utest/color.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -8,7 +8,7 @@ package utest
 import (
 	"fmt"
 	"image/color"
-	"strings"
+	str "strings"
 	"testing"
 
 	"github.com/balacode/one-file-pdf"
@@ -199,19 +199,19 @@ func Test_PDF_Color_(t *testing.T) {
 			switch pass {
 			case 0: // do nothing
 			case 1:
-				s = strings.ToLower(s)
+				s = str.ToLower(s)
 			case 2:
-				s = strings.Replace(s, " ", "", -1)
+				s = str.Replace(s, " ", "", -1)
 			case 3:
-				s = strings.ToLower(strings.Replace(s, " ", "", -1))
+				s = str.ToLower(str.Replace(s, " ", "", -1))
 			case 4:
-				s = strings.Replace(s, " ", "-", -1)
+				s = str.Replace(s, " ", "-", -1)
 			case 5:
-				s = strings.ToLower(strings.Replace(s, " ", "-", -1))
+				s = str.ToLower(str.Replace(s, " ", "-", -1))
 			case 6:
-				s = strings.Replace(s, " ", "_", -1)
+				s = str.Replace(s, " ", "_", -1)
 			case 7:
-				s = strings.ToLower(strings.Replace(s, " ", "_", -1))
+				s = str.ToLower(str.Replace(s, " ", "_", -1))
 			}
 			var doc = pdf.NewPDF("A4")
 			var doc2 = doc.SetColor(s)

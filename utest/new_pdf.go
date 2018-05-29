@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-13 01:54:23 B03BB1                             [utest/new_pdf.go]
+// :v: 2018-05-29 07:41:55 827178                             [utest/new_pdf.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -40,7 +40,6 @@ func Test_NewPDF_(t *testing.T) {
 	238
 	%%EOF
 	`
-
 	// test NewPDF() and Bytes() while calling AddPage()
 	func() {
 		var doc = pdf.NewPDF("A4")
