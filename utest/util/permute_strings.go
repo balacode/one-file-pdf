@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-04 23:53:15 26AD8A                [utest/util/permute_strings.go]
+// :v: 2018-05-04 23:53:15 AA2EDD   one-file-pdf/utest/util/[permute_strings.go]
 // -----------------------------------------------------------------------------
 
 package util

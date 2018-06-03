@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-13 01:54:23 935F4E                  [utest/horizontal_scaling.go]
+// :v: 2018-05-13 01:54:23 2370ED     one-file-pdf/utest/[horizontal_scaling.go]
 // -----------------------------------------------------------------------------
 
 package utest
