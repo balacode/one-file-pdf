@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-06 20:18:41 22BFEB                  one-file-pdf/[public_test.go]
+// :v: 2018-06-07 20:25:46 6BF1EC                  one-file-pdf/[public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -91,9 +91,9 @@ func Test_PDF_DocTitle_(t *testing.T) { utest.Test_PDF_DocTitle_(t) }
 // SetFontName(name string) *PDF
 func Test_PDF_FontName_(t *testing.T) { utest.Test_PDF_FontName_(t) }
 
-// TODO: func Test_PDF_FontSize_(t *testing.T) { utest.Test_PDF_FontSize_(t) }
 // FontSize() float64
 // SetFontSize(points float64) *PDF
+func Test_PDF_FontSize_(t *testing.T) { utest.Test_PDF_FontSize_(t) }
 
 // SetFont(name string, points float64) *PDF
 func Test_PDF_SetFont_(t *testing.T) { utest.Test_PDF_SetFont_(t) }
