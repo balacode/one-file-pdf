@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-06-07 20:25:46 6BF1EC                  one-file-pdf/[public_test.go]
+// :v: 2018-06-08 21:53:33 A54185                  one-file-pdf/[public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -120,8 +120,8 @@ func Test_PDF_X_(t *testing.T) { utest.Test_PDF_X_(t) }
 // SetY(y float64) *PDF
 func Test_PDF_Y_(t *testing.T) { utest.Test_PDF_Y_(t) }
 
-//TODO: func Test_PDF_SetXY_(t *testing.T) { utest.Test_PDF_SetXY_(t) }
 // SetXY(x, y float64) *PDF
+func Test_PDF_SetXY_(t *testing.T) { utest.Test_PDF_SetXY_(t) }
 
 // -----------------------------------------------------------------------------
 // # Methods (ob *PDF)
