@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-06-07 20:25:46 9B4253              one-file-pdf/utest/[font_size.go]
+// :v: 2018-06-09 15:25:35 1BD4D4              one-file-pdf/utest/[font_size.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -67,8 +67,7 @@ func Test_PDF_FontSize_(t *testing.T) {
 					fmt.Sprintf("Helvetica %1.0f", size))
 		}
 
-		const expect =
-		`
+		const expect = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
