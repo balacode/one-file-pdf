@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-29 07:41:55 2AE25A                     one-file-pdf/[pdf_core.go]
+// :v: 2019-01-10 14:51:58 B96F81                     one-file-pdf/[pdf_core.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -819,7 +819,7 @@ func (ob *PDF) WrapTextLines(width float64, text string) (ret []string) {
 				if w > width {
 					return n
 				}
-				n = int((float64(n) * 1.2)) //                 increase n by 20%
+				n = 1 + int((float64(n) * 1.2)) //    increase n by 1 + 20% of n
 			}
 		}
 		return 0
