@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-13 01:54:23 9E52FF       one-file-pdf/utest/[draw_text_in_box.go]
+// :v: 2019-01-15 13:21:24 B5555F       one-file-pdf/utest/[draw_text_in_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -50,43 +50,42 @@ func Test_PDF_DrawTextInBox_(t *testing.T) {
 		3 0 obj <</Type/Page/Parent 2 0 R/Contents 4 0 R
 		/Resources <</Font <</FNT1 5 0 R>> >> >>
 		endobj
-		4 0 obj <</Length 1275>> stream
+		4 0 obj <</Length 1252>> stream
 		0.827 0.827 0.827 rg
 		0.827 0.827 0.827 RG
 		141.732 274.961 85.039 425.197 re b
 		BT /FNT1 10 Tf ET
 		0.000 0.000 0.000 rg
 		0.000 0.000 0.000 RG
-		BT 153 629 Td (Lorem ipsum ) Tj ET
-		BT 151 619 Td (dolor sit amet, ) Tj ET
-		BT 157 609 Td (consectetur ) Tj ET
-		BT 142 599 Td (adipiscing elit, sed ) Tj ET
-		BT 157 589 Td (do eiusmod ) Tj ET
-		BT 144 579 Td (tempor incididunt ) Tj ET
-		BT 142 569 Td (ut labore et dolore ) Tj ET
-		BT 145 559 Td (magna aliqua. Ut ) Tj ET
-		BT 150 549 Td (enim ad minim ) Tj ET
-		BT 154 539 Td (veniam, quis ) Tj ET
-		BT 166 529 Td (nostrud ) Tj ET
-		BT 157 519 Td (exercitation ) Tj ET
-		BT 149 509 Td (ullamco laboris ) Tj ET
-		BT 147 499 Td (nisi ut aliquip ex ) Tj ET
-		BT 153 489 Td (ea commodo ) Tj ET
-		BT 147 479 Td (consequat. Duis ) Tj ET
-		BT 143 469 Td (aute irure dolor in ) Tj ET
-		BT 147 459 Td (reprehenderit in ) Tj ET
-		BT 152 449 Td (voluptate velit ) Tj ET
-		BT 142 439 Td (esse cillum dolore ) Tj ET
-		BT 151 429 Td (eu fugiat nulla ) Tj ET
-		BT 164 419 Td (pariatur. ) Tj ET
-		BT 151 409 Td (Excepteur sint ) Tj ET
-		BT 162 399 Td (occaecat ) Tj ET
-		BT 152 389 Td (cupidatat non ) Tj ET
-		BT 147 379 Td (proident, sunt in ) Tj ET
-		BT 148 369 Td (culpa qui officia ) Tj ET
-		BT 150 359 Td (deserunt mollit ) Tj ET
-		BT 158 349 Td (anim id est ) Tj ET
-		BT 164 339 Td (laborum.) Tj ET
+		BT 153 624 Td (Lorem ipsum ) Tj ET
+		BT 151 614 Td (dolor sit amet, ) Tj ET
+		BT 157 604 Td (consectetur ) Tj ET
+		BT 142 594 Td (adipiscing elit, sed ) Tj ET
+		BT 157 584 Td (do eiusmod ) Tj ET
+		BT 144 574 Td (tempor incididunt ) Tj ET
+		BT 142 564 Td (ut labore et dolore ) Tj ET
+		BT 145 554 Td (magna aliqua. Ut ) Tj ET
+		BT 150 544 Td (enim ad minim ) Tj ET
+		BT 154 534 Td (veniam, quis ) Tj ET
+		BT 166 524 Td (nostrud ) Tj ET
+		BT 157 514 Td (exercitation ) Tj ET
+		BT 149 504 Td (ullamco laboris ) Tj ET
+		BT 147 494 Td (nisi ut aliquip ex ) Tj ET
+		BT 153 484 Td (ea commodo ) Tj ET
+		BT 147 474 Td (consequat. Duis ) Tj ET
+		BT 143 464 Td (aute irure dolor in ) Tj ET
+		BT 147 454 Td (reprehenderit in ) Tj ET
+		BT 152 444 Td (voluptate velit ) Tj ET
+		BT 142 434 Td (esse cillum dolore ) Tj ET
+		BT 151 424 Td (eu fugiat nulla ) Tj ET
+		BT 164 414 Td (pariatur. ) Tj ET
+		BT 151 404 Td (Excepteur sint ) Tj ET
+		BT 162 394 Td (occaecat ) Tj ET
+		BT 152 384 Td (cupidatat non ) Tj ET
+		BT 147 374 Td (proident, sunt in ) Tj ET
+		BT 148 364 Td (culpa qui officia ) Tj ET
+		BT 150 354 Td (deserunt mollit ) Tj ET
+		BT 139 344 Td (anim id est laborum.) Tj ET
 		endstream
 		endobj
 		5 0 obj <</Type/Font/Subtype/Type1/Name/FNT1
@@ -100,11 +99,11 @@ func Test_PDF_DrawTextInBox_(t *testing.T) {
 		0000000056 00000 n
 		0000000130 00000 n
 		0000000228 00000 n
-		0000001555 00000 n
+		0000001532 00000 n
 		trailer
 		<</Size 6/Root 1 0 R>>
 		startxref
-		1656
+		1633
 		%%EOF
 		`
 
