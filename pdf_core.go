@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 A333A6                     one-file-pdf/[pdf_core.go]
+// :v: 2019-04-03 11:14:34 A3A710                     one-file-pdf/[pdf_core.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -457,28 +457,28 @@ func (ob *PDF) Bytes() []byte {
 	ob.writePages(pagesIndex, fontsIndex, imagesIndex)
 	//
 	// write fonts
-	for _, iter := range ob.fonts {
-		if iter.handler == nil {
-			ob.writeObj("/Font").write("/Subtype/Type1/Name/FNT", iter.id, "\n",
-				"/BaseFont/", iter.name, "\n",
+	for _, font := range ob.fonts {
+		if font.handler == nil {
+			ob.writeObj("/Font").write("/Subtype/Type1/Name/FNT", font.id, "\n",
+				"/BaseFont/", font.name, "\n",
 				"/Encoding/StandardEncoding>>\n"+"endobj\n")
 		} else {
-			iter.handler.writeFontObjects(&iter)
+			font.handler.writeFontObjects(&font)
 		}
 	}
 	// write images
-	for _, iter := range ob.images {
+	for _, img := range ob.images {
 		colorSpace := "DeviceRGB"
-		if iter.isGray {
+		if img.isGray {
 			colorSpace = "DeviceGray"
 		}
 		old := ob.compression
 		ob.compression = true
 		ob.writeObj("/XObject").
 			write("/Subtype/Image\n",
-				"/Width ", iter.widthPx, "/Height ", iter.heightPx,
+				"/Width ", img.widthPx, "/Height ", img.heightPx,
 				"/ColorSpace/", colorSpace, "/BitsPerComponent 8\n").
-			writeStreamData(iter.data).write("\n" + "endobj\n\n")
+			writeStreamData(img.data).write("\n" + "endobj\n\n")
 		ob.compression = old
 	}
 	// write info object
@@ -487,13 +487,13 @@ func (ob *PDF) Bytes() []byte {
 		//
 		infoIndex = imagesIndex + len(ob.images)
 		ob.writeObj("/Info")
-		for _, iter := range [][]string{
+		for _, tuple := range [][]string{
 			{"/Title ", ob.docTitle}, {"/Subject ", ob.docSubject},
 			{"/Keywords ", ob.docKeywords}, {"/Author ", ob.docAuthor},
 			{"/Creator ", ob.docCreator},
 		} {
-			if iter[1] != "" {
-				ob.write(iter[0], "(", ob.escape(iter[1]), ")")
+			if tuple[1] != "" {
+				ob.write(tuple[0], "(", ob.escape(tuple[1]), ")")
 			}
 		}
 		ob.write(">>\n" + "endobj\n\n")
@@ -574,8 +574,8 @@ func (ob *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 		return ob.putError(0xE8F375, err.msg, err.val)
 	}
 	var found bool
-	for _, iter := range ob.page.imageIDs {
-		if iter == idx {
+	for _, id := range ob.page.imageIDs {
+		if id == idx {
 			found = true
 			break
 		}
@@ -828,16 +828,16 @@ func (ob *PDF) WrapTextLines(width float64, text string) (ret []string) {
 		return 0
 	}
 	// split text into lines. then break lines based on text width
-	for _, iter := range ob.splitLines(text) {
-		for ob.TextWidth(iter) > width {
-			n := len(iter) //    reduce, increase, then reduce n to get best fit
+	for _, line := range ob.splitLines(text) {
+		for ob.TextWidth(line) > width {
+			n := len(line) //    reduce, increase, then reduce n to get best fit
 			for i := 1; i <= 3; i++ {
-				n = fit(iter, i, n, width)
+				n = fit(line, i, n, width)
 			}
 			// move to the last word (if white-space is found)
 			found, max := false, n
 			for n > 0 {
-				if ob.isWhiteSpace(iter[n-1 : n]) {
+				if ob.isWhiteSpace(line[n-1 : n]) {
 					found = true
 					break
 				}
@@ -849,10 +849,10 @@ func (ob *PDF) WrapTextLines(width float64, text string) (ret []string) {
 			if n <= 0 {
 				break
 			}
-			ret = append(ret, iter[:n])
-			iter = iter[n:]
+			ret = append(ret, line[:n])
+			line = line[n:]
 		}
-		ret = append(ret, iter)
+		ret = append(ret, line)
 	}
 	return ret
 } //                                                               WrapTextLines
@@ -966,17 +966,17 @@ func (ob *PDF) applyFont() (handler pdfFontHandler, err error) {
 	)
 	if valid {
 		valid = false
-		for i, iter := range pdfFontNames {
-			iter = ob.toUpperLettersDigits(iter, "")
-			if iter != name {
+		for i, fname := range pdfFontNames {
+			fname = ob.toUpperLettersDigits(fname, "")
+			if fname != name {
 				continue
 			}
 			has := str.Contains
 			font = pdfFont{
 				name:         pdfFontNames[i],
 				builtInIndex: i,
-				isBold:       has(iter, "BOLD"),
-				isItalic:     has(iter, "OBLIQUE") || has(iter, "ITALIC"),
+				isBold:       has(fname, "BOLD"),
+				isItalic:     has(fname, "OBLIQUE") || has(fname, "ITALIC"),
 			}
 			valid = true
 			break
@@ -995,9 +995,9 @@ func (ob *PDF) applyFont() (handler pdfFontHandler, err error) {
 		return nil, err
 	}
 	// has the font been added to the global list? if not, add it:
-	for _, iter := range ob.fonts {
-		if font.name == iter.name {
-			font.id = iter.id
+	for _, it := range ob.fonts {
+		if font.name == it.name {
+			font.id = it.id
 			break
 		}
 	}
@@ -1130,9 +1130,9 @@ func (ob *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 	var buf *bytes.Buffer
 	switch val := fileNameOrBytes.(type) {
 	case string:
-		for i, iter := range ob.images {
-			if iter.filename == val && iter.backColor == back {
-				return iter, i, nil
+		for i, it := range ob.images {
+			if it.filename == val && it.backColor == back {
+				return it, i, nil
 			}
 		}
 		img.filename = val
@@ -1152,9 +1152,9 @@ func (ob *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 				val: fmt.Sprintf("%s = %v",
 					reflect.TypeOf(fileNameOrBytes), fileNameOrBytes)}
 	}
-	for i, iter := range ob.images {
-		if bytes.Equal(iter.hash[:], img.hash[:]) && iter.backColor == back {
-			return iter, i, nil
+	for i, it := range ob.images {
+		if bytes.Equal(it.hash[:], img.hash[:]) && it.backColor == back {
+			return it, i, nil
 		}
 	}
 	decoded, _, err2 := image.Decode(buf)
@@ -1403,13 +1403,13 @@ func (*PDF) isWhiteSpace(s string) bool {
 
 // splitLines splits 's' into several lines using line breaks in 's'
 func (*PDF) splitLines(s string) []string {
-	split := func(ar []string, sep string) (ret []string) {
-		for _, iter := range ar {
-			if str.Contains(iter, sep) {
-				ret = append(ret, str.Split(iter, sep)...)
+	split := func(lines []string, sep string) (ret []string) {
+		for _, line := range lines {
+			if str.Contains(line, sep) {
+				ret = append(ret, str.Split(line, sep)...)
 				continue
 			}
-			ret = append(ret, iter)
+			ret = append(ret, line)
 		}
 		return ret
 	}
@@ -1697,15 +1697,12 @@ var pdfBlack = color.RGBA{A: 255}
 
 // pdfFontNames contains font names available on all PDF implementations
 var pdfFontNames = []string{
-	// 0 1 2 3
-	"Helvetica", "Helvetica-Bold", "Helvetica-BoldOblique", "Helvetica-Oblique",
-	// 4
-	"Symbol",
-	// 5 6 7 8
-	"Times-Bold", "Times-BoldItalic", "Times-Italic", "Times-Roman",
-	// 9
-	"ZapfDingbats",
-	// keep fixed-width Courier font at the end of the list
+	"Helvetica", "Helvetica-Bold", // 0 1
+	"Helvetica-BoldOblique", "Helvetica-Oblique", // 2 3
+	"Symbol",                                                        // 4
+	"Times-Bold", "Times-BoldItalic", "Times-Italic", "Times-Roman", // 5 6 7 8
+	"ZapfDingbats", // 9
+	// keep fixed-width Courier font at the end of the list:
 	"Courier", "Courier-Bold", "Courier-BoldOblique", "Courier-Oblique",
 } //                                                                pdfFontNames
 
