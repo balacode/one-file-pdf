@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 22C7FB         one-file-pdf/utest/[draw_unit_grid.go]
+// :v: 2019-04-03 10:27:56 FD68AD         one-file-pdf/utest/[draw_unit_grid.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -16,13 +16,13 @@ import (
 func Test_PDF_DrawUnitGrid_(t *testing.T) {
 	fmt.Println("Test PDF.DrawUnitGrid()")
 	//
-	result := func() []byte {
+	got := func() []byte {
 		doc := pdf.NewPDF("A4")
 		doc.SetCompression(false).SetUnits("cm").DrawUnitGrid()
 		return doc.Bytes()
 	}()
 
-	const expect = `
+	const want = `
 	%PDF-1.4
 	1 0 obj <</Type/Catalog/Pages 2 0 R>>
 	endobj
@@ -361,7 +361,7 @@ func Test_PDF_DrawUnitGrid_(t *testing.T) {
 	%%EOF
 	`
 
-	ComparePDF(t, result, expect)
+	ComparePDF(t, got, want)
 } //                                                      Test_PDF_DrawUnitGrid_
 
 //end

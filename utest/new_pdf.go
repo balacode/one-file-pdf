@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 95C100                one-file-pdf/utest/[new_pdf.go]
+// :v: 2019-04-03 10:27:56 76F9E9                one-file-pdf/utest/[new_pdf.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -16,7 +16,7 @@ import (
 func Test_NewPDF_(t *testing.T) {
 	fmt.Println("Test NewPDF()")
 
-	const expect = `
+	const want = `
 	%PDF-1.4
 	1 0 obj <</Type/Catalog/Pages 2 0 R>>
 	endobj
@@ -43,15 +43,15 @@ func Test_NewPDF_(t *testing.T) {
 	// test NewPDF() and Bytes() while calling AddPage()
 	func() {
 		doc := pdf.NewPDF("A4")
-		result := doc.SetCompression(false).AddPage().Bytes()
-		ComparePDF(t, result, expect)
+		got := doc.SetCompression(false).AddPage().Bytes()
+		ComparePDF(t, got, want)
 	}()
 
 	// test NewPDF() and Bytes() without calling AddPage()
 	func() {
 		doc := pdf.NewPDF("A4")
-		result := doc.SetCompression(false).Bytes()
-		ComparePDF(t, result, expect)
+		got := doc.SetCompression(false).Bytes()
+		ComparePDF(t, got, want)
 	}()
 
 } //                                                                Test_NewPDF_

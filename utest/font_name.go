@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 022D5C              one-file-pdf/utest/[font_name.go]
+// :v: 2019-04-03 10:27:56 035BBA              one-file-pdf/utest/[font_name.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -57,7 +57,7 @@ func Test_PDF_FontName_(t *testing.T) {
 			SetFontName("TimesRoman").
 			DrawText("Hello World!")
 
-		const expect = `
+		const want = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -92,7 +92,7 @@ func Test_PDF_FontName_(t *testing.T) {
 		%%EOF
 		`
 
-		ComparePDF(t, doc.Bytes(), expect)
+		ComparePDF(t, doc.Bytes(), want)
 	}()
 
 } //                                                          Test_PDF_FontName_

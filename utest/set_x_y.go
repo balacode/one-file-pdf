@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 64A492                one-file-pdf/utest/[set_x_y.go]
+// :v: 2019-04-03 10:27:56 EA35B8                one-file-pdf/utest/[set_x_y.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -39,7 +39,7 @@ func Test_PDF_SetXY_(t *testing.T) {
 			SetXY(10, 5).DrawText("X=10cm Y=5cm").
 			SetXY(5, 10).DrawText("X=5cm Y=10cm")
 
-		const expect = `
+		const want = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -77,7 +77,7 @@ func Test_PDF_SetXY_(t *testing.T) {
 		%%EOF
 		`
 
-		ComparePDF(t, doc.Bytes(), expect)
+		ComparePDF(t, doc.Bytes(), want)
 		doc.SaveFile("~~Test_PDF_SetXY_.pdf")
 	}()
 } //                                                             Test_PDF_SetXY_

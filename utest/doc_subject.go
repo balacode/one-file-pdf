@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 0DEB6A            one-file-pdf/utest/[doc_subject.go]
+// :v: 2019-04-03 10:27:56 3626FF            one-file-pdf/utest/[doc_subject.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -51,7 +51,7 @@ func Test_PDF_DocSubject_(t *testing.T) {
 		doc := pdf.NewPDF("A4") // initialized PDF
 		doc.SetCompression(false).SetDocSubject("'Subject' metadata entry")
 
-		const expect = `
+		const want = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -79,7 +79,7 @@ func Test_PDF_DocSubject_(t *testing.T) {
 		%%EOF
 		`
 
-		ComparePDF(t, doc.Bytes(), expect)
+		ComparePDF(t, doc.Bytes(), want)
 	}()
 
 } //                                                        Test_PDF_DocSubject_

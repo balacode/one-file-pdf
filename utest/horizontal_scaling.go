@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 842F69     one-file-pdf/utest/[horizontal_scaling.go]
+// :v: 2019-04-03 10:27:56 768530     one-file-pdf/utest/[horizontal_scaling.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -61,7 +61,7 @@ func Test_PDF_HorizontalScaling_(t *testing.T) {
 				DrawText("Five hexing wizard bots jump quickly")
 		}
 
-		const expect = `
+		const want = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -130,7 +130,7 @@ func Test_PDF_HorizontalScaling_(t *testing.T) {
 		%%EOF
 		`
 
-		ComparePDF(t, doc.Bytes(), expect)
+		ComparePDF(t, doc.Bytes(), want)
 		doc.SaveFile("~~test_horizontal_scaling.pdf")
 	}()
 

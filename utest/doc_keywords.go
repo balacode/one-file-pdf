@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 98EE8A           one-file-pdf/utest/[doc_keywords.go]
+// :v: 2019-04-03 10:27:56 BC711A           one-file-pdf/utest/[doc_keywords.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -52,7 +52,7 @@ func Test_PDF_DocKeywords_(t *testing.T) {
 		doc := pdf.NewPDF("A4") // initialized PDF
 		doc.SetCompression(false).SetDocKeywords("'Keywords' metadata entry")
 
-		const expect = `
+		const want = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -80,7 +80,7 @@ func Test_PDF_DocKeywords_(t *testing.T) {
 		%%EOF
 		`
 
-		ComparePDF(t, doc.Bytes(), expect)
+		ComparePDF(t, doc.Bytes(), want)
 	}()
 
 } //                                                       Test_PDF_DocKeywords_

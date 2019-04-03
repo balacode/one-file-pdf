@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 3DE0FA                      one-file-pdf/utest/[y.go]
+// :v: 2019-04-03 10:27:56 7D9554                      one-file-pdf/utest/[y.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -45,7 +45,7 @@ func Test_PDF_Y_(t *testing.T) {
 			SetXY(1, 10).
 			SetFont("Times-Bold", 20).
 			DrawText("X=1 Y=10")
-		const expect = `
+		const want = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -79,7 +79,7 @@ func Test_PDF_Y_(t *testing.T) {
 		471
 		%%EOF
 		`
-		ComparePDF(t, doc.Bytes(), expect)
+		ComparePDF(t, doc.Bytes(), want)
 		// doc.SaveFile("~~Test_PDF_Y_.pdf")
 	}()
 } //                                                                 Test_PDF_Y_

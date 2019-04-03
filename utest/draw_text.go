@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 339D9A              one-file-pdf/utest/[draw_text.go]
+// :v: 2019-04-03 10:27:56 127DD3              one-file-pdf/utest/[draw_text.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -30,7 +30,7 @@ func Test_PDF_DrawText_(t *testing.T) {
 			DrawText("SECOND").
 			DrawText("THIRD")
 
-		const expect = `
+		const want = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -67,7 +67,7 @@ func Test_PDF_DrawText_(t *testing.T) {
 		%%EOF
 		`
 
-		ComparePDF(t, doc.Bytes(), expect)
+		ComparePDF(t, doc.Bytes(), want)
 	}()
 
 	func() {
@@ -79,7 +79,7 @@ func Test_PDF_DrawText_(t *testing.T) {
 			SetHorizontalScaling(150).
 			DrawText("Ye-Olde-Scriptte")
 
-		const expect = `
+		const want = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -115,7 +115,7 @@ func Test_PDF_DrawText_(t *testing.T) {
 		%%EOF
 		`
 
-		ComparePDF(t, doc.Bytes(), expect)
+		ComparePDF(t, doc.Bytes(), want)
 		TEqual(t, len(doc.Errors()), 1)
 		TEqual(t, doc.PullError(),
 			fmt.Errorf(`Invalid font "Ye-Olde-Scriptte" @DrawText`))

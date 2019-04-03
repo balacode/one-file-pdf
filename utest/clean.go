@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 AA8A1F                  one-file-pdf/utest/[clean.go]
+// :v: 2019-04-03 10:27:56 52F592                  one-file-pdf/utest/[clean.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -25,7 +25,7 @@ func Test_PDF_Clean_(t *testing.T) {
 		var doc pdf.PDF // uninitialized PDF
 		doc.Clean().Clean().Clean()
 		//
-		//        result            expected
+		//        got                want
 		TEqual(t, len(doc.Errors()), 0)
 		TEqual(t, doc.Errors(), []error{})
 	}()
@@ -37,7 +37,7 @@ func Test_PDF_Clean_(t *testing.T) {
 		doc.Clean()
 		doc.Clean()
 		doc.Clean()
-		//        result            expected
+		//        got                want
 		TEqual(t, len(doc.Errors()), 0)
 		TEqual(t, doc.Errors(), []error{})
 	}()
@@ -47,10 +47,10 @@ func Test_PDF_Clean_(t *testing.T) {
 	// after Clean(), Errors should be zero-length
 	func() {
 		doc := pdf.NewPDF("Parchment")
-		//        result             expected
+		//        got                want
 		TEqual(t, len(doc.Errors()), 1)
 		doc.Clean()
-		//        result             expected
+		//        got                want
 		TEqual(t, len(doc.Errors()), 0)
 		TEqual(t, doc.Errors(), []error{})
 	}()

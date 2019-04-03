@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 4E79FC           one-file-pdf/utest/[draw_text_at.go]
+// :v: 2019-04-03 10:27:56 317C0B           one-file-pdf/utest/[draw_text_at.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -33,7 +33,7 @@ func Test_PDF_DrawTextAt_(t *testing.T) {
 		FillBox(10, 10, 0.1, 0.1).
 		FillBox(15, 15, 0.1, 0.1)
 
-	const expect = `
+	const want = `
 	%PDF-1.4
 	1 0 obj <</Type/Catalog/Pages 2 0 R>>
 	endobj
@@ -75,7 +75,7 @@ func Test_PDF_DrawTextAt_(t *testing.T) {
 	%%EOF
 	`
 
-	ComparePDF(t, doc.Bytes(), expect)
+	ComparePDF(t, doc.Bytes(), want)
 } //                                                        Test_PDF_DrawTextAt_
 
 //end

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-13 01:54:23 F58EAA               one-file-pdf/utest/[draw_box.go]
+// :v: 2019-04-03 10:27:56 1C87D1               one-file-pdf/utest/[draw_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -31,7 +31,7 @@ func Test_PDF_DrawBox_(t *testing.T) {
 		SetColor("DarkGreen").DrawBox(x, y, 9, 9).
 		SetColor("Blue").DrawBox(x, y, 16, 16)
 
-	const expect = `
+	const want = `
 	%PDF-1.4
 	1 0 obj <</Type/Catalog/Pages 2 0 R>>
 	endobj
@@ -66,7 +66,7 @@ func Test_PDF_DrawBox_(t *testing.T) {
 	%%EOF
 	`
 
-	ComparePDF(t, doc.Bytes(), expect)
+	ComparePDF(t, doc.Bytes(), want)
 } //                                                           Test_PDF_DrawBox_
 
 //end

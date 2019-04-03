@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 ABD6DB             one-file-pdf/utest/[draw_image.go]
+// :v: 2019-04-03 10:27:56 26B36E             one-file-pdf/utest/[draw_image.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -62,7 +62,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 		}
 	)
 
-	const expectOpaque = `
+	const wantOpaque = `
 	%PDF-1.4
 	1 0 obj <</Type/Catalog/Pages 2 0 R>>
 	endobj
@@ -111,7 +111,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 			SetUnits("cm").
 			DrawImage(x, y, height, pngData)
 		FailIfHasErrors(t, doc.Errors)
-		ComparePDF(t, doc.Bytes(), expectOpaque)
+		ComparePDF(t, doc.Bytes(), wantOpaque)
 	}()
 
 	// the same test, but reading direcly from PNG file
@@ -121,7 +121,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 			SetUnits("cm").
 			DrawImage(x, y, height, "./image/rgbw64.png")
 		FailIfHasErrors(t, doc.Errors)
-		ComparePDF(t, doc.Bytes(), expectOpaque)
+		ComparePDF(t, doc.Bytes(), wantOpaque)
 	}()
 
 	// PNG transparency test
@@ -130,7 +130,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 		y := 5.0
 		height := 5.0
 
-		const expectTransparent = `
+		const wantTransparent = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -290,7 +290,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 			DrawImage(x, y, height, "./image/rgbt64.png", "Yellow").
 			DrawImage(x, y+height+1, height, "./image/rgbt64.png", "Cyan")
 		FailIfHasErrors(t, doc.Errors)
-		ComparePDF(t, doc.Bytes(), expectTransparent)
+		ComparePDF(t, doc.Bytes(), wantTransparent)
 	}()
 
 	// wrong argument in fileNameOrBytes
@@ -298,7 +298,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 		doc := pdf.NewPDF("20cm x 20cm")
 		fileNameOrBytes := []int{0xBAD, 0xBAD, 0xBAD}
 
-		const expect = `
+		const want = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -327,7 +327,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 		doc.SetCompression(true).
 			SetUnits("cm").
 			DrawImage(x, y, height, fileNameOrBytes)
-		ComparePDF(t, doc.Bytes(), expect)
+		ComparePDF(t, doc.Bytes(), want)
 		//
 		TEqual(t, len(doc.Errors()), 1)
 		if len(doc.Errors()) > 0 {
@@ -341,7 +341,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 	// (catch bug where image name in '/XObject' and '/IMG Do' do not match)
 	func() {
 
-		const expect = `
+		const want = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -417,7 +417,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 			AddPage().
 			DrawImage(x, y, height, pngData2)
 		FailIfHasErrors(t, doc.Errors)
-		ComparePDF(t, doc.Bytes(), expect)
+		ComparePDF(t, doc.Bytes(), want)
 	}()
 
 } //                                                         Test_PDF_DrawImage_

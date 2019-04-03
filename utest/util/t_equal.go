@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 7C77F6           one-file-pdf/utest/util/[t_equal.go]
+// :v: 2019-04-03 10:43:04 AF5042           one-file-pdf/utest/util/[t_equal.go]
 // -----------------------------------------------------------------------------
 
 package util
@@ -28,8 +28,8 @@ const showFileNames = 1
 // PL is fmt.Println() but is used only for debugging.
 var PL = fmt.Println
 
-// TEqual asserts that result is equal to expect.
-func TEqual(t *testing.T, result interface{}, expect interface{}) bool {
+// TEqual asserts that 'got' is equal to 'want'.
+func TEqual(t *testing.T, got interface{}, want interface{}) bool {
 	makeStr := func(val interface{}) string {
 		switch val := val.(type) {
 		case nil:
@@ -68,9 +68,9 @@ func TEqual(t *testing.T, result interface{}, expect interface{}) bool {
 		}
 		return fmt.Sprintf("(type: %v value: %v)", reflect.TypeOf(val), val)
 	}
-	if makeStr(result) != makeStr(expect) {
+	if makeStr(got) != makeStr(want) {
 		t.Logf("\n"+"LOCATION: %s\n"+"EXPECTED: %s\n"+"RETURNED: %s\n",
-			TCaller(), makeStr(expect), makeStr(result))
+			TCaller(), makeStr(want), makeStr(got))
 		t.Fail()
 		return false
 	}

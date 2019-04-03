@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 6936DA                 one-file-pdf/utest/[errors.go]
+// :v: 2019-04-03 10:27:56 91D784                 one-file-pdf/utest/[errors.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -20,7 +20,7 @@ func Test_PDF_Errors_(t *testing.T) {
 	func() {
 		var doc pdf.PDF // uninitialized PDF
 		//
-		//        result            expected
+		//        got                want
 		TEqual(t, len(doc.Errors()), 0)
 		TEqual(t, doc.Errors(), []error{})
 	}()

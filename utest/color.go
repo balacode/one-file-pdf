@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 1EC181                  one-file-pdf/utest/[color.go]
+// :v: 2019-04-03 10:29:47 20B5AF                  one-file-pdf/utest/[color.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -39,8 +39,8 @@ func Test_PDF_Color_(t *testing.T) {
 
 	// test various named colors and codes
 	for _, iter := range []struct {
-		in     string
-		expect color.RGBA
+		in   string
+		want color.RGBA
 	}{
 		// test HTML color codes
 		{"#000000", color.RGBA{R: 0, G: 0, B: 0, A: 255}},
@@ -220,10 +220,10 @@ func Test_PDF_Color_(t *testing.T) {
 					`Address of pointer returned by SetColor("%s") is wrong`,
 					iter.in)
 			}
-			if doc.Color() != iter.expect {
+			if doc.Color() != iter.want {
 				t.Errorf(
 					`After SetColor("%s"), Color() returned %v instead of %v`,
-					iter.in, doc.Color(), iter.expect)
+					iter.in, doc.Color(), iter.want)
 			}
 		}
 	}

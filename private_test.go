@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 4C16DC                 one-file-pdf/[private_test.go]
+// :v: 2019-04-03 10:50:58 E799D5                 one-file-pdf/[private_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -122,11 +122,11 @@ func floatStr(val float64) string {
 } //                                                                    floatStr
 
 // mismatch formats and raises a test error
-func mismatch(t *testing.T, tag string, expected, got interface{}) {
-	expStr := fmt.Sprintf("%v", expected)
-	gotStr := fmt.Sprintf("%v", got)
+func mismatch(t *testing.T, tag string, want, got interface{}) {
+	ws := fmt.Sprintf("%v", want)
+	gs := fmt.Sprintf("%v", got)
 	t.Errorf("%s mismatch: expected: %s got: %s\n"+"%s",
-		tag, expStr, gotStr, getStack())
+		tag, ws, gs, getStack())
 } //                                                                    mismatch
 
 // getStack returns a list of line numbers and function names on the call stack

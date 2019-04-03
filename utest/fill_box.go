@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-13 01:54:23 14C206               one-file-pdf/utest/[fill_box.go]
+// :v: 2019-04-03 10:27:56 11575D               one-file-pdf/utest/[fill_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -30,7 +30,7 @@ func Test_PDF_FillBox_(t *testing.T) {
 		SetColor("#1B1B1B EerieBlack").
 		FillBox(x, y, width, height)
 
-	const expect = `
+	const want = `
 	%PDF-1.4
 	1 0 obj <</Type/Catalog/Pages 2 0 R>>
 	endobj
@@ -58,7 +58,7 @@ func Test_PDF_FillBox_(t *testing.T) {
 	%%EOF
 	`
 
-	ComparePDF(t, doc.Bytes(), expect)
+	ComparePDF(t, doc.Bytes(), want)
 } //                                                           Test_PDF_FillBox_
 
 //end

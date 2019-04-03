@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 A1C4AE       one-file-pdf/utest/[draw_text_in_box.go]
+// :v: 2019-04-03 10:27:56 9A6013       one-file-pdf/utest/[draw_text_in_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -41,7 +41,7 @@ func Test_PDF_DrawTextInBox_(t *testing.T) {
 			DrawTextInBox(5, 5, 3, 15, "C", ""). // no effect
 			DrawTextInBox(5, 5, 3, 15, "C", lorem)
 
-		const expect = `
+		const want = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -107,7 +107,7 @@ func Test_PDF_DrawTextInBox_(t *testing.T) {
 		%%EOF
 		`
 
-		ComparePDF(t, doc.Bytes(), expect)
+		ComparePDF(t, doc.Bytes(), want)
 	}()
 
 	func() {
@@ -121,7 +121,7 @@ func Test_PDF_DrawTextInBox_(t *testing.T) {
 			DrawTextInBox(5, 5, 3, 15, "C", ""). // no effect
 			DrawTextInBox(5, 5, 3, 15, "C", lorem)
 
-		const expect = `
+		const want = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -198,7 +198,7 @@ func Test_PDF_DrawTextInBox_(t *testing.T) {
 		%%EOF
 		`
 
-		ComparePDF(t, doc.Bytes(), expect)
+		ComparePDF(t, doc.Bytes(), want)
 	}()
 
 } //                                                     Test_PDF_DrawTextInBox_

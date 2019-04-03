@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 02D294              one-file-pdf/utest/[font_size.go]
+// :v: 2019-04-03 10:27:56 513FCD              one-file-pdf/utest/[font_size.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -67,7 +67,7 @@ func Test_PDF_FontSize_(t *testing.T) {
 					fmt.Sprintf("Helvetica %1.0f", size))
 		}
 
-		const expect = `
+		const want = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -190,7 +190,7 @@ func Test_PDF_FontSize_(t *testing.T) {
 		%%EOF
 		`
 
-		ComparePDF(t, doc.Bytes(), expect)
+		ComparePDF(t, doc.Bytes(), want)
 		// doc.SaveFile("~~Test_PDF_FontSize_.pdf")
 	}()
 

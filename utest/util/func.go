@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:10:37 AD0537              one-file-pdf/utest/util/[func.go]
+// :v: 2019-04-03 10:47:20 C1BC88              one-file-pdf/utest/util/[func.go]
 // -----------------------------------------------------------------------------
 
 package util
@@ -14,37 +14,35 @@ import (
 )
 
 // ComparePDF compares generated result bytes to the expected PDF content:
-// - convert result to a string
+// - convert result ('got') to a string
 // - format both result and expected string using formatLines()
-// - compare result and expected lines
+// - compare result and expected lines ('got' and 'want')
 // - raise an error if there are diffs (report up to 5 differences)
-func ComparePDF(t *testing.T, result []byte, expect string) {
+func ComparePDF(t *testing.T, got []byte, want string) {
 	//
 	const formatStreams = true
 	var (
-		results    = formatLines(string(result), formatStreams)
-		expects    = formatLines(expect, !formatStreams)
-		lenResults = len(results)
-		lenExpects = len(expects)
-		errCount   = 0
-		mismatch   = false
-		max        = lenResults
+		gotAr    = formatLines(string(got), formatStreams)
+		wantAr   = formatLines(want, !formatStreams)
+		errCount = 0
+		mismatch = false
+		max      = len(gotAr)
 	)
-	if max < lenExpects {
-		max = lenExpects
+	if max < len(wantAr) {
+		max = len(wantAr)
 	}
 	for i := 0; i < max; i++ {
 		//
 		// get the expected and the result line at i
 		// if the slice is too short, leave it blank
-		var expect, result string
-		if i < lenExpects {
-			expect = expects[i]
+		var want, got string
+		if i < len(wantAr) {
+			want = wantAr[i]
 		}
-		if i < lenResults {
-			result = results[i]
+		if i < len(gotAr) {
+			got = gotAr[i]
 		}
-		if expect == result { // no problem, move along
+		if want == got { // no problem, move along
 			continue
 		}
 		// only report the first 5 mismatches
@@ -58,8 +56,8 @@ func ComparePDF(t *testing.T, result []byte, expect string) {
 				"/*\n"+
 				"LOCATION: "+TCaller()+":\n"+
 				"MISMATCH: L"+strconv.Itoa(i+1)+":\n"+
-				"EXPECTED: "+expect+"\n"+
-				"PRODUCED: "+result+"\n"+
+				"EXPECTED: "+want+"\n"+
+				"PRODUCED: "+got+"\n"+
 				"*/\n")
 	}
 	if mismatch {
@@ -68,7 +66,7 @@ func ComparePDF(t *testing.T, result []byte, expect string) {
 				"// RETURNED-PDF:\n"+
 				"// "+TCaller()+"\n"+
 				"`\n"+
-				str.Join(results, "\n")+"\n"+
+				str.Join(gotAr, "\n")+"\n"+
 				"`\n")
 	}
 } //                                                                  ComparePDF

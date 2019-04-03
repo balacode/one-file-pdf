@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 E80744              one-file-pdf/utest/[to_points.go]
+// :v: 2019-04-03 10:27:56 320DEA              one-file-pdf/utest/[to_points.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -16,15 +16,15 @@ import (
 func Test_PDF_ToPoints_(t *testing.T) {
 	fmt.Println("Test PDF.ToPoints()")
 	//
-	test := func(expectVal float64, expectErr error, inputParts ...[]string) {
+	test := func(wantVal float64, wantErr error, inputParts ...[]string) {
 		for _, s := range PermuteStrings(inputParts...) {
 			var doc pdf.PDF // uninitialized PDF
 			gotVal, gotErr := doc.ToPoints(s)
 			TEqual(t,
 				fmt.Sprintf("%0.03f", gotVal),
-				fmt.Sprintf("%0.03f", expectVal),
+				fmt.Sprintf("%0.03f", wantVal),
 			)
-			TEqual(t, gotErr, expectErr)
+			TEqual(t, gotErr, wantErr)
 		}
 	}
 	var (

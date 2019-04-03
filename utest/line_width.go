@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 842983             one-file-pdf/utest/[line_width.go]
+// :v: 2019-04-03 10:27:56 B38FA5             one-file-pdf/utest/[line_width.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -61,7 +61,7 @@ func Test_PDF_LineWidth_(t *testing.T) {
 				SetColor("Indigo").SetLineWidth(w).DrawLine(4, y, 15, y)
 			y += 1
 		}
-		const expect = `
+		const want = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -202,7 +202,7 @@ func Test_PDF_LineWidth_(t *testing.T) {
 		2998
 		%%EOF
         `
-		ComparePDF(t, doc.Bytes(), expect)
+		ComparePDF(t, doc.Bytes(), want)
 		// doc.SaveFile("~~Test_PDF_LineWidth_.pdf")
 	}()
 
