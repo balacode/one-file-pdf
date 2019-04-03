@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 FD3A7E                    one-file-pdf/demo/[demo.go]
+// :v: 2019-04-03 10:52:12 05EDE7                    one-file-pdf/demo/[demo.go]
 // -----------------------------------------------------------------------------
 
 package main
@@ -172,7 +172,7 @@ func dingbats() {
 				fmt.Sprintf("%d", row*16+col))
 			//
 			// this is the right way to use a dingbat code (0-255):
-			// (casting int to rune to string won't work expected)
+			// (casting int to rune to string won't work as expected)
 			code := row*16 + col
 			s := string([]byte{byte(code)})
 			//
