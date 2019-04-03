@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-29 07:41:55 F5DC5B           one-file-pdf/utest/util/[t_equal.go]
+// :v: 2019-04-03 10:03:38 7C77F6           one-file-pdf/utest/util/[t_equal.go]
 // -----------------------------------------------------------------------------
 
 package util
@@ -30,7 +30,7 @@ var PL = fmt.Println
 
 // TEqual asserts that result is equal to expect.
 func TEqual(t *testing.T, result interface{}, expect interface{}) bool {
-	var makeStr = func(val interface{}) string {
+	makeStr := func(val interface{}) string {
 		switch val := val.(type) {
 		case nil:
 			return "nil"
@@ -43,7 +43,7 @@ func TEqual(t *testing.T, result interface{}, expect interface{}) bool {
 			uint, uint8, uint16, uint32, uint64, uintptr:
 			return fmt.Sprintf("%d", val)
 		case float32, float64:
-			var s = fmt.Sprintf("%.4f", val)
+			s := fmt.Sprintf("%.4f", val)
 			if str.Contains(s, ".") {
 				for str.HasSuffix(s, "0") {
 					s = s[:len(s)-1]
@@ -58,7 +58,7 @@ func TEqual(t *testing.T, result interface{}, expect interface{}) bool {
 		case string:
 			return val
 		case time.Time: // use date part without time and time zone
-			var s = val.Format(time.RFC3339)[:19] // "2006-01-02T15:04:05Z07:00"
+			s := val.Format(time.RFC3339)[:19] // "2006-01-02T15:04:05Z07:00"
 			if str.HasSuffix(s, "T00:00:00") {
 				s = s[:10]
 			}
@@ -87,12 +87,12 @@ func TEqual(t *testing.T, result interface{}, expect interface{}) bool {
 // and other top-level callers are not included.
 func CallerList() []string {
 	var ret []string
-	var i = 0
+	i := 0
 mainLoop:
 	for {
 		i++
-		var programCounter, filename, lineNo, _ = runtime.Caller(i)
-		var funcName = runtime.FuncForPC(programCounter).Name()
+		programCounter, filename, lineNo, _ := runtime.Caller(i)
+		funcName := runtime.FuncForPC(programCounter).Name()
 		//
 		// end loop on reaching a top-level runtime function
 		for _, s := range []string{
@@ -138,7 +138,7 @@ mainLoop:
 				funcName = str.Replace(funcName, find, "", -1)
 			}
 		}
-		var line = fmt.Sprintf(":%d %s()", lineNo, funcName)
+		line := fmt.Sprintf(":%d %s()", lineNo, funcName)
 		if showFileNames > 0 {
 			line = filename + line
 		}

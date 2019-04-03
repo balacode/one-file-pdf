@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-29 07:41:55 994506                one-file-pdf/utest/[new_pdf.go]
+// :v: 2019-04-03 10:03:38 95C100                one-file-pdf/utest/[new_pdf.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -42,15 +42,15 @@ func Test_NewPDF_(t *testing.T) {
 	`
 	// test NewPDF() and Bytes() while calling AddPage()
 	func() {
-		var doc = pdf.NewPDF("A4")
-		var result = doc.SetCompression(false).AddPage().Bytes()
+		doc := pdf.NewPDF("A4")
+		result := doc.SetCompression(false).AddPage().Bytes()
 		ComparePDF(t, result, expect)
 	}()
 
 	// test NewPDF() and Bytes() without calling AddPage()
 	func() {
-		var doc = pdf.NewPDF("A4")
-		var result = doc.SetCompression(false).Bytes()
+		doc := pdf.NewPDF("A4")
+		result := doc.SetCompression(false).Bytes()
 		ComparePDF(t, result, expect)
 	}()
 

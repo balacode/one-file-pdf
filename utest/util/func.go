@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-29 07:41:55 5BD156              one-file-pdf/utest/util/[func.go]
+// :v: 2019-04-03 10:10:37 AD0537              one-file-pdf/utest/util/[func.go]
 // -----------------------------------------------------------------------------
 
 package util
@@ -21,13 +21,15 @@ import (
 func ComparePDF(t *testing.T, result []byte, expect string) {
 	//
 	const formatStreams = true
-	var results = formatLines(string(result), formatStreams)
-	var expects = formatLines(expect, !formatStreams)
-	var lenResults = len(results)
-	var lenExpects = len(expects)
-	var errCount = 0
-	var mismatch = false
-	var max = lenResults
+	var (
+		results    = formatLines(string(result), formatStreams)
+		expects    = formatLines(expect, !formatStreams)
+		lenResults = len(results)
+		lenExpects = len(expects)
+		errCount   = 0
+		mismatch   = false
+		max        = lenResults
+	)
 	if max < lenExpects {
 		max = lenExpects
 	}
@@ -105,9 +107,11 @@ func formatLines(s string, formatStreams bool) []string {
 	}
 	// trim and copy non-blank lines to result
 	// also, continue lines that end with '\'
-	var ar = str.Split(s, "\n")
-	var ret = make([]string, 0, len(ar))
-	var prev = ""
+	var (
+		ar   = str.Split(s, "\n")
+		ret  = make([]string, 0, len(ar))
+		prev = ""
+	)
 	for _, line := range ar {
 		line = str.Trim(line, " \a\b\f\n\r\t\v")
 		if line == "" {
@@ -135,13 +139,13 @@ func pdfFormatStreams(s string) string {
 		ENDSTREAM = "endstream"
 		BPL       = 16 // bytes per line
 	)
-	var buf = bytes.NewBuffer(make([]byte, 0, len(s)))
+	buf := bytes.NewBuffer(make([]byte, 0, len(s)))
 	for part, s := range str.Split(s, " obj ") {
 		if part > 0 {
 			buf.WriteString(" obj ")
 		}
 		// write the stream as-is if not compressed/image
-		var i = str.Index(s, STREAM)
+		i := str.Index(s, STREAM)
 		if i == -1 ||
 			(!str.Contains(s[:i], "/FlateDecode") &&
 				!str.Contains(s[:i], "/Image")) {
@@ -155,11 +159,11 @@ func pdfFormatStreams(s string) string {
 		//
 		// write the stream's data as hex numbers (each line with BPL columns)
 		buf.WriteString("\n")
-		var n = str.Index(s, ENDSTREAM)
+		n := str.Index(s, ENDSTREAM)
 		if n == -1 {
 			n = len(s)
 		}
-		var c = 0
+		c := 0
 		for _, b := range []byte(s[:n]) {
 			buf.WriteString(fmt.Sprintf(" %02X", b))
 			c++

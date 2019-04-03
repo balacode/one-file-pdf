@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-13 01:54:23 09BCC3               one-file-pdf/utest/[set_font.go]
+// :v: 2019-04-03 10:03:38 E9C0CC               one-file-pdf/utest/[set_font.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -37,7 +37,7 @@ func Test_PDF_SetFont_(t *testing.T) {
 	// Test PDF generation
 
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		doc.SetCompression(false).
 			SetUnits("cm").
 			SetFont("Times-Bold", 20).
@@ -59,7 +59,7 @@ func Test_PDF_SetFont_(t *testing.T) {
 			"Times-Roman",
 			"ZapfDingbats",
 		} {
-			var y = 2.5 + float64(i)*1.8
+			y := 2.5 + float64(i)*1.8
 			doc.SetXY(1, y).
 				SetFont("Helvetica", 10).
 				DrawText(font).

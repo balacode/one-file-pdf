@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-29 23:42:24 B074D8            one-file-pdf/utest/[page_height.go]
+// :v: 2019-04-03 10:03:38 8E2A6C            one-file-pdf/utest/[page_height.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -25,14 +25,14 @@ func Test_PDF_PageHeight_(t *testing.T) {
 	// 1 inch / 25.4mm per inch * 72 points per inch
 
 	func() {
-		var doc = pdf.NewPDF("A4")              // initialized PDF
+		doc := pdf.NewPDF("A4")                 // initialized PDF
 		TEqual(t, doc.PageHeight(), 841.889764) // points
 		//
 		// A4 = 210mm width x 297mm height = 841.8897637795276 points
 	}()
 
 	func() {
-		var doc = pdf.NewPDF("LETTER")          // initialized PDF
+		doc := pdf.NewPDF("LETTER")             // initialized PDF
 		TEqual(t, doc.PageHeight(), 790.866142) // points
 		//
 		// LETTER = 216mm width x 279mm height = 790.8661417322835 points

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-05 01:22:38 BD60FC                   one-file-pdf/[pdf_ttfont.go]
+// :v: 2019-04-03 10:03:38 3119D2                   one-file-pdf/[pdf_ttfont.go]
 // -----------------------------------------------------------------------------
 
 // THIS FILE IS A WORK IN PROGRESS
@@ -91,7 +91,7 @@ func (ob *pdfTTFont) readFont(owner *PDF, font interface{}) bool {
 	switch arg := font.(type) {
 	case string:
 		src = arg
-		var data, err = ioutil.ReadFile(arg)
+		data, err := ioutil.ReadFile(arg)
 		if err != nil {
 			ob.pdf.putError(0xE5445B, "Failed reading font file", src)
 			return false
@@ -118,12 +118,12 @@ func (ob *pdfTTFont) textWidthPt(s string) float64 {
 	var ret float64
 	for _, r := range s {
 		_ = r
-		var glyph, found = 0, false //TODO: find out glyph entry
+		glyph, found := 0, false //TODO: find out glyph entry
 		if !found {
 			//TODO: 0xE0074A: error
 			continue
 		}
-		var w = float64(ob.HMTX.Widths[glyph])
+		w := float64(ob.HMTX.Widths[glyph])
 		if ob.HEAD.UnitsPerEm != 1000 {
 			w = w * 1000.0 / float64(ob.HEAD.UnitsPerEm)
 		}
@@ -143,7 +143,7 @@ func (ob *pdfTTFont) writeText(s string) {
 	ob.pdf.write("[<")
 	for _, r := range s {
 		_ = r
-		var glyph, found = 0, false //TODO: find out glyph entry
+		glyph, found := 0, false //TODO: find out glyph entry
 		if !found {
 			//TODO: 0xE1DC96: error
 			return
@@ -176,8 +176,8 @@ func (ob *pdfTTFont) readTTF(reader io.Reader) {
 		ob.Err = err
 		return
 	}
-	var rd = bytes.NewReader(ob.Data)
-	var ver = ob.read(rd, 4)
+	rd := bytes.NewReader(ob.Data)
+	ver := ob.read(rd, 4)
 	if !bytes.Equal(ver, []byte{0, 1, 0, 0}) {
 		//TODO: 0xE0E9AE: error
 		return
@@ -277,8 +277,8 @@ func (ob *pdfTTFont) read(rd *bytes.Reader, size int, useData ...bool) []byte {
 		}
 		return nil
 	}
-	var ret = make([]byte, size)
-	var n, err = rd.Read(ret)
+	ret := make([]byte, size)
+	n, err := rd.Read(ret)
 	if err != nil {
 		ob.Err = err
 		return nil
@@ -292,11 +292,11 @@ func (ob *pdfTTFont) read(rd *bytes.Reader, size int, useData ...bool) []byte {
 
 // readI16 __
 func (ob *pdfTTFont) readI16(rd *bytes.Reader) int16 {
-	var ar = ob.read(rd, 2)
+	ar := ob.read(rd, 2)
 	if ob.Err != nil {
 		return 0
 	}
-	var ret = int(uint16(ar[0])<<8 | uint16(ar[1]))
+	ret := int(uint16(ar[0])<<8 | uint16(ar[1]))
 	if ret >= 32768 {
 		ret -= 65536
 	}
@@ -305,7 +305,7 @@ func (ob *pdfTTFont) readI16(rd *bytes.Reader) int16 {
 
 // readUI16 __
 func (ob *pdfTTFont) readUI16(rd *bytes.Reader) uint16 {
-	var ar = ob.read(rd, 2)
+	ar := ob.read(rd, 2)
 	if ob.Err != nil {
 		return 0
 	}
@@ -314,7 +314,7 @@ func (ob *pdfTTFont) readUI16(rd *bytes.Reader) uint16 {
 
 // readUI32 __
 func (ob *pdfTTFont) readUI32(rd *bytes.Reader) uint32 {
-	var ar = ob.read(rd, 4)
+	ar := ob.read(rd, 4)
 	if ob.Err != nil {
 		return 0
 	}

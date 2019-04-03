@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-13 01:54:23 FB9867           one-file-pdf/utest/[doc_keywords.go]
+// :v: 2019-04-03 10:03:38 98EE8A           one-file-pdf/utest/[doc_keywords.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -26,7 +26,7 @@ func Test_PDF_DocKeywords_(t *testing.T) {
 	}()
 
 	func() {
-		var doc = pdf.NewPDF("A4") // initialized PDF
+		doc := pdf.NewPDF("A4") // initialized PDF
 		TEqual(t, doc.DocKeywords(), "")
 	}()
 
@@ -41,7 +41,7 @@ func Test_PDF_DocKeywords_(t *testing.T) {
 	}()
 
 	func() {
-		var doc = pdf.NewPDF("A4") // initialized PDF
+		doc := pdf.NewPDF("A4") // initialized PDF
 		TEqual(t, doc.SetDocKeywords("Abcdefg").DocKeywords(), "Abcdefg")
 	}()
 
@@ -49,7 +49,7 @@ func Test_PDF_DocKeywords_(t *testing.T) {
 	// Test PDF generation
 	//
 	func() {
-		var doc = pdf.NewPDF("A4") // initialized PDF
+		doc := pdf.NewPDF("A4") // initialized PDF
 		doc.SetCompression(false).SetDocKeywords("'Keywords' metadata entry")
 
 		const expect = `

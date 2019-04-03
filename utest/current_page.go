@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-29 23:42:24 7C1E53           one-file-pdf/utest/[current_page.go]
+// :v: 2019-04-03 10:03:38 40516D           one-file-pdf/utest/[current_page.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -39,7 +39,7 @@ func Test_PDF_CurrentPage_(t *testing.T) {
 	}()
 
 	func() {
-		var doc = pdf.NewPDF("LETTER")
+		doc := pdf.NewPDF("LETTER")
 		//
 		// before calling AddPage(), returns 1
 		TEqual(t, doc.CurrentPage(), 1)

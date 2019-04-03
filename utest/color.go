@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-28 13:59:12 5C1F1F                  one-file-pdf/utest/[color.go]
+// :v: 2019-04-03 10:03:38 1EC181                  one-file-pdf/utest/[color.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -28,7 +28,7 @@ func Test_PDF_Color_(t *testing.T) {
 	}()
 
 	func() {
-		var doc = pdf.NewPDF("A4") // initialized PDF
+		doc := pdf.NewPDF("A4") // initialized PDF
 		TEqual(t, doc.Color(), color.RGBA{A: 255})
 	}()
 
@@ -195,7 +195,7 @@ func Test_PDF_Color_(t *testing.T) {
 		{"YELLOW GREEN", color.RGBA{R: 154, G: 205, B: 50, A: 255}},
 	} {
 		for pass := 0; pass < 3; pass++ {
-			var s = iter.in
+			s := iter.in
 			switch pass {
 			case 0: // do nothing
 			case 1:
@@ -213,8 +213,8 @@ func Test_PDF_Color_(t *testing.T) {
 			case 7:
 				s = str.ToLower(str.Replace(s, " ", "_", -1))
 			}
-			var doc = pdf.NewPDF("A4")
-			var doc2 = doc.SetColor(s)
+			doc := pdf.NewPDF("A4")
+			doc2 := doc.SetColor(s)
 			if doc2 != &doc {
 				t.Errorf(
 					`Address of pointer returned by SetColor("%s") is wrong`,
@@ -233,8 +233,8 @@ func Test_PDF_Color_(t *testing.T) {
 		[]string{"red", "Red", "RED"},
 		[]string{"", " ", "  "},
 	) {
-		var doc = pdf.NewPDF("A4")
-		var doc2 = doc.SetColor(name)
+		doc := pdf.NewPDF("A4")
+		doc2 := doc.SetColor(name)
 		TEqual(t, doc.Color(), color.RGBA{R: 255, A: 255})
 		TEqual(t, &doc, doc2)
 	}
@@ -275,24 +275,24 @@ func Test_PDF_Color_(t *testing.T) {
 
 	func() {
 		// red
-		var a = pdf.NewPDF("A4")
-		var b = a.SetColorRGB(128, 0, 0)
+		a := pdf.NewPDF("A4")
+		b := a.SetColorRGB(128, 0, 0)
 		TEqual(t, a.Color(), color.RGBA{R: 128, A: 255})
 		TEqual(t, &a, b)
 	}()
 
 	func() {
 		// green
-		var a = pdf.NewPDF("A4")
-		var b = a.SetColorRGB(0, 128, 0)
+		a := pdf.NewPDF("A4")
+		b := a.SetColorRGB(0, 128, 0)
 		TEqual(t, a.Color(), color.RGBA{G: 128, A: 255})
 		TEqual(t, &a, b)
 	}()
 
 	func() {
 		// blue
-		var a = pdf.NewPDF("A4")
-		var b = a.SetColorRGB(0, 0, 128)
+		a := pdf.NewPDF("A4")
+		b := a.SetColorRGB(0, 0, 128)
 		TEqual(t, a.Color(), color.RGBA{B: 128, A: 255})
 		TEqual(t, &a, b)
 	}()

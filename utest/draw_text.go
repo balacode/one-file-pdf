@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-13 01:54:23 9B80E0              one-file-pdf/utest/[draw_text.go]
+// :v: 2019-04-03 10:03:38 339D9A              one-file-pdf/utest/[draw_text.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -18,7 +18,7 @@ func Test_PDF_DrawText_(t *testing.T) {
 	fmt.Println("Test PDF.DrawText()")
 	//
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		doc.SetCompression(false).
 			SetUnits("cm").
 			SetColumnWidths(1, 4, 9).
@@ -71,7 +71,7 @@ func Test_PDF_DrawText_(t *testing.T) {
 	}()
 
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		doc.SetCompression(false).
 			SetUnits("cm").
 			SetFont("Ye-Olde-Scriptte", 10).

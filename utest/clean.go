@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-29 23:42:24 6183CF                  one-file-pdf/utest/[clean.go]
+// :v: 2019-04-03 10:03:38 AA8A1F                  one-file-pdf/utest/[clean.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -33,7 +33,7 @@ func Test_PDF_Clean_(t *testing.T) {
 	// same as above for a PDF properly initialized with NewPDF()
 	// (also, call Clean() without chaining)
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		doc.Clean()
 		doc.Clean()
 		doc.Clean()
@@ -46,7 +46,7 @@ func Test_PDF_Clean_(t *testing.T) {
 	// first, Errors should have 1 error
 	// after Clean(), Errors should be zero-length
 	func() {
-		var doc = pdf.NewPDF("Parchment")
+		doc := pdf.NewPDF("Parchment")
 		//        result             expected
 		TEqual(t, len(doc.Errors()), 1)
 		doc.Clean()

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-10 22:50:31 5EF8AB         one-file-pdf/utest/[draw_unit_grid.go]
+// :v: 2019-04-03 10:03:38 22C7FB         one-file-pdf/utest/[draw_unit_grid.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -16,8 +16,8 @@ import (
 func Test_PDF_DrawUnitGrid_(t *testing.T) {
 	fmt.Println("Test PDF.DrawUnitGrid()")
 	//
-	var result = func() []byte {
-		var doc = pdf.NewPDF("A4")
+	result := func() []byte {
+		doc := pdf.NewPDF("A4")
 		doc.SetCompression(false).SetUnits("cm").DrawUnitGrid()
 		return doc.Bytes()
 	}()

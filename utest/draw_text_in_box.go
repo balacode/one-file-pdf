@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-01-15 13:21:24 B5555F       one-file-pdf/utest/[draw_text_in_box.go]
+// :v: 2019-04-03 10:03:38 A1C4AE       one-file-pdf/utest/[draw_text_in_box.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -31,7 +31,7 @@ func Test_PDF_DrawTextInBox_(t *testing.T) {
 		" sunt in culpa qui officia deserunt mollit anim id est laborum."
 
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		doc.SetCompression(false).
 			SetUnits("cm").
 			SetFont("Helvetica", 10).
@@ -111,7 +111,7 @@ func Test_PDF_DrawTextInBox_(t *testing.T) {
 	}()
 
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		doc.SetCompression(false).
 			SetUnits("cm").
 			SetFont("Courier", 10).

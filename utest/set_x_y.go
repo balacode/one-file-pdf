@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-06-08 21:53:17 0E6BBA                one-file-pdf/utest/[set_x_y.go]
+// :v: 2019-04-03 10:03:38 64A492                one-file-pdf/utest/[set_x_y.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -24,7 +24,7 @@ func Test_PDF_SetXY_(t *testing.T) {
 		TEqual(t, doc.Y(), 456)
 	}()
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		doc.SetXY(123, 456)
 		TEqual(t, doc.X(), 123)
 		TEqual(t, doc.Y(), 456)
@@ -32,7 +32,7 @@ func Test_PDF_SetXY_(t *testing.T) {
 	// -------------------------------------------------------------------------
 	// Test PDF generation
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		doc.SetCompression(false).SetUnits("cm").SetFont("Helvetica", 10).
 			SetXY(1, 3).DrawText("X=1cm Y=3cm").
 			SetXY(3, 1).DrawText("X=3cm Y=1cm").

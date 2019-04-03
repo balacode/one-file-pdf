@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-01-10 14:51:58 B96F81                     one-file-pdf/[pdf_core.go]
+// :v: 2019-04-03 10:03:38 A333A6                     one-file-pdf/[pdf_core.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -194,7 +194,7 @@ type PDF struct {
 // for example "20 cm x 20 cm" or even "15cm x 10inch", etc.
 func NewPDF(paperSize string) PDF {
 	var ob PDF
-	var size, err = ob.init().getPaperSize(paperSize)
+	size, err := ob.init().getPaperSize(paperSize)
 	if err, isT := err.(pdfError); isT {
 		ob.putError(0xE52F92, err.msg, paperSize)
 		ob.paperSize, _ = ob.getPaperSize("A4")
@@ -249,7 +249,7 @@ func (ob *PDF) Color() color.RGBA { ob.init(); return ob.color }
 // for subsequent text and line drawing and fills.
 // If the name is unknown or invalid, sets color to black.
 func (ob *PDF) SetColor(nameOrHTMLColor string) *PDF {
-	var color, err = ob.init().ToColor(nameOrHTMLColor)
+	color, err := ob.init().ToColor(nameOrHTMLColor)
 	if err, isT := err.(pdfError); isT {
 		ob.putError(0xE5B3A5, err.msg, nameOrHTMLColor)
 	}
@@ -381,7 +381,7 @@ func (ob *PDF) Units() string { ob.init(); return ob.units }
 // SetUnits changes the current measurement units:
 // mm cm " in inch inches tw twip twips pt point points (can be in any case)
 func (ob *PDF) SetUnits(units string) *PDF {
-	var ppu, err = ob.init().getPointsPerUnit(units)
+	ppu, err := ob.init().getPointsPerUnit(units)
 	if err, isT := err.(pdfError); isT {
 		return ob.putError(0xEB4AAA, err.msg, units)
 	}
@@ -419,7 +419,7 @@ func (ob *PDF) SetXY(x, y float64) *PDF { return ob.SetX(x).SetY(y) }
 
 // AddPage appends a new blank page to the PDF and makes it the current page.
 func (ob *PDF) AddPage() *PDF {
-	var COLOR = color.RGBA{1, 0, 1, 0x01} // unlikely default color
+	COLOR := color.RGBA{1, 0, 1, 0x01} // unlikely default color
 	ob.pages = append(ob.pages, pdfPage{
 		x: -1, y: ob.paperSize.heightPt + 1, lineWidth: 1,
 		strokeColor: COLOR, nonStrokeColor: COLOR,
@@ -439,10 +439,12 @@ func (ob *PDF) Bytes() []byte {
 	// free any existing generated content and write PDF header
 	ob.reservePage()
 	const pagesIndex = 3
-	var fontsIndex = pagesIndex + len(ob.pages)*2
-	var imagesIndex = fontsIndex + len(ob.fonts)
-	var infoIndex int // set when metadata found
-	var prevWriter = ob.writer
+	var (
+		fontsIndex  = pagesIndex + len(ob.pages)*2
+		imagesIndex = fontsIndex + len(ob.fonts)
+		infoIndex   int // set when metadata found
+		prevWriter  = ob.writer
+	)
 	ob.content.Reset()
 	ob.writer = &ob.content
 	ob.objOffsets = []int{}
@@ -466,11 +468,11 @@ func (ob *PDF) Bytes() []byte {
 	}
 	// write images
 	for _, iter := range ob.images {
-		var colorSpace = "DeviceRGB"
+		colorSpace := "DeviceRGB"
 		if iter.isGray {
 			colorSpace = "DeviceGray"
 		}
-		var old = ob.compression
+		old := ob.compression
 		ob.compression = true
 		ob.writeObj("/XObject").
 			write("/Subtype/Image\n",
@@ -497,7 +499,7 @@ func (ob *PDF) Bytes() []byte {
 		ob.write(">>\n" + "endobj\n\n")
 	}
 	// write cross-reference table at end of document
-	var start = ob.content.Len()
+	start := ob.content.Len()
 	ob.write("xref\n"+
 		"0 ", len(ob.objOffsets), "\n"+"0000000000 65535 f \n")
 	for _, offset := range ob.objOffsets[1:] {
@@ -519,7 +521,7 @@ func (ob *PDF) Bytes() []byte {
 func (ob *PDF) DrawBox(x, y, width, height float64, optFill ...bool) *PDF {
 	width, height = width*ob.ptPerUnit, height*ob.ptPerUnit
 	x, y = x*ob.ptPerUnit, ob.paperSize.heightPt-y*ob.ptPerUnit-height
-	var mode = ob.writeMode(optFill...)
+	mode := ob.writeMode(optFill...)
 	return ob.write(x, " ", y, " ", width, " ", height, " re ", mode, "\n")
 	// re: construct a rectangular path
 } //                                                                     DrawBox
@@ -538,12 +540,13 @@ func (ob *PDF) DrawCircle(x, y, radius float64, optFill ...bool) *PDF {
 func (ob *PDF) DrawEllipse(x, y, xRadius, yRadius float64,
 	optFill ...bool) *PDF {
 	x, y = x*ob.ptPerUnit, ob.paperSize.heightPt-y*ob.ptPerUnit
-	const ratio = 0.552284749830794     // (4/3) * tan(PI/8)
-	var r = xRadius * ob.ptPerUnit      // horizontal radius
-	var v = yRadius * ob.ptPerUnit      // vertical radius
-	var m, n = r * ratio, v * ratio     // ratios for control points
-	var mode = ob.writeMode(optFill...) // prepare colors/line width
-	//
+	const ratio = 0.552284749830794 // (4/3) * tan(PI/8)
+	var (
+		r    = xRadius * ob.ptPerUnit   // horizontal radius
+		v    = yRadius * ob.ptPerUnit   // vertical radius
+		m, n = r * ratio, v * ratio     // ratios for control points
+		mode = ob.writeMode(optFill...) // prepare colors/line width
+	)
 	return ob.write(x-r, " ", y, " m\n"). // x0 y0 m: move to point (x0, y0)
 		//         control-1 control-2 endpoint
 		writeCurve(x-r, y+n, x-m, y+v, x+0, y+v). // top left arc
@@ -560,13 +563,13 @@ func (ob *PDF) DrawEllipse(x, y, xRadius, yRadius float64,
 func (ob *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 	backColor ...string) *PDF {
 	//
-	var back = color.RGBA{R: 255, G: 255, B: 255, A: 255} // white by default
+	back := color.RGBA{R: 255, G: 255, B: 255, A: 255} // white by default
 	if len(backColor) > 0 {
 		back, _ = ob.ToColor(backColor[0])
 	}
 	// add the image to the current page, if not already referenced
 	ob.reservePage()
-	var img, idx, err = ob.loadImage(fileNameOrBytes, back)
+	img, idx, err := ob.loadImage(fileNameOrBytes, back)
 	if err, isT := err.(pdfError); isT {
 		return ob.putError(0xE8F375, err.msg, err.val)
 	}
@@ -581,8 +584,8 @@ func (ob *PDF) DrawImage(x, y, height float64, fileNameOrBytes interface{},
 		ob.page.imageIDs = append(ob.page.imageIDs, idx)
 	}
 	// draw the image
-	var h = height * ob.ptPerUnit
-	var w = float64(img.widthPx) / float64(img.heightPx) * h
+	h := height * ob.ptPerUnit
+	w := float64(img.widthPx) / float64(img.heightPx) * h
 	x, y = x*ob.ptPerUnit, ob.paperSize.heightPt-y*ob.ptPerUnit-h
 	return ob.write("q\n", w, " 0 0 ", h, " ", x, " ", y, " cm\n"+
 		"/IMG", idx, " Do\n"+"Q\n")
@@ -606,7 +609,7 @@ func (ob *PDF) DrawText(s string) *PDF {
 	if len(ob.columnWidths) == 0 {
 		return ob.drawTextLine(s)
 	}
-	var x = 0.0
+	x := 0.0
 	for i := 0; i < ob.columnNo; i, x = i+1, x+ob.columnWidths[i] {
 	}
 	ob.SetX(x).drawTextLine(s)
@@ -646,7 +649,7 @@ func (ob *PDF) DrawTextInBox(
 // current measurement unit. The grid fills the entire page.
 // It helps with item positioning.
 func (ob *PDF) DrawUnitGrid() *PDF {
-	var pw, ph = ob.PageWidth(), ob.PageHeight()
+	pw, ph := ob.PageWidth(), ob.PageHeight()
 	ob.SetLineWidth(0.1).SetFont("Helvetica", 8)
 	for i, x := 0, 0.0; x < pw; i, x = i+1, x+1 { //            vertical lines |
 		ob.SetColorRGB(200, 200, 200).DrawLine(x, 0, x, ph).
@@ -680,7 +683,7 @@ func (ob *PDF) FillEllipse(x, y, xRadius, yRadius float64) *PDF {
 // I.e. the Y increases by the height of the font and
 // the X-coordinate is reset to zero.
 func (ob *PDF) NextLine() *PDF {
-	var x, y = 0.0, ob.Y() + ob.FontSize()*ob.ptPerUnit
+	x, y := 0.0, ob.Y()+ob.FontSize()*ob.ptPerUnit
 	if len(ob.columnWidths) > 0 {
 		x = ob.columnWidths[0]
 	}
@@ -701,7 +704,7 @@ func (ob *PDF) Reset() *PDF {
 
 // SaveFile generates and saves the PDF document to a file.
 func (ob *PDF) SaveFile(filename string) error {
-	var err = ioutil.WriteFile(filename, ob.Bytes(), 0644)
+	err := ioutil.WriteFile(filename, ob.Bytes(), 0644)
 	if err != nil {
 		ob.putError(0xED3F6D, "Failed writing file", err.Error())
 	}
@@ -730,7 +733,7 @@ func (ob *PDF) TextWidth(s string) float64 {
 func (ob *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error) {
 	//
 	// if name starts with '#' treat it as HTML color code (#RRGGBB)
-	var s = ob.toUpperLettersDigits(nameOrHTMLColor, "#")
+	s := ob.toUpperLettersDigits(nameOrHTMLColor, "#")
 	if len(s) >= 7 && s[0] == '#' {
 		var hex [6]byte
 		for i, r := range s[1:7] {
@@ -774,7 +777,7 @@ func (ob *PDF) ToPoints(numberAndUnit string) (float64, error) {
 			unit += string(r)
 		}
 	}
-	var ppu = 1.0
+	ppu := 1.0
 	if unit != "" {
 		var err error
 		ppu, err = ob.getPointsPerUnit(unit)
@@ -782,7 +785,7 @@ func (ob *PDF) ToPoints(numberAndUnit string) (float64, error) {
 			return 0, err
 		}
 	}
-	var n, err = strconv.ParseFloat(num, 64)
+	n, err := strconv.ParseFloat(num, 64)
 	if err != nil {
 		return 0, pdfError{id: 0xE154AC, msg: "Invalid number", val: num}
 	}
@@ -803,9 +806,9 @@ func (ob *PDF) ToUnits(points float64) float64 {
 // You can find out the number of lines needed to wrap some
 // text by checking the length of the returned array.
 func (ob *PDF) WrapTextLines(width float64, text string) (ret []string) {
-	var fit = func(s string, step, n int, width float64) int {
+	fit := func(s string, step, n int, width float64) int {
 		for max := len(s); n > 0 && n <= max; {
-			var w = ob.TextWidth(s[:n])
+			w := ob.TextWidth(s[:n])
 			switch step {
 			case 1, 3: //       keep halving (or - 1) until n chars fit in width
 				if w <= width {
@@ -827,12 +830,12 @@ func (ob *PDF) WrapTextLines(width float64, text string) (ret []string) {
 	// split text into lines. then break lines based on text width
 	for _, iter := range ob.splitLines(text) {
 		for ob.TextWidth(iter) > width {
-			var n = len(iter) // reduce, increase, then reduce n to get best fit
+			n := len(iter) //    reduce, increase, then reduce n to get best fit
 			for i := 1; i <= 3; i++ {
 				n = fit(iter, i, n, width)
 			}
 			// move to the last word (if white-space is found)
-			var found, max = false, n
+			found, max := false, n
 			for n > 0 {
 				if ob.isWhiteSpace(iter[n-1 : n]) {
 					found = true
@@ -879,7 +882,7 @@ func (ob *PDF) PullError() error {
 	if len(ob.errors) == 0 {
 		return nil
 	}
-	var ret = ob.errors[0]
+	ret := ob.errors[0]
 	ob.errors = ob.errors[1:]
 	return ret
 } //                                                                   PullError
@@ -895,7 +898,7 @@ type pdfError struct {
 
 // Error creates and returns an error message from pdfError details
 func (err pdfError) Error() string {
-	var ret = fmt.Sprintf("%s %q", err.msg, err.val)
+	ret := fmt.Sprintf("%s %q", err.msg, err.val)
 	if err.src != "" {
 		ret += " @" + err.src
 	}
@@ -956,9 +959,11 @@ type pdfPaperSize struct {
 // - Fills the document-wide list of fonts (ob.fonts).
 // - Adds items to the list of font ID's used on the current page.
 func (ob *PDF) applyFont() (handler pdfFontHandler, err error) {
-	var font pdfFont
-	var name = ob.toUpperLettersDigits(ob.fontName, "")
-	var valid = name != ""
+	var (
+		font  pdfFont
+		name  = ob.toUpperLettersDigits(ob.fontName, "")
+		valid = name != ""
+	)
 	if valid {
 		valid = false
 		for i, iter := range pdfFontNames {
@@ -966,7 +971,7 @@ func (ob *PDF) applyFont() (handler pdfFontHandler, err error) {
 			if iter != name {
 				continue
 			}
-			var has = str.Contains
+			has := str.Contains
 			font = pdfFont{
 				name:         pdfFontNames[i],
 				builtInIndex: i,
@@ -1031,7 +1036,7 @@ func (ob *PDF) drawTextLine(s string) *PDF {
 		return ob
 	}
 	// draw the text
-	var handler, err = ob.applyFont()
+	handler, err := ob.applyFont()
 	if err, isT := err.(pdfError); isT {
 		ob.putError(0xEAEAC4, err.msg, err.val)
 	}
@@ -1061,7 +1066,7 @@ func (ob *PDF) drawTextBox(x, y, width, height float64,
 		return ob
 	}
 	ob.reservePage()
-	var handler, err = ob.applyFont()
+	handler, err := ob.applyFont()
 	if err, isT := err.(pdfError); isT {
 		ob.putError(0xE0737C, err.msg, err.val)
 	}
@@ -1073,8 +1078,8 @@ func (ob *PDF) drawTextBox(x, y, width, height float64,
 		lines = []string{text}
 	}
 	align = str.ToUpper(align)
-	var lineHeight = ob.FontSize()
-	var allLinesHeight = lineHeight * float64(len(lines))
+	lineHeight := ob.FontSize()
+	allLinesHeight := lineHeight * float64(len(lines))
 	//
 	// calculate aligned y-axis position of text (top, bottom, center)
 	y, height = y*ob.ptPerUnit+ob.fontSizePt, height*ob.ptPerUnit
@@ -1088,7 +1093,7 @@ func (ob *PDF) drawTextBox(x, y, width, height float64,
 	// calculate x-axis position of text (left, right, center)
 	x, width = x*ob.ptPerUnit, width*ob.ptPerUnit
 	for _, line := range lines {
-		var off = 0.0 //                                x-offset to align in box
+		off := 0.0 //                                  x-offset to align in box
 		if str.Contains(align, "L") {
 			off = ob.fontSizePt / 6 //                              left margin
 		} else if str.Contains(align, "R") {
@@ -1131,7 +1136,7 @@ func (ob *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 			}
 		}
 		img.filename = val
-		var data, err = ioutil.ReadFile(val)
+		data, err := ioutil.ReadFile(val)
 		if err != nil {
 			return pdfImage{}, -1, pdfError{id: 0xE9F387,
 				msg: "Failed reading file", val: err.Error()}
@@ -1152,7 +1157,7 @@ func (ob *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 			return iter, i, nil
 		}
 	}
-	var decoded, _, err2 = image.Decode(buf)
+	decoded, _, err2 := image.Decode(buf)
 	if err2 != nil {
 		return pdfImage{}, -1,
 			pdfError{id: 0xE64335, msg: "Image not decoded", val: err2.Error()}
@@ -1168,16 +1173,16 @@ func makeImage(source image.Image, back color.RGBA,
 ) (widthPx, heightPx int, isGray bool, ar []byte) {
 	//
 	// blends color into the background (back), using opacity (alpha) value
-	var blend = func(color, alpha uint32, back byte) byte {
-		var c, a = float64(color), 65535 - float64(alpha) // range 0-65535
+	blend := func(color, alpha uint32, back byte) byte {
+		c, a := float64(color), 65535-float64(alpha) // range 0-65535
 		return byte((c + (float64(back)*255-c)/65536*a) / 65536 * 255)
 	}
 	widthPx, heightPx = source.Bounds().Max.X, source.Bounds().Max.Y
-	var model = source.ColorModel()
+	model := source.ColorModel()
 	isGray = model == color.GrayModel || model == color.Gray16Model
 	for y := 0; y < heightPx; y++ {
 		for x := 0; x < widthPx; x++ {
-			var r, g, b, a = source.At(x, y).RGBA() //      value range: 0-65535
+			r, g, b, a := source.At(x, y).RGBA() //         value range: 0-65535
 			switch {
 			case isGray:
 				ar = append(ar, byte(float64(r)))
@@ -1212,14 +1217,14 @@ func (ob *PDF) textWidthPt(s string) float64 {
 	if ob.font != nil && ob.font.handler != nil {
 		return ob.font.handler.textWidthPt(s)
 	}
-	var w = 0.0
+	w := 0.0
 	for i, r := range s {
 		if r < 0 || r > 255 {
 			ob.putError(0xE31046, "Rune out of range",
 				fmt.Sprintf("at %d = '%s'", i, string(r)))
 			break
 		}
-		var id = ob.fonts[ob.page.fontID-1].builtInIndex
+		id := ob.fonts[ob.page.fontID-1].builtInIndex
 		if id >= 0 && id <= 9 {
 			w += float64(pdfFontWidths[r][id])
 		} else {
@@ -1293,7 +1298,7 @@ func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
 		int(ob.paperSize.widthPt), " ", int(ob.paperSize.heightPt), "]")
 	//                                                        write page numbers
 	if len(ob.pages) > 0 {
-		var pageIndex = pagesIndex
+		pageIndex := pagesIndex
 		ob.write("/Kids[")
 		for i := range ob.pages {
 			if i > 0 {
@@ -1344,9 +1349,11 @@ func (ob *PDF) writePages(pagesIndex, fontsIndex, imagesIndex int) *PDF {
 func (ob *PDF) writeStreamData(ar []byte) *PDF {
 	var filter string
 	if ob.compression {
-		var buf bytes.Buffer
-		var wr = zlib.NewWriter(&buf)
-		var _, err = wr.Write(ar)
+		var (
+			buf    bytes.Buffer
+			wr     = zlib.NewWriter(&buf)
+			_, err = wr.Write(ar)
+		)
 		if err != nil {
 			return ob.putError(0xE782A2, "Failed compressing", err.Error())
 		}
@@ -1370,11 +1377,11 @@ func (ob *PDF) writeStreamObj(ar []byte) *PDF {
 // escape escapes special characters '(', '(' and '\' in strings
 // in order to avoid them interfering with PDF commands
 func (*PDF) escape(s string) string {
-	var has = str.Contains
+	has := str.Contains
 	if !has(s, "(") && !has(s, ")") && !has(s, "\\") {
 		return s
 	}
-	var buf = bytes.NewBuffer(make([]byte, 0, len(s)))
+	buf := bytes.NewBuffer(make([]byte, 0, len(s)))
 	for _, r := range s {
 		if r == '(' || r == ')' || r == '\\' {
 			buf.WriteRune('\\')
@@ -1396,7 +1403,7 @@ func (*PDF) isWhiteSpace(s string) bool {
 
 // splitLines splits 's' into several lines using line breaks in 's'
 func (*PDF) splitLines(s string) []string {
-	var split = func(ar []string, sep string) (ret []string) {
+	split := func(ar []string, sep string) (ret []string) {
 		for _, iter := range ar {
 			if str.Contains(iter, sep) {
 				ret = append(ret, str.Split(iter, sep)...)
@@ -1411,7 +1418,7 @@ func (*PDF) splitLines(s string) []string {
 
 // toUpperLettersDigits returns letters and digits from s, in upper case
 func (*PDF) toUpperLettersDigits(s, extras string) string {
-	var buf = bytes.NewBuffer(make([]byte, 0, len(s)))
+	buf := bytes.NewBuffer(make([]byte, 0, len(s)))
 	for _, r := range str.ToUpper(s) {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) ||
 			str.ContainsRune(extras, r) {
@@ -1425,10 +1432,10 @@ func (*PDF) toUpperLettersDigits(s, extras string) string {
 // Specify custom paper sizes using "width x height", e.g. "9cm x 20cm"
 // If the paper size is not found, returns a zero-initialized structure
 func (ob *PDF) getPaperSize(name string) (pdfPaperSize, error) {
-	var s = str.ToUpper(name)
+	s := str.ToUpper(name)
 	if str.Contains(s, " X ") {
-		var wh = str.Split(s, " X ")
-		var w, err = ob.ToPoints(wh[0])
+		wh := str.Split(s, " X ")
+		w, err := ob.ToPoints(wh[0])
 		if err, isT := err.(pdfError); isT {
 			return pdfPaperSize{}, err
 		}
@@ -1440,18 +1447,18 @@ func (ob *PDF) getPaperSize(name string) (pdfPaperSize, error) {
 		return pdfPaperSize{s, w, h}, nil
 	}
 	s = ob.toUpperLettersDigits(s, "-")
-	var landscape = str.HasSuffix(s, "-L")
+	landscape := str.HasSuffix(s, "-L")
 	s = ob.toUpperLettersDigits(s, "")
 	if landscape {
 		s = s[:len(s)-1] // "-" is already removed above. now remove the "L"
 	}
-	var wh, found = pdfStandardPaperSizes[s]
+	wh, found := pdfStandardPaperSizes[s]
 	if !found {
 		return pdfPaperSize{},
 			pdfError{id: 0xEE42FB, msg: "Unknown paper size", val: name}
 	}
 	// convert mm to points: div by 25.4mm/inch; mul by 72 points/inch
-	var w, h = float64(wh[0]) / 25.4 * 72, float64(wh[1]) / 25.4 * 72
+	w, h := float64(wh[0])/25.4*72, float64(wh[1])/25.4*72
 	if landscape {
 		return pdfPaperSize{s + "-L", h, w}, nil
 	}
@@ -1482,7 +1489,7 @@ func (ob *PDF) getPointsPerUnit(units string) (ret float64, err error) {
 func (ob *PDF) putError(id int, msg, val string) *PDF {
 	var fn string //                                  get the public method name
 	for i := 0; i < 10; i++ {
-		var programCounter, _, _, _ = runtime.Caller(i)
+		programCounter, _, _, _ := runtime.Caller(i)
 		fn = runtime.FuncForPC(programCounter).Name()
 		fn = fn[str.LastIndex(fn, ".")+1:]
 		if unicode.IsLower(rune(fn[0])) {
@@ -1498,7 +1505,7 @@ func (ob *PDF) putError(id int, msg, val string) *PDF {
 // writer 'wr'. Returns total bytes written and the first error if any.
 func (*PDF) writeTo(wr io.Writer, args ...interface{}) (count int, err error) {
 	for _, any := range args {
-		var n, err = 0, error(nil)
+		n, err := 0, error(nil)
 		switch val := any.(type) {
 		case string:
 			n, err = io.WriteString(wr, val)

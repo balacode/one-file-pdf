@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-28 13:59:12 23A268                 one-file-pdf/[private_test.go]
+// :v: 2019-04-03 10:03:38 4C16DC                 one-file-pdf/[private_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -27,10 +27,10 @@ import (
 func Test_getPapreSize_(t *testing.T) {
 	//
 	// subtest: tests a specific paper size against width and height in points
-	var subtest = func(paperSize, permuted string, w, h float64, err error) {
+	subtest := func(paperSize, permuted string, w, h float64, err error) {
 		var doc PDF
 		doc.SetUnits("mm")
-		var got, gotErr = doc.getPaperSize(permuted)
+		got, gotErr := doc.getPaperSize(permuted)
 		if gotErr != err {
 			t.Errorf("'error' mismatch: expected: %v returned %v", err, gotErr)
 			t.Fail()
@@ -49,11 +49,11 @@ func Test_getPapreSize_(t *testing.T) {
 	// w and h are the paper width and height in mm
 	// - permutes the paper size by including spaces
 	// - converts units from mm to points
-	var test = func(paperSize string, w, h float64, err error) {
+	test := func(paperSize string, w, h float64, err error) {
 		const PTperMM = 2.83464566929134
-		var spaces = []string{"", " ", "  ", "   ", "\r", "\n", "\t"}
+		spaces := []string{"", " ", "  ", "   ", "\r", "\n", "\t"}
 		for _, orient := range []string{"", "-l", "-L"} {
-			var permuted = util.PermuteStrings(
+			permuted := util.PermuteStrings(
 				spaces,
 				[]string{
 					str.ToLower(paperSize),
@@ -64,7 +64,7 @@ func Test_getPapreSize_(t *testing.T) {
 				spaces,
 			)
 			for _, s := range permuted {
-				var size = paperSize + str.ToUpper(orient)
+				size := paperSize + str.ToUpper(orient)
 				if orient == "-l" || orient == "-L" {
 					subtest(size, s, h*PTperMM, w*PTperMM, err)
 				} else {
@@ -123,15 +123,15 @@ func floatStr(val float64) string {
 
 // mismatch formats and raises a test error
 func mismatch(t *testing.T, tag string, expected, got interface{}) {
-	var expStr = fmt.Sprintf("%v", expected)
-	var gotStr = fmt.Sprintf("%v", got)
+	expStr := fmt.Sprintf("%v", expected)
+	gotStr := fmt.Sprintf("%v", got)
 	t.Errorf("%s mismatch: expected: %s got: %s\n"+"%s",
 		tag, expStr, gotStr, getStack())
 } //                                                                    mismatch
 
 // getStack returns a list of line numbers and function names on the call stack
 func getStack() string {
-	var buf = make([]byte, 8192)
+	buf := make([]byte, 8192)
 	runtime.Stack(buf, true)
 	var ar []string
 	for _, s := range str.Split(string(buf), "\n") {

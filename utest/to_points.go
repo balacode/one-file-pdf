@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-04 23:53:15 EA1519              one-file-pdf/utest/[to_points.go]
+// :v: 2019-04-03 10:03:38 E80744              one-file-pdf/utest/[to_points.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -16,12 +16,10 @@ import (
 func Test_PDF_ToPoints_(t *testing.T) {
 	fmt.Println("Test PDF.ToPoints()")
 	//
-	var test = func(
-		expectVal float64, expectErr error, inputParts ...[]string,
-	) {
+	test := func(expectVal float64, expectErr error, inputParts ...[]string) {
 		for _, s := range PermuteStrings(inputParts...) {
 			var doc pdf.PDF // uninitialized PDF
-			var gotVal, gotErr = doc.ToPoints(s)
+			gotVal, gotErr := doc.ToPoints(s)
 			TEqual(t,
 				fmt.Sprintf("%0.03f", gotVal),
 				fmt.Sprintf("%0.03f", expectVal),
@@ -56,7 +54,7 @@ func Test_PDF_ToPoints_(t *testing.T) {
 	test(123, nil, spc, []string{"123"}, spc)
 	//
 	// test single units
-	var one = []string{"1"}
+	one := []string{"1"}
 	test(72, nil, spc, one, spc, inches, spc)   // 1 inch = 72 points
 	test(2.835, nil, spc, one, spc, mm, spc)    // 1 mm = 2.835 points
 	test(28.346, nil, spc, one, spc, cm, spc)   // 1 cm = 28.346 points
@@ -64,7 +62,7 @@ func Test_PDF_ToPoints_(t *testing.T) {
 	test(1, nil, spc, one, spc, points, spc)    // 1 point = 1 point :)
 	//
 	// test negative number with decimals
-	var negative = []string{"-12.345"}
+	negative := []string{"-12.345"}
 	test(-888.840, nil, spc, negative, spc, inches, spc)
 	test(-34.994, nil, spc, negative, spc, mm, spc)
 	test(-349.937, nil, spc, negative, spc, cm, spc)

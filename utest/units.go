@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-01 19:33:24 2E90E9                  one-file-pdf/utest/[units.go]
+// :v: 2019-04-03 10:03:38 65D195                  one-file-pdf/utest/[units.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -24,7 +24,7 @@ func Test_PDF_Units_(t *testing.T) {
 	}()
 
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		TEqual(t, doc.Units(), "POINT")
 	}()
 
@@ -33,7 +33,7 @@ func Test_PDF_Units_(t *testing.T) {
 	fmt.Println("Test PDF.SetUnits()")
 
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		TEqual(t, len(doc.Errors()), 0)
 		doc.SetUnits("cm")
 		TEqual(t, len(doc.Errors()), 0)
@@ -41,7 +41,7 @@ func Test_PDF_Units_(t *testing.T) {
 	}()
 
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		TEqual(t, len(doc.Errors()), 0)
 		doc.SetUnits("fathoms")
 		TEqual(t, len(doc.Errors()), 1)

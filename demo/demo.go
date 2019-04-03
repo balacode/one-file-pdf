@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-29 07:41:55 43B250                    one-file-pdf/demo/[demo.go]
+// :v: 2019-04-03 10:03:38 FD3A7E                    one-file-pdf/demo/[demo.go]
 // -----------------------------------------------------------------------------
 
 package main
@@ -26,7 +26,7 @@ func helloWorld() {
 	fmt.Println(`Generating a "Hello World" PDF...`)
 	//
 	// create a new PDF using 'A4' page size
-	var doc = pdf.NewPDF("A4")
+	doc := pdf.NewPDF("A4")
 	//
 	// you can call AddPage() to add the first page, but it is
 	// not required: the first page is added automatically
@@ -69,7 +69,7 @@ func helloWorld() {
 func corporateIpsum() {
 	const FILENAME = "corporate.pdf"
 	fmt.Println("Generating sample PDF:", FILENAME, "...")
-	var doc = pdf.NewPDF("A4") // create a new PDF using 'A4' page size
+	doc := pdf.NewPDF("A4") // create a new PDF using 'A4' page size
 	doc.SetUnits("cm")
 	//
 	// draw the heading
@@ -83,7 +83,7 @@ func corporateIpsum() {
 	doc.SetColor("#74C365 Mantis").FillCircle(21, 21, 10) // x, y, radius
 	//
 	// draw the left column of text (in a box)
-	var col1 = str.Replace(CorporateFiller1, "\n", " ", -1)
+	col1 := str.Replace(CorporateFiller1, "\n", " ", -1)
 	doc.SetColor("#73C2FB MayaBlue").
 		FillBox(0, 4, 10, 15). // xywh
 		SetColor("black").
@@ -91,7 +91,7 @@ func corporateIpsum() {
 		DrawTextInBox(0.5, 4.5, 9, 15, "LT", col1)
 	//
 	// draw the right column of text
-	var col2 = str.Replace(CorporateFiller2, "\n", " ", -1)
+	col2 := str.Replace(CorporateFiller2, "\n", " ", -1)
 	doc.SetColor("black").
 		SetFont("Times-Italic", 11).
 		DrawTextInBox(10.5, 4, 9, 28, "LT", col2)
@@ -110,7 +110,7 @@ func corporateIpsum() {
 func pngImages() {
 	const FILENAME = "png_images.pdf"
 	fmt.Println("Generating sample PDF:", FILENAME, "...")
-	var doc = pdf.NewPDF("A4")
+	doc := pdf.NewPDF("A4")
 	doc.SetUnits("cm")
 	//
 	// draw background pattern
@@ -142,11 +142,11 @@ func dingbats() {
 	fmt.Println("Generating", filename, "...")
 	//
 	// create a new PDF using 'A4' page size
-	var doc = pdf.NewPDF("A4")
+	doc := pdf.NewPDF("A4")
 	doc.SetUnits("cm")
 	//
 	const boxSize = 1.2 // cm
-	var x, y = 1.0, 1.0 // cm
+	x, y := 1.0, 1.0    // cm
 	//
 	doc.SetFont("Helvetica-Bold", 100)
 	doc.SetLineWidth(0.02)
@@ -173,8 +173,8 @@ func dingbats() {
 			//
 			// this is the right way to use a dingbat code (0-255):
 			// (casting int to rune to string won't work expected)
-			var code = row*16 + col
-			var s = string([]byte{byte(code)})
+			code := row*16 + col
+			s := string([]byte{byte(code)})
 			//
 			// draw the dingbat icon
 			doc.SetColor("black")

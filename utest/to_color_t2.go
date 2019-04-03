@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) markaum@gmail.com                                            License: MIT
-// :v: 2018-04-29 23:42:24 4153B6            one-file-pdf/utest/[to_color_t2.go]
+// :v: 2019-04-03 10:03:38 A5778D            one-file-pdf/utest/[to_color_t2.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -70,7 +70,7 @@ func Test_PDF_ToColor_2_(t *testing.T) {
 		var doc pdf.PDF
 		t.Run(test.description, func(t *testing.T) {
 			color, err := doc.ToColor(test.input)
-			var inf = doc.ErrorInfo(err)
+			inf := doc.ErrorInfo(err)
 			if inf.Msg != test.errMsg {
 				t.Fatalf("expected error message %q got %q",
 					test.errMsg, inf.Msg)

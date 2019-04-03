@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-06 20:18:41 CCB81A             one-file-pdf/utest/[page_count.go]
+// :v: 2019-04-03 10:03:38 C9F56A             one-file-pdf/utest/[page_count.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -28,18 +28,18 @@ func Test_PDF_PageCount_(t *testing.T) {
 	}()
 	//                                                   initialized PDF: 1 page
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		TEqual(t, doc.PageCount(), 1)
 	}()
 	//                    initialized PDF with initial call to AddPage(): 1 page
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		doc.AddPage()
 		TEqual(t, doc.PageCount(), 1)
 	}()
 	//                              initialized PDF with a single method: 1 page
 	func() {
-		var doc = pdf.NewPDF("LETTER")
+		doc := pdf.NewPDF("LETTER")
 		doc.SetXY(1, 1)
 		TEqual(t, doc.PageCount(), 1)
 	}()
@@ -51,7 +51,7 @@ func Test_PDF_PageCount_(t *testing.T) {
 		TEqual(t, doc.PageCount(), 2)
 	}()
 	func() {
-		var doc = pdf.NewPDF("LETTER") //                        initialized PDF
+		doc := pdf.NewPDF("LETTER") //                           initialized PDF
 		doc.SetXY(1, 1)
 		doc.AddPage()
 		TEqual(t, doc.PageCount(), 2)
@@ -65,7 +65,7 @@ func Test_PDF_PageCount_(t *testing.T) {
 		TEqual(t, doc.PageCount(), 10)
 	}()
 	func() {
-		var doc = pdf.NewPDF("LETTER") //                        initialized PDF
+		doc := pdf.NewPDF("LETTER") //                           initialized PDF
 		for i := 0; i < 10; i++ {
 			doc.AddPage()
 		}

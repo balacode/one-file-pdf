@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-13 01:54:23 02C800             one-file-pdf/utest/[line_width.go]
+// :v: 2019-04-03 10:03:38 842983             one-file-pdf/utest/[line_width.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -24,7 +24,7 @@ func Test_PDF_LineWidth_(t *testing.T) {
 		TEqual(t, doc.LineWidth(), 1)
 	}()
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		TEqual(t, doc.LineWidth(), 1)
 	}()
 	//
@@ -35,7 +35,7 @@ func Test_PDF_LineWidth_(t *testing.T) {
 		TEqual(t, doc.LineWidth(), 42)
 	}()
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		doc.SetLineWidth(7)
 		TEqual(t, doc.LineWidth(), 7)
 	}()
@@ -44,7 +44,7 @@ func Test_PDF_LineWidth_(t *testing.T) {
 	// Test PDF generation
 
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		doc.SetCompression(false).
 			SetUnits("cm").
 			//DrawUnitGrid().
@@ -52,7 +52,7 @@ func Test_PDF_LineWidth_(t *testing.T) {
 			SetFont("Helvetica", 16).
 			DrawText("Test PDF.LineWidth()").
 			SetFont("Helvetica", 9)
-		var y = 2.0
+		y := 2.0
 		for _, w := range []float64{0.1, 0.2, 0.5, 1, 5, 10, 15, 20, 25} {
 			doc.SetColor("Dark Gray").
 				SetXY(1.0, y+0.3).DrawText(" y = "+strconv.Itoa(int(y))).

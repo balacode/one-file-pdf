@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-13 01:54:23 F59B4F                      one-file-pdf/utest/[x.go]
+// :v: 2019-04-03 10:03:38 F7C903                      one-file-pdf/utest/[x.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -22,7 +22,7 @@ func Test_PDF_X_(t *testing.T) {
 		TEqual(t, doc.X(), -1)
 	}()
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		TEqual(t, doc.X(), -1)
 	}()
 	// SetX() sets the property?
@@ -32,14 +32,14 @@ func Test_PDF_X_(t *testing.T) {
 		TEqual(t, doc.X(), 123)
 	}()
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		doc.SetX(456)
 		TEqual(t, doc.X(), 456)
 	}()
 	// -------------------------------------------------------------------------
 	// Test PDF generation
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		doc.SetCompression(false).
 			SetUnits("cm").
 			SetXY(10, 1).

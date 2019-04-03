@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-13 01:54:23 36FD8E            one-file-pdf/utest/[doc_subject.go]
+// :v: 2019-04-03 10:03:38 0DEB6A            one-file-pdf/utest/[doc_subject.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -26,7 +26,7 @@ func Test_PDF_DocSubject_(t *testing.T) {
 	}()
 
 	func() {
-		var doc = pdf.NewPDF("A4") // initialized PDF
+		doc := pdf.NewPDF("A4") // initialized PDF
 		TEqual(t, doc.DocSubject(), "")
 	}()
 
@@ -41,14 +41,14 @@ func Test_PDF_DocSubject_(t *testing.T) {
 	}()
 
 	func() {
-		var doc = pdf.NewPDF("A4") // initialized PDF
+		doc := pdf.NewPDF("A4") // initialized PDF
 		TEqual(t, doc.SetDocSubject("Abcdefg").DocSubject(), "Abcdefg")
 	}()
 
 	// -------------------------------------------------------------------------
 	// Test PDF generation
 	func() {
-		var doc = pdf.NewPDF("A4") // initialized PDF
+		doc := pdf.NewPDF("A4") // initialized PDF
 		doc.SetCompression(false).SetDocSubject("'Subject' metadata entry")
 
 		const expect = `

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-13 01:54:23 0A0CC1             one-file-pdf/utest/[doc_author.go]
+// :v: 2019-04-03 10:03:38 05C299             one-file-pdf/utest/[doc_author.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -26,7 +26,7 @@ func Test_PDF_DocAuthor_(t *testing.T) {
 	}()
 
 	func() {
-		var doc = pdf.NewPDF("A4") // initialized PDF
+		doc := pdf.NewPDF("A4") // initialized PDF
 		TEqual(t, doc.DocAuthor(), "")
 	}()
 
@@ -41,7 +41,7 @@ func Test_PDF_DocAuthor_(t *testing.T) {
 	}()
 
 	func() {
-		var doc = pdf.NewPDF("A4") // initialized PDF
+		doc := pdf.NewPDF("A4") // initialized PDF
 		TEqual(t, doc.SetDocAuthor("Abcdefg").DocAuthor(), "Abcdefg")
 	}()
 
@@ -49,7 +49,7 @@ func Test_PDF_DocAuthor_(t *testing.T) {
 	// Test PDF generation
 	//
 	func() {
-		var doc = pdf.NewPDF("A4") // initialized PDF
+		doc := pdf.NewPDF("A4") // initialized PDF
 		doc.SetCompression(false).SetDocAuthor("'Author' metadata entry")
 
 		const expect = `

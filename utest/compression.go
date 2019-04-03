@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-13 01:54:23 B51C7F            one-file-pdf/utest/[compression.go]
+// :v: 2019-04-03 10:03:38 8B8DC8            one-file-pdf/utest/[compression.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -16,7 +16,7 @@ import (
 func Test_PDF_Compression_(t *testing.T) {
 	fmt.Println("Test PDF.Compression()")
 
-	var draw = func(doc *pdf.PDF) {
+	draw := func(doc *pdf.PDF) {
 		doc.SetUnits("cm").
 			SetXY(1, 1).
 			SetFont("Helvetica", 10).
@@ -30,7 +30,7 @@ func Test_PDF_Compression_(t *testing.T) {
 	}()
 
 	func() {
-		var doc = pdf.NewPDF("A4") // initialized PDF
+		doc := pdf.NewPDF("A4") // initialized PDF
 		TEqual(t, doc.Compression(), true)
 		FailIfHasErrors(t, doc.Errors)
 	}()
@@ -75,7 +75,7 @@ func Test_PDF_Compression_(t *testing.T) {
 		%%EOF
 		`
 
-		var doc = pdf.NewPDF("A4") // initialized PDF
+		doc := pdf.NewPDF("A4") // initialized PDF
 		doc.SetCompression(true)
 		draw(&doc)
 		FailIfHasErrors(t, doc.Errors)
@@ -84,7 +84,7 @@ func Test_PDF_Compression_(t *testing.T) {
 
 	// generate a simple PDF with compression turned off
 	func() {
-		var expect = `
+		expect := `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
 		endobj
@@ -119,7 +119,7 @@ func Test_PDF_Compression_(t *testing.T) {
 		%%EOF
 		`
 
-		var doc = pdf.NewPDF("A4") // initialized PDF
+		doc := pdf.NewPDF("A4") // initialized PDF
 		doc.SetCompression(false)
 		draw(&doc)
 		FailIfHasErrors(t, doc.Errors)

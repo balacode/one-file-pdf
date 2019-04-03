@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-13 01:54:23 9D8232             one-file-pdf/utest/[draw_image.go]
+// :v: 2019-04-03 10:03:38 ABD6DB             one-file-pdf/utest/[draw_image.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -106,7 +106,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 
 	// generate image from an array of PNG bytes
 	func() {
-		var doc = pdf.NewPDF("20cm x 20cm")
+		doc := pdf.NewPDF("20cm x 20cm")
 		doc.SetCompression(true).
 			SetUnits("cm").
 			DrawImage(x, y, height, pngData)
@@ -116,7 +116,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 
 	// the same test, but reading direcly from PNG file
 	func() {
-		var doc = pdf.NewPDF("20cm x 20cm")
+		doc := pdf.NewPDF("20cm x 20cm")
 		doc.SetCompression(true).
 			SetUnits("cm").
 			DrawImage(x, y, height, "./image/rgbw64.png")
@@ -126,9 +126,9 @@ func Test_PDF_DrawImage_(t *testing.T) {
 
 	// PNG transparency test
 	func() {
-		var x = 5.0
-		var y = 5.0
-		var height = 5.0
+		x := 5.0
+		y := 5.0
+		height := 5.0
 
 		const expectTransparent = `
 		%PDF-1.4
@@ -284,7 +284,7 @@ func Test_PDF_DrawImage_(t *testing.T) {
 		%%EOF
 		`
 
-		var doc = pdf.NewPDF("20cm x 20cm")
+		doc := pdf.NewPDF("20cm x 20cm")
 		doc.SetCompression(true).
 			SetUnits("cm").
 			DrawImage(x, y, height, "./image/rgbt64.png", "Yellow").
@@ -295,8 +295,8 @@ func Test_PDF_DrawImage_(t *testing.T) {
 
 	// wrong argument in fileNameOrBytes
 	func() {
-		var doc = pdf.NewPDF("20cm x 20cm")
-		var fileNameOrBytes = []int{0xBAD, 0xBAD, 0xBAD}
+		doc := pdf.NewPDF("20cm x 20cm")
+		fileNameOrBytes := []int{0xBAD, 0xBAD, 0xBAD}
 
 		const expect = `
 		%PDF-1.4
@@ -408,10 +408,9 @@ func Test_PDF_DrawImage_(t *testing.T) {
 		`
 
 		// create two slightly-different images by appending a byte to each
-		var pngData1 = append(pngData, 1)
-		var pngData2 = append(pngData, 2)
-		//
-		var doc = pdf.NewPDF("20cm x 20cm")
+		pngData1 := append(pngData, 1)
+		pngData2 := append(pngData, 2)
+		doc := pdf.NewPDF("20cm x 20cm")
 		doc.SetCompression(false).
 			SetUnits("cm").
 			DrawImage(x, y, height, pngData1).

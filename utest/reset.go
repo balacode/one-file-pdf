@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-13 01:54:23 474523                  one-file-pdf/utest/[reset.go]
+// :v: 2019-04-03 10:03:38 C7D4CE                  one-file-pdf/utest/[reset.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -17,7 +17,7 @@ func Test_PDF_Reset_(t *testing.T) {
 	fmt.Println("Test PDF.Reset()")
 	//
 	// prepare a test PDF before calling Reset()
-	var doc = pdf.NewPDF("A4")
+	doc := pdf.NewPDF("A4")
 	{
 		doc.SetCompression(false).
 			SetUnits("cm").
@@ -65,7 +65,7 @@ func Test_PDF_Reset_(t *testing.T) {
 		528
 		%%EOF
 		`
-		var result = doc.Bytes()
+		result := doc.Bytes()
 		ComparePDF(t, result, expect)
 	}
 	{
@@ -96,7 +96,7 @@ func Test_PDF_Reset_(t *testing.T) {
 		238
 		%%EOF
 		`
-		var result = doc.SetCompression(false).Bytes()
+		result := doc.SetCompression(false).Bytes()
 		ComparePDF(t, result, expect)
 	}
 	// TODO: add more test cases, test each property's state

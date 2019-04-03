@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-04 23:53:15 AA2EDD   one-file-pdf/utest/util/[permute_strings.go]
+// :v: 2019-04-03 10:03:38 634948   one-file-pdf/utest/util/[permute_strings.go]
 // -----------------------------------------------------------------------------
 
 package util
@@ -12,13 +12,13 @@ import (
 // PermuteStrings returns all combinations of strings in 'parts'
 func PermuteStrings(parts ...[]string) (ret []string) {
 	{
-		var n = 1
+		n := 1
 		for _, ar := range parts {
 			n *= len(ar)
 		}
 		ret = make([]string, 0, n)
 	}
-	var at = make([]int, len(parts))
+	at := make([]int, len(parts))
 	var buf bytes.Buffer
 loop:
 	for {
@@ -35,7 +35,7 @@ loop:
 		// construct permutated string
 		buf.Reset()
 		for i, ar := range parts {
-			var j = at[i]
+			j := at[i]
 			if j >= 0 && j < len(ar) {
 				buf.WriteString(ar[j])
 			}

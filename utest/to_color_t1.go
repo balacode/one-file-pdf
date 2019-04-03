@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-04-29 23:42:24 E4B30C            one-file-pdf/utest/[to_color_t1.go]
+// :v: 2019-04-03 10:03:38 5C6F74            one-file-pdf/utest/[to_color_t1.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -20,7 +20,7 @@ func Test_PDF_ToColor_1_(t *testing.T) {
 
 	func() {
 		var doc pdf.PDF
-		var got, err = doc.ToColor("")
+		got, err := doc.ToColor("")
 		TEqual(t, got, color.RGBA{A: 255}) // black
 		// error is returned in `err`, but does not affect Errors()
 		TEqual(t, len(doc.Errors()), 0)
@@ -30,7 +30,7 @@ func Test_PDF_ToColor_1_(t *testing.T) {
 
 	func() {
 		var doc pdf.PDF
-		var got, err = doc.ToColor("#uvwxyz")
+		got, err := doc.ToColor("#uvwxyz")
 		TEqual(t, got, color.RGBA{A: 255}) // black
 		// error is returned in `err`, but does not affect Errors()
 		TEqual(t, len(doc.Errors()), 0)
@@ -40,7 +40,7 @@ func Test_PDF_ToColor_1_(t *testing.T) {
 
 	func() {
 		// map copied from PDFColorNames, but color names in lower case
-		var m = map[string]color.RGBA{
+		m := map[string]color.RGBA{
 			"aliceblue":            {R: 240, G: 248, B: 255}, // #F0F8FF
 			"antiquewhite":         {R: 250, G: 235, B: 215}, // #FAEBD7
 			"aqua":                 {R: 000, G: 255, B: 255}, // #00FFFF
@@ -190,7 +190,7 @@ func Test_PDF_ToColor_1_(t *testing.T) {
 		var doc pdf.PDF
 		for key, val := range m {
 			val.A = 255 // make opaque, not transparent
-			var color, err = doc.ToColor(key)
+			color, err := doc.ToColor(key)
 			TEqual(t, color, val)
 			TEqual(t, err, nil)
 		}

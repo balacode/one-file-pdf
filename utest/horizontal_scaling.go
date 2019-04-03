@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-13 01:54:23 2370ED     one-file-pdf/utest/[horizontal_scaling.go]
+// :v: 2019-04-03 10:03:38 842F69     one-file-pdf/utest/[horizontal_scaling.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -22,7 +22,7 @@ func Test_PDF_HorizontalScaling_(t *testing.T) {
 		TEqual(t, doc.HorizontalScaling(), 100)
 	}()
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		TEqual(t, doc.HorizontalScaling(), 100)
 	}()
 	//
@@ -33,7 +33,7 @@ func Test_PDF_HorizontalScaling_(t *testing.T) {
 		TEqual(t, doc.HorizontalScaling(), 149)
 	}()
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		doc.SetHorizontalScaling(149)
 		TEqual(t, doc.HorizontalScaling(), 149)
 	}()
@@ -42,7 +42,7 @@ func Test_PDF_HorizontalScaling_(t *testing.T) {
 	// Test PDF generation
 
 	func() {
-		var doc = pdf.NewPDF("A4-L")
+		doc := pdf.NewPDF("A4-L")
 		doc.SetCompression(false).
 			SetUnits("cm").
 			SetFont("Times-Bold", 20).
@@ -50,7 +50,7 @@ func Test_PDF_HorizontalScaling_(t *testing.T) {
 			DrawText("Horizontal Scaling Property")
 
 		for i, hscaling := range []int{50, 100, 150, 200, 250} {
-			var y = 2.5 + float64(i)*2.5
+			y := 2.5 + float64(i)*2.5
 			doc.SetXY(1, y).
 				SetFont("Helvetica", 10).
 				SetHorizontalScaling(100).

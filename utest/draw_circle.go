@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-05-13 01:54:23 2DF737            one-file-pdf/utest/[draw_circle.go]
+// :v: 2019-04-03 10:03:38 190B15            one-file-pdf/utest/[draw_circle.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -19,10 +19,8 @@ import (
 // circles and one small filled circle
 func Test_PDF_DrawCircle_(t *testing.T) {
 	fmt.Println("Test PDF.DrawCircle()")
-	var (
-		doc  = pdf.NewPDF("20cm x 20cm")
-		x, y = 10.0, 10.0 // center of page
-	)
+	doc := pdf.NewPDF("20cm x 20cm")
+	x, y := 10.0, 10.0 // center of page
 	doc.SetCompression(false).
 		SetUnits("cm").
 		SetLineWidth(5).

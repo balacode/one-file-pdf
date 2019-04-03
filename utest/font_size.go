@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-06-09 15:25:35 1BD4D4              one-file-pdf/utest/[font_size.go]
+// :v: 2019-04-03 10:03:38 02D294              one-file-pdf/utest/[font_size.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -26,7 +26,7 @@ func Test_PDF_FontSize_(t *testing.T) {
 	}()
 
 	func() {
-		var doc = pdf.NewPDF("A4") // initialized PDF
+		doc := pdf.NewPDF("A4") // initialized PDF
 		TEqual(t, doc.FontSize(), 10)
 	}()
 
@@ -41,7 +41,7 @@ func Test_PDF_FontSize_(t *testing.T) {
 	}()
 
 	func() {
-		var doc = pdf.NewPDF("A4") // initialized PDF
+		doc := pdf.NewPDF("A4") // initialized PDF
 		TEqual(t, doc.SetFontSize(20).FontSize(), 20)
 	}()
 
@@ -49,13 +49,13 @@ func Test_PDF_FontSize_(t *testing.T) {
 	// Test PDF generation
 
 	func() {
-		var doc = pdf.NewPDF("A4")
+		doc := pdf.NewPDF("A4")
 		doc.SetCompression(false).SetUnits("cm")
-		var pt10 = doc.ToUnits(10) // 10pt
+		pt10 := doc.ToUnits(10) // 10pt
 		const w = 10
 		doc.SetFont("Times-Bold", 20).SetXY(1, 1).DrawText("Font Sizes")
 		for i, size := range []float64{5, 6, 7, 8, 9, 10, 15, 20, 25, 30} {
-			var y = 2 + float64(i)*3*pt10
+			y := 2 + float64(i)*3*pt10
 			doc.SetLineWidth(0.1).
 				SetXY(1, y+0.5).SetColor("Gray").
 				DrawBox(1, y+0*pt10, w, pt10).
