@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:43:04 AF5042           one-file-pdf/utest/util/[t_equal.go]
+// :v: 2019-04-03 11:02:10 115A19           one-file-pdf/utest/util/[t_equal.go]
 // -----------------------------------------------------------------------------
 
 package util
@@ -149,13 +149,13 @@ mainLoop:
 
 // TCaller returns the name of the unit test function.
 func TCaller() string {
-	for _, iter := range CallerList() {
-		if str.Contains(iter, "util.TCaller") ||
-			str.Contains(iter, "util.TEqual") ||
-			str.Contains(iter, "util.ComparePDF") {
+	for _, caller := range CallerList() {
+		if str.Contains(caller, "util.TCaller") ||
+			str.Contains(caller, "util.TEqual") ||
+			str.Contains(caller, "util.ComparePDF") {
 			continue
 		}
-		return iter
+		return caller
 	}
 	return "<no-caller>"
 } //                                                                     TCaller

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:29:47 20B5AF                  one-file-pdf/utest/[color.go]
+// :v: 2019-04-03 11:04:23 C92644                  one-file-pdf/utest/[color.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -38,9 +38,9 @@ func Test_PDF_Color_(t *testing.T) {
 	fmt.Println("Test PDF.SetColor()")
 
 	// test various named colors and codes
-	for _, iter := range []struct {
-		in   string
-		want color.RGBA
+	for _, test := range []struct {
+		input string
+		want  color.RGBA
 	}{
 		// test HTML color codes
 		{"#000000", color.RGBA{R: 0, G: 0, B: 0, A: 255}},
@@ -195,7 +195,7 @@ func Test_PDF_Color_(t *testing.T) {
 		{"YELLOW GREEN", color.RGBA{R: 154, G: 205, B: 50, A: 255}},
 	} {
 		for pass := 0; pass < 3; pass++ {
-			s := iter.in
+			s := test.input
 			switch pass {
 			case 0: // do nothing
 			case 1:
@@ -218,12 +218,12 @@ func Test_PDF_Color_(t *testing.T) {
 			if doc2 != &doc {
 				t.Errorf(
 					`Address of pointer returned by SetColor("%s") is wrong`,
-					iter.in)
+					test.input)
 			}
-			if doc.Color() != iter.want {
+			if doc.Color() != test.want {
 				t.Errorf(
 					`After SetColor("%s"), Color() returned %v instead of %v`,
-					iter.in, doc.Color(), iter.want)
+					test.input, doc.Color(), test.want)
 			}
 		}
 	}
