@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 11:14:34 A3A710                     one-file-pdf/[pdf_core.go]
+// :v: 2019-04-28 20:57:28 D37E14                     one-file-pdf/[pdf_core.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -150,7 +150,7 @@ import (
 	"reflect"
 	"runtime"
 	"strconv"
-	str "strings"
+	"strings"
 	"unicode" // only uses IsDigit(), IsLetter(), IsSpace()
 )
 
@@ -971,7 +971,7 @@ func (ob *PDF) applyFont() (handler pdfFontHandler, err error) {
 			if fname != name {
 				continue
 			}
-			has := str.Contains
+			has := strings.Contains
 			font = pdfFont{
 				name:         pdfFontNames[i],
 				builtInIndex: i,
@@ -1077,15 +1077,15 @@ func (ob *PDF) drawTextBox(x, y, width, height float64,
 	} else {
 		lines = []string{text}
 	}
-	align = str.ToUpper(align)
+	align = strings.ToUpper(align)
 	lineHeight := ob.FontSize()
 	allLinesHeight := lineHeight * float64(len(lines))
 	//
 	// calculate aligned y-axis position of text (top, bottom, center)
 	y, height = y*ob.ptPerUnit+ob.fontSizePt, height*ob.ptPerUnit
-	if str.Contains(align, "B") { // bottom
+	if strings.Contains(align, "B") { // bottom
 		y += height - allLinesHeight - 4 //                           4pt margin
-	} else if !str.Contains(align, "T") {
+	} else if !strings.Contains(align, "T") {
 		y += height/2 - allLinesHeight/2 - ob.fontSizePt*0.15 //         center
 	}
 	y = ob.paperSize.heightPt - y
@@ -1094,9 +1094,9 @@ func (ob *PDF) drawTextBox(x, y, width, height float64,
 	x, width = x*ob.ptPerUnit, width*ob.ptPerUnit
 	for _, line := range lines {
 		off := 0.0 //                                  x-offset to align in box
-		if str.Contains(align, "L") {
+		if strings.Contains(align, "L") {
 			off = ob.fontSizePt / 6 //                              left margin
-		} else if str.Contains(align, "R") {
+		} else if strings.Contains(align, "R") {
 			off = width - ob.textWidthPt(line) - ob.fontSizePt/6
 		} else {
 			off = width/2 - ob.textWidthPt(line)/2 //                     center
@@ -1377,7 +1377,7 @@ func (ob *PDF) writeStreamObj(ar []byte) *PDF {
 // escape escapes special characters '(', '(' and '\' in strings
 // in order to avoid them interfering with PDF commands
 func (*PDF) escape(s string) string {
-	has := str.Contains
+	has := strings.Contains
 	if !has(s, "(") && !has(s, ")") && !has(s, "\\") {
 		return s
 	}
@@ -1405,8 +1405,8 @@ func (*PDF) isWhiteSpace(s string) bool {
 func (*PDF) splitLines(s string) []string {
 	split := func(lines []string, sep string) (ret []string) {
 		for _, line := range lines {
-			if str.Contains(line, sep) {
-				ret = append(ret, str.Split(line, sep)...)
+			if strings.Contains(line, sep) {
+				ret = append(ret, strings.Split(line, sep)...)
 				continue
 			}
 			ret = append(ret, line)
@@ -1419,9 +1419,9 @@ func (*PDF) splitLines(s string) []string {
 // toUpperLettersDigits returns letters and digits from s, in upper case
 func (*PDF) toUpperLettersDigits(s, extras string) string {
 	buf := bytes.NewBuffer(make([]byte, 0, len(s)))
-	for _, r := range str.ToUpper(s) {
+	for _, r := range strings.ToUpper(s) {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) ||
-			str.ContainsRune(extras, r) {
+			strings.ContainsRune(extras, r) {
 			buf.WriteRune(r)
 		}
 	}
@@ -1432,9 +1432,9 @@ func (*PDF) toUpperLettersDigits(s, extras string) string {
 // Specify custom paper sizes using "width x height", e.g. "9cm x 20cm"
 // If the paper size is not found, returns a zero-initialized structure
 func (ob *PDF) getPaperSize(name string) (pdfPaperSize, error) {
-	s := str.ToUpper(name)
-	if str.Contains(s, " X ") {
-		wh := str.Split(s, " X ")
+	s := strings.ToUpper(name)
+	if strings.Contains(s, " X ") {
+		wh := strings.Split(s, " X ")
 		w, err := ob.ToPoints(wh[0])
 		if err, isT := err.(pdfError); isT {
 			return pdfPaperSize{}, err
@@ -1447,7 +1447,7 @@ func (ob *PDF) getPaperSize(name string) (pdfPaperSize, error) {
 		return pdfPaperSize{s, w, h}, nil
 	}
 	s = ob.toUpperLettersDigits(s, "-")
-	landscape := str.HasSuffix(s, "-L")
+	landscape := strings.HasSuffix(s, "-L")
 	s = ob.toUpperLettersDigits(s, "")
 	if landscape {
 		s = s[:len(s)-1] // "-" is already removed above. now remove the "L"
@@ -1491,7 +1491,7 @@ func (ob *PDF) putError(id int, msg, val string) *PDF {
 	for i := 0; i < 10; i++ {
 		programCounter, _, _, _ := runtime.Caller(i)
 		fn = runtime.FuncForPC(programCounter).Name()
-		fn = fn[str.LastIndex(fn, ".")+1:]
+		fn = fn[strings.LastIndex(fn, ".")+1:]
 		if unicode.IsLower(rune(fn[0])) {
 			continue
 		}

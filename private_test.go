@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:50:58 E799D5                 one-file-pdf/[private_test.go]
+// :v: 2019-04-28 20:57:28 F688A9                 one-file-pdf/[private_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -17,7 +17,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
-	str "strings"
+	"strings"
 	"testing"
 
 	"github.com/balacode/one-file-pdf/utest/util"
@@ -56,15 +56,15 @@ func Test_getPapreSize_(t *testing.T) {
 			permuted := util.PermuteStrings(
 				spaces,
 				[]string{
-					str.ToLower(paperSize),
-					str.ToUpper(paperSize),
+					strings.ToLower(paperSize),
+					strings.ToUpper(paperSize),
 				},
 				spaces,
 				[]string{orient},
 				spaces,
 			)
 			for _, s := range permuted {
-				size := paperSize + str.ToUpper(orient)
+				size := paperSize + strings.ToUpper(orient)
 				if orient == "-l" || orient == "-L" {
 					subtest(size, s, h*PTperMM, w*PTperMM, err)
 				} else {
@@ -134,12 +134,12 @@ func getStack() string {
 	buf := make([]byte, 8192)
 	runtime.Stack(buf, true)
 	var ar []string
-	for _, s := range str.Split(string(buf), "\n") {
-		if str.Contains(s, "\t") && !str.Contains(s, "/testing.go") {
+	for _, s := range strings.Split(string(buf), "\n") {
+		if strings.Contains(s, "\t") && !strings.Contains(s, "/testing.go") {
 			ar = append(ar, "<- "+filepath.Base(s))
 		}
 	}
-	return str.Join(ar, "\n")
+	return strings.Join(ar, "\n")
 } //                                                                    getStack
 
 //end

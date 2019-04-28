@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:52:12 05EDE7                    one-file-pdf/demo/[demo.go]
+// :v: 2019-04-28 20:57:28 93C2BF                    one-file-pdf/demo/[demo.go]
 // -----------------------------------------------------------------------------
 
 package main
@@ -10,7 +10,7 @@ package main
 
 import (
 	"fmt"
-	str "strings"
+	"strings"
 
 	"github.com/balacode/one-file-pdf"
 )
@@ -83,7 +83,7 @@ func corporateIpsum() {
 	doc.SetColor("#74C365 Mantis").FillCircle(21, 21, 10) // x, y, radius
 	//
 	// draw the left column of text (in a box)
-	col1 := str.Replace(CorporateFiller1, "\n", " ", -1)
+	col1 := strings.Replace(CorporateFiller1, "\n", " ", -1)
 	doc.SetColor("#73C2FB MayaBlue").
 		FillBox(0, 4, 10, 15). // xywh
 		SetColor("black").
@@ -91,7 +91,7 @@ func corporateIpsum() {
 		DrawTextInBox(0.5, 4.5, 9, 15, "LT", col1)
 	//
 	// draw the right column of text
-	col2 := str.Replace(CorporateFiller2, "\n", " ", -1)
+	col2 := strings.Replace(CorporateFiller2, "\n", " ", -1)
 	doc.SetColor("black").
 		SetFont("Times-Italic", 11).
 		DrawTextInBox(10.5, 4, 9, 28, "LT", col2)
