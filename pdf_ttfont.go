@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:03:38 3119D2                   one-file-pdf/[pdf_ttfont.go]
+// :v: 2019-05-06 06:21:42 0C985B                   one-file-pdf/[pdf_ttfont.go]
 // -----------------------------------------------------------------------------
 
 // THIS FILE IS A WORK IN PROGRESS
@@ -75,7 +75,7 @@ type pdfTTFont struct {
 
 // init __
 func init() {
-	//TODO: uncomment this line when font handler is implemented
+	// TODO: uncomment this line when font handler is implemented
 	// pdfNewFontHandler = func() pdfFontHandler { return &pdfTTFont{}	}
 } //                                                                        init
 
@@ -108,7 +108,7 @@ func (ob *pdfTTFont) readFont(owner *PDF, font interface{}) bool {
 			reflect.TypeOf(font).String())
 		return false
 	}
-	_ = rd //TODO: remove when reader is used
+	_ = rd // TODO: remove when reader is used
 	return ob.Err == nil
 } //                                                                    readFont
 
@@ -118,9 +118,9 @@ func (ob *pdfTTFont) textWidthPt(s string) float64 {
 	var ret float64
 	for _, r := range s {
 		_ = r
-		glyph, found := 0, false //TODO: find out glyph entry
+		glyph, found := 0, false // TODO: find out glyph entry
 		if !found {
-			//TODO: 0xE0074A: error
+			// TODO: 0xE0074A: error
 			continue
 		}
 		w := float64(ob.HMTX.Widths[glyph])
@@ -137,15 +137,15 @@ func (ob *pdfTTFont) writeText(s string) {
 	ob.Err = nil
 	ob.pdf.write("BT ", ob.pdf.page.x, " ", ob.pdf.page.y, " Td ")
 	//
-	//TODO: add each rune of s, to determine glyphs to embed
+	// TODO: add each rune of s, to determine glyphs to embed
 	//
 	// write hex encoded text to PDF
 	ob.pdf.write("[<")
 	for _, r := range s {
 		_ = r
-		glyph, found := 0, false //TODO: find out glyph entry
+		glyph, found := 0, false // TODO: find out glyph entry
 		if !found {
-			//TODO: 0xE1DC96: error
+			// TODO: 0xE1DC96: error
 			return
 		}
 		ob.pdf.write(fmt.Sprintf("%04X", glyph))
@@ -156,7 +156,7 @@ func (ob *pdfTTFont) writeText(s string) {
 // writeFontObjects writes the PDF objects that define the embedded font
 func (ob *pdfTTFont) writeFontObjects(font *pdfFont) {
 	ob.Err = nil
-	//TODO: write font-related objects here (call writer methods)
+	// TODO: write font-related objects here (call writer methods)
 	if ob.Err != nil {
 		ob.pdf.putError(0xED2CDF, ob.Err.Error(), "")
 	}
@@ -179,7 +179,7 @@ func (ob *pdfTTFont) readTTF(reader io.Reader) {
 	rd := bytes.NewReader(ob.Data)
 	ver := ob.read(rd, 4)
 	if !bytes.Equal(ver, []byte{0, 1, 0, 0}) {
-		//TODO: 0xE0E9AE: error
+		// TODO: 0xE0E9AE: error
 		return
 	}
 	for _, fn := range []func(*bytes.Reader){
@@ -198,7 +198,7 @@ func (ob *pdfTTFont) readHEAD(rd *bytes.Reader) {
 	if ob.Err != nil {
 		return
 	}
-	//TODO: implement
+	// TODO: implement
 } //                                                                    readHEAD
 
 // readHHEA __
@@ -206,7 +206,7 @@ func (ob *pdfTTFont) readHHEA(rd *bytes.Reader) {
 	if ob.Err != nil {
 		return
 	}
-	//TODO: implement
+	// TODO: implement
 } //                                                                    readHHEA
 
 // readMAXP __
@@ -214,7 +214,7 @@ func (ob *pdfTTFont) readMAXP(rd *bytes.Reader) {
 	if ob.Err != nil {
 		return
 	}
-	//TODO: implement
+	// TODO: implement
 } //                                                                    readMAXP
 
 // readHMTX __
@@ -222,7 +222,7 @@ func (ob *pdfTTFont) readHMTX(rd *bytes.Reader) {
 	if ob.Err != nil {
 		return
 	}
-	//TODO: implement
+	// TODO: implement
 } //                                                                    readHMTX
 
 // readCMAP __
@@ -230,7 +230,7 @@ func (ob *pdfTTFont) readCMAP(rd *bytes.Reader) {
 	if ob.Err != nil {
 		return
 	}
-	//TODO: implement
+	// TODO: implement
 } //                                                                    readCMAP
 
 // readNAME __
@@ -238,7 +238,7 @@ func (ob *pdfTTFont) readNAME(rd *bytes.Reader) {
 	if ob.Err != nil {
 		return
 	}
-	//TODO: implement
+	// TODO: implement
 } //                                                                    readNAME
 
 // readOS2 __
@@ -246,7 +246,7 @@ func (ob *pdfTTFont) readOS2(rd *bytes.Reader) {
 	if ob.Err != nil {
 		return
 	}
-	//TODO: implement
+	// TODO: implement
 } //                                                                     readOS2
 
 // readPOST __
@@ -254,7 +254,7 @@ func (ob *pdfTTFont) readPOST(rd *bytes.Reader) {
 	if ob.Err != nil {
 		return
 	}
-	//TODO: implement
+	// TODO: implement
 } //                                                                    readPOST
 
 // readLOCA __
@@ -262,7 +262,7 @@ func (ob *pdfTTFont) readLOCA(rd *bytes.Reader) {
 	if ob.Err != nil {
 		return
 	}
-	//TODO: implement
+	// TODO: implement
 } //                                                                    readLOCA
 
 // read __

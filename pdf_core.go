@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-28 20:57:28 D37E14                     one-file-pdf/[pdf_core.go]
+// :v: 2019-05-06 06:21:42 EF0581                     one-file-pdf/[pdf_core.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.
@@ -1025,7 +1025,7 @@ func (ob *PDF) applyFont() (handler pdfFontHandler, err error) {
 	ob.page.fontSizePt = ob.fontSizePt
 	ob.write("BT /FNT", ob.page.fontID, " ", int(ob.page.fontSizePt),
 		" Tf ET\n")
-	// BT: begin text   /FNT0 i0 Tf: set font to FNT0 index i0   ET: end text
+	// BT: begin text  /FNT0 i0 Tf: set font to FNT0 index i0  ET: end text
 	return handler, err
 } //                                                                   applyFont
 
@@ -1043,13 +1043,13 @@ func (ob *PDF) drawTextLine(s string) *PDF {
 	if ob.page.horzScaling != ob.horzScaling {
 		ob.page.horzScaling = ob.horzScaling
 		ob.write("BT ", ob.page.horzScaling, " Tz ET\n")
-		// BT: begin text   n0 Tz: set horiz. text scaling to n0%   ET: end text
+		// BT: begin text  n0 Tz: set horiz. text scaling to n0%  ET: end text
 	}
 	ob.writeMode(true) // fill/nonStroke
 	if handler == nil {
 		ob.write("BT ", int(ob.page.x), " ", int(ob.page.y),
 			" Td (", ob.escape(s), ") Tj ET\n")
-		// BT: begin text   Td: move text position   Tj: show text   ET: end text
+		// BT: begin text  Td: move text position  Tj: show text  ET: end text
 	} else {
 		handler.writeText(s)
 	}
@@ -1073,7 +1073,7 @@ func (ob *PDF) drawTextBox(x, y, width, height float64,
 	var lines []string
 	if wrapText {
 		lines = ob.WrapTextLines(width, text)
-		_ = handler //TODO: ^needs to interact with font handler to get width
+		_ = handler // TODO: ^needs to interact with font handler to get width
 	} else {
 		lines = []string{text}
 	}
@@ -1207,7 +1207,7 @@ func (ob *PDF) reservePage() *PDF {
 		ob.AddPage()
 	}
 	return ob
-} //                                                                  reservePage
+} //                                                                 reservePage
 
 // textWidthPt returns the width of text in points
 func (ob *PDF) textWidthPt(s string) float64 {

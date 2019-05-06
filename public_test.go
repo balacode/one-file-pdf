@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2018-06-08 21:53:33 A54185                  one-file-pdf/[public_test.go]
+// :v: 2019-05-06 06:21:42 02D016                  one-file-pdf/[public_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf_test
@@ -127,10 +127,10 @@ func Test_PDF_SetXY_(t *testing.T) { utest.Test_PDF_SetXY_(t) }
 // # Methods (ob *PDF)
 
 // AddPage() *PDF
-//TODO: func Test_PDF_AddPage_(t *testing.T) { utest.Test_PDF_AddPage_(t) }
+// TODO: func Test_PDF_AddPage_(t *testing.T) { utest.Test_PDF_AddPage_(t) }
 
 // Bytes() []byte
-//TODO: func Test_PDF_Bytes_(t *testing.T) { utest.Test_PDF_Bytes_(t) }
+// TODO: func Test_PDF_Bytes_(t *testing.T) { utest.Test_PDF_Bytes_(t) }
 
 // DrawBox(x, y, width, height float64, optFill ...bool) *PDF
 func Test_PDF_DrawBox_(t *testing.T) { utest.Test_PDF_DrawBox_(t) }
@@ -140,7 +140,7 @@ func Test_PDF_DrawCircle_(t *testing.T) { utest.Test_PDF_DrawCircle_(t) }
 
 // DrawEllipse(x, y, xRadius, yRadius float64,
 //     optFill ...bool) *PDF
-//TODO: func Test_PDF_DrawEllipse_(t *testing.T) {
+// TODO: func Test_PDF_DrawEllipse_(t *testing.T) {
 //          utest.Test_PDF_DrawEllipse_(t)
 //      }
 
@@ -149,14 +149,14 @@ func Test_PDF_DrawCircle_(t *testing.T) { utest.Test_PDF_DrawCircle_(t) }
 func Test_PDF_DrawImage_(t *testing.T) { utest.Test_PDF_DrawImage_(t) }
 
 // DrawLine(x1, y1, x2, y2 float64) *PDF
-//TODO: func Test_PDF_DrawLine_(t *testing.T) { utest.Test_PDF_DrawLine_(t) }
+// TODO: func Test_PDF_DrawLine_(t *testing.T) { utest.Test_PDF_DrawLine_(t) }
 
 // DrawText(s string) *PDF
 func Test_PDF_DrawText_(t *testing.T) { utest.Test_PDF_DrawText_(t) }
 
 // DrawTextAlignedToBox(
 //     x, y, width, height float64, align, text string) *PDF
-//TODO: func Test_PDF_DrawTextAlignedToBox_(t *testing.T) {
+// TODO: func Test_PDF_DrawTextAlignedToBox_(t *testing.T) {
 //          utest.Test_PDF_DrawTextAlignedToBox(t)
 //      }
 
@@ -177,21 +177,21 @@ func Test_PDF_FillBox_(t *testing.T) { utest.Test_PDF_FillBox_(t) }
 func Test_PDF_FillCircle_(t *testing.T) { utest.Test_PDF_FillCircle_(t) }
 
 // FillEllipse(x, y, xRadius, yRadius float64) *PDF
-//TODO: func Test_PDF_FillEllipse_(t *testing.T) {
+// TODO: func Test_PDF_FillEllipse_(t *testing.T) {
 //          utest.Test_PDF_FillEllipse_(t)
 // }
 
 // NextLine() *PDF
-//TODO: func Test_PDF_NextLine_(t *testing.T) { utest.Test_PDF_NextLine_(t) }
+// TODO: func Test_PDF_NextLine_(t *testing.T) { utest.Test_PDF_NextLine_(t) }
 
 // Reset() *PDF
 func Test_PDF_Reset_(t *testing.T) { utest.Test_PDF_Reset_(t) }
 
 // SaveFile(filename string) error
-//TODO: func Test_PDF_SaveFile_(t *testing.T) { utest.Test_PDF_SaveFile_(t) }
+// TODO: func Test_PDF_SaveFile_(t *testing.T) { utest.Test_PDF_SaveFile_(t) }
 
 // SetColumnWidths(widths ...float64) *PDF
-//TODO: func Test_PDF_SetColumnWidths_(t *testing.T) {
+// TODO: func Test_PDF_SetColumnWidths_(t *testing.T) {
 //          utest.Test_PDF_SetColumnWidths(t)
 //      }
 
@@ -199,7 +199,7 @@ func Test_PDF_Reset_(t *testing.T) { utest.Test_PDF_Reset_(t) }
 // # Metrics Methods (ob *PDF)
 
 // TextWidth(s string) float64
-//TODO: func Test_PDF_TextWidth_(t *testing.T) { utest.Test_PDF_TextWidth_(t) }
+// TODO: func Test_PDF_TextWidth_(t *testing.T) { utest.Test_PDF_TextWidth_(t) }
 
 // ToColor(nameOrHTMLColor string) (color.RGBA, error)
 func Test_PDF_ToColor_1_(t *testing.T) { utest.Test_PDF_ToColor_1_(t) }
@@ -215,7 +215,7 @@ func Test_PDF_ToPoints_(t *testing.T) { utest.Test_PDF_ToPoints_(t) }
 func Test_PDF_ToUnits_(t *testing.T) { utest.Test_PDF_ToUnits_(t) }
 
 // WrapTextLines(width float64, text string) (ret []string)
-//TODO: func Test_PDF_WrapTextLines_(t *testing.T) {
+// TODO: func Test_PDF_WrapTextLines_(t *testing.T) {
 //          utest.Test_PDF_WrapTextLines(t)
 //      }
 
