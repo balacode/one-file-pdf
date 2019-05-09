@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-28 20:57:28 F688A9                 one-file-pdf/[private_test.go]
+// :v: 2019-05-09 17:16:11 6D81D1                 one-file-pdf/[private_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -125,7 +125,7 @@ func floatStr(val float64) string {
 func mismatch(t *testing.T, tag string, want, got interface{}) {
 	ws := fmt.Sprintf("%v", want)
 	gs := fmt.Sprintf("%v", got)
-	t.Errorf("%s mismatch: expected: %s got: %s\n"+"%s",
+	t.Errorf("%s mismatch: expected: %s got: %s\n%s",
 		tag, ws, gs, getStack())
 } //                                                                    mismatch
 
