@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-03 10:27:56 26B36E             one-file-pdf/utest/[draw_image.go]
+// :v: 2019-05-11 04:21:45 15C7F3             one-file-pdf/utest/[draw_image.go]
 // -----------------------------------------------------------------------------
 
 package utest
@@ -126,10 +126,11 @@ func Test_PDF_DrawImage_(t *testing.T) {
 
 	// PNG transparency test
 	func() {
-		x := 5.0
-		y := 5.0
-		height := 5.0
-
+		var (
+			x      = 5.0
+			y      = 5.0
+			height = 5.0
+		)
 		const wantTransparent = `
 		%PDF-1.4
 		1 0 obj <</Type/Catalog/Pages 2 0 R>>
@@ -408,9 +409,11 @@ func Test_PDF_DrawImage_(t *testing.T) {
 		`
 
 		// create two slightly-different images by appending a byte to each
-		pngData1 := append(pngData, 1)
-		pngData2 := append(pngData, 2)
-		doc := pdf.NewPDF("20cm x 20cm")
+		var (
+			pngData1 = append(pngData, 1)
+			pngData2 = append(pngData, 2)
+			doc      = pdf.NewPDF("20cm x 20cm")
+		)
 		doc.SetCompression(false).
 			SetUnits("cm").
 			DrawImage(x, y, height, pngData1).
