@@ -1,17 +1,15 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-05-09 17:16:11 6D81D1                 one-file-pdf/[private_test.go]
+// :v: 2019-05-12 17:01:26 D4C05C                 one-file-pdf/[private_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf
 
-/*
-This file contains unit tests for internal methods/functions.
-
-To generate a test coverage report use:
-	go test -coverprofile cover.out
-	go tool cover -html=cover.out
-*/
+//  This file contains unit tests for internal methods/functions.
+//
+//  To generate a test coverage report use:
+//  	go test -coverprofile cover.out
+//  	go tool cover -html=cover.out
 
 import (
 	"fmt"
