@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-05-06 06:21:42 0C985B                   one-file-pdf/[pdf_ttfont.go]
+// :v: 2019-05-13 20:32:30 4E4AD1                   one-file-pdf/[pdf_ttfont.go]
 // -----------------------------------------------------------------------------
 
 // THIS FILE IS A WORK IN PROGRESS
@@ -86,23 +86,31 @@ func init() {
 func (ob *pdfTTFont) readFont(owner *PDF, font interface{}) bool {
 	ob.Err = nil
 	ob.pdf = owner
-	var src string
-	var rd io.Reader
+	var (
+		src string
+		rd  io.Reader
+	)
 	switch arg := font.(type) {
 	case string:
-		src = arg
-		data, err := ioutil.ReadFile(arg)
-		if err != nil {
-			ob.pdf.putError(0xE5445B, "Failed reading font file", src)
-			return false
+		{
+			src = arg
+			data, err := ioutil.ReadFile(arg)
+			if err != nil {
+				ob.pdf.putError(0xE5445B, "Failed reading font file", src)
+				return false
+			}
+			rd = bytes.NewReader(data)
 		}
-		rd = bytes.NewReader(data)
 	case []byte:
-		src = fmt.Sprintf("[]byte len(%d)", len(arg))
-		rd = bytes.NewReader(arg)
+		{
+			src = fmt.Sprintf("[]byte len(%d)", len(arg))
+			rd = bytes.NewReader(arg)
+		}
 	case io.Reader:
-		src = "io.Reader"
-		rd = arg
+		{
+			src = "io.Reader"
+			rd = arg
+		}
 	default:
 		ob.pdf.putError(0xECEB7B, "Invalid type in arg",
 			reflect.TypeOf(font).String())

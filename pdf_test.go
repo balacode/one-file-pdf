@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-05-13 16:07:54 8D1FE2               one-file-pdf/utest/[pdf_test.go]
+// :v: 2019-05-13 20:32:24 89508C               one-file-pdf/utest/[pdf_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -302,7 +302,8 @@ func Test_PDF_Color_(t *testing.T) {
 		for pass := 0; pass < 3; pass++ {
 			s := test.input
 			switch pass {
-			case 0: // do nothing
+			case 0:
+				// do nothing
 			case 1:
 				s = strings.ToLower(s)
 			case 2:
