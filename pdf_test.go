@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-05-13 20:32:24 89508C               one-file-pdf/utest/[pdf_test.go]
+// :v: 2019-05-16 16:59:24 B54049               one-file-pdf/utest/[pdf_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -4281,7 +4281,7 @@ func tEqual(t *testing.T, got interface{}, want interface{}) bool {
 		case int, int8, int16, int32, int64,
 			uint, uint8, uint16, uint32, uint64, uintptr:
 			return fmt.Sprintf("%d", val)
-		case float32, float64:
+		case float64, float32:
 			s := fmt.Sprintf("%.4f", val)
 			if strings.Contains(s, ".") {
 				for strings.HasSuffix(s, "0") {
