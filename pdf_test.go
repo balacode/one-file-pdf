@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-05-16 16:59:24 B54049               one-file-pdf/utest/[pdf_test.go]
+// :v: 2019-05-17 19:38:47 4CF777               one-file-pdf/utest/[pdf_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -4269,43 +4269,57 @@ const (
 // Provides a slightly-altered tEqual() function (and functions it uses)
 // from Zircon-Go lib: github.com/balacode/zr
 func tEqual(t *testing.T, got interface{}, want interface{}) bool {
-	makeStr := func(val interface{}) string {
-		switch val := val.(type) {
+	makeStr := func(value interface{}) string {
+		switch v := value.(type) {
 		case nil:
-			return "nil"
-		case bool:
-			if val {
-				return "true"
+			{
+				return "nil"
 			}
-			return "false"
+		case bool:
+			{
+				if v {
+					return "true"
+				}
+				return "false"
+			}
 		case int, int8, int16, int32, int64,
 			uint, uint8, uint16, uint32, uint64, uintptr:
-			return fmt.Sprintf("%d", val)
+			{
+				return fmt.Sprintf("%d", v)
+			}
 		case float64, float32:
-			s := fmt.Sprintf("%.4f", val)
-			if strings.Contains(s, ".") {
-				for strings.HasSuffix(s, "0") {
-					s = s[:len(s)-1]
+			{
+				s := fmt.Sprintf("%.4f", v)
+				if strings.Contains(s, ".") {
+					for strings.HasSuffix(s, "0") {
+						s = s[:len(s)-1]
+					}
+					for strings.HasSuffix(s, ".") {
+						s = s[:len(s)-1]
+					}
 				}
-				for strings.HasSuffix(s, ".") {
-					s = s[:len(s)-1]
-				}
+				return s
 			}
-			return s
 		case error:
-			return val.Error()
-		case string:
-			return val
-		case time.Time: // use date part without time and time zone
-			s := val.Format(time.RFC3339)[:19] // "2006-01-02T15:04:05Z07:00"
-			if strings.HasSuffix(s, "T00:00:00") {
-				s = s[:10]
+			{
+				return v.Error()
 			}
-			return s
+		case string:
+			{
+				return v
+			}
+		case time.Time: // use date part without time and time zone
+			{
+				s := v.Format(time.RFC3339)[:19] // "2006-01-02T15:04:05Z07:00"
+				if strings.HasSuffix(s, "T00:00:00") {
+					s = s[:10]
+				}
+				return s
+			}
 		case fmt.Stringer:
-			return val.String()
+			return v.String()
 		}
-		return fmt.Sprintf("(type: %v value: %v)", reflect.TypeOf(val), val)
+		return fmt.Sprintf("(type: %v value: %v)", reflect.TypeOf(value), value)
 	}
 	if makeStr(got) != makeStr(want) {
 		t.Logf("\n"+"LOCATION: %s\n"+"EXPECTED: %s\n"+"RETURNED: %s\n",
