@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-05-17 19:38:47 4CF777               one-file-pdf/utest/[pdf_test.go]
+// :v: 2019-05-20 02:28:47 24B904               one-file-pdf/utest/[pdf_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -4317,7 +4317,11 @@ func tEqual(t *testing.T, got interface{}, want interface{}) bool {
 				return s
 			}
 		case fmt.Stringer:
-			return v.String()
+			{
+				return v.String()
+			}
+		case fmt.GoStringer:
+			return v.GoString()
 		}
 		return fmt.Sprintf("(type: %v value: %v)", reflect.TypeOf(value), value)
 	}
