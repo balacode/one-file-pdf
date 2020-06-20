@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-05-13 20:32:30 4E4AD1                   one-file-pdf/[pdf_ttfont.go]
+// :v: 2020-06-20 10:07:23 6C3570                   one-file-pdf/[pdf_ttfont.go]
 // -----------------------------------------------------------------------------
 
 // THIS FILE IS A WORK IN PROGRESS
@@ -76,7 +76,7 @@ type pdfTTFont struct {
 // init __
 func init() {
 	// TODO: uncomment this line when font handler is implemented
-	// pdfNewFontHandler = func() pdfFontHandler { return &pdfTTFont{}	}
+	// pdfNewFontHandler = func() pdfFontHandler { return &pdfTTFont{} }
 } //                                                                        init
 
 // -----------------------------------------------------------------------------

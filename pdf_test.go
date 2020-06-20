@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-05-20 02:28:47 24B904               one-file-pdf/utest/[pdf_test.go]
+// :v: 2020-06-20 10:07:23 20DE3D               one-file-pdf/utest/[pdf_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf
@@ -64,8 +64,8 @@ package pdf
 //  This file contains unit tests for internal methods/functions.
 //
 //  To generate a test coverage report use:
-//  	go test -coverprofile cover.out
-//  	go tool cover -html=cover.out
+//      go test -coverprofile cover.out
+//      go tool cover -html=cover.out
 
 import (
 	"bytes"
