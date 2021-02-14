@@ -307,17 +307,17 @@ func Test_PDF_Color_(t *testing.T) {
 			case 1:
 				s = strings.ToLower(s)
 			case 2:
-				s = strings.Replace(s, " ", "", -1)
+				s = strings.ReplaceAll(s, " ", "")
 			case 3:
-				s = strings.ToLower(strings.Replace(s, " ", "", -1))
+				s = strings.ToLower(strings.ReplaceAll(s, " ", ""))
 			case 4:
-				s = strings.Replace(s, " ", "-", -1)
+				s = strings.ReplaceAll(s, " ", "-")
 			case 5:
-				s = strings.ToLower(strings.Replace(s, " ", "-", -1))
+				s = strings.ToLower(strings.ReplaceAll(s, " ", "-"))
 			case 6:
-				s = strings.Replace(s, " ", "_", -1)
+				s = strings.ReplaceAll(s, " ", "_")
 			case 7:
-				s = strings.ToLower(strings.Replace(s, " ", "_", -1))
+				s = strings.ToLower(strings.ReplaceAll(s, " ", "_"))
 			}
 			doc := NewPDF("A4")
 			doc2 := doc.SetColor(s)
@@ -3988,8 +3988,8 @@ mainLoop:
 			// let the file name's path use the right kind of OS path separator
 			// (by default, the file name contains '/' on all platforms)
 			if string(os.PathSeparator) != "/" {
-				filename = strings.Replace(filename,
-					"/", string(os.PathSeparator), -1)
+				filename = strings.ReplaceAll(filename, "/",
+					string(os.PathSeparator))
 			}
 		}
 		// remove parent module/function names
@@ -4002,7 +4002,7 @@ mainLoop:
 		// remove unneeded punctuation from function names
 		for _, find := range []string{"(", ")", "*"} {
 			if strings.Contains(funcName, find) {
-				funcName = strings.Replace(funcName, find, "", -1)
+				funcName = strings.ReplaceAll(funcName, find, "")
 			}
 		}
 		line := fmt.Sprintf(":%d %s()", lineNo, funcName)
@@ -4040,16 +4040,16 @@ func formatLines(s string, formatStreams bool) []string {
 	}
 	//
 	// change all newlines to "\n"
-	s = strings.Replace(s, "\r\n", "\n", -1)
-	s = strings.Replace(s, "\r", "\n", -1)
+	s = strings.ReplaceAll(s, "\r\n", "\n")
+	s = strings.ReplaceAll(s, "\r", "\n")
 	//
 	// change all other white-spaces to spaces
 	for _, space := range "\a\b\f\t\v" {
-		s = strings.Replace(s, string(space), " ", -1)
+		s = strings.ReplaceAll(s, string(space), " ")
 	}
 	// remove all repeated spaces
 	for strings.Contains(s, "  ") {
-		s = strings.Replace(s, "  ", " ", -1)
+		s = strings.ReplaceAll(s, "  ", " ")
 	}
 	// trim and copy non-blank lines to result
 	// also, continue lines that end with '\'
