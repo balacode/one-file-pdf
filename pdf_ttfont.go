@@ -330,4 +330,4 @@ func (ob *pdfTTFont) readUI32(rd *bytes.Reader) uint32 {
 		uint32(ar[2])<<8 | uint32(ar[3])
 } //                                                                    readUI32
 
-//end
+// end

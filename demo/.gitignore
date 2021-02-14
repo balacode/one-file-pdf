@@ -1,7 +1,10 @@
-# one-file-pdf/demo/[.gitignore]
+## -----------------------------------------------------------------------------
+## github.com/balacode/one-file-pdf               one-file-pdf/demo/[.gitignore]
+## (c) balarabe@protonmail.com                                      License: MIT
+## -----------------------------------------------------------------------------
 
-# ignore this file till it can be made smaller
-# It is about 6MB now!
-png_images.pdf 
+## ignore this file till it can be made smaller
+## it is about 6MB now!
+png_images.pdf
 
-#end
+## end

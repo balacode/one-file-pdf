@@ -1,30 +1,33 @@
-# one-file-pdf/[.gitignore]
+## -----------------------------------------------------------------------------
+## github.com/balacode/one-file-pdf                    one-file-pdf/[.gitignore]
+## (c) balarabe@protonmail.com                                      License: MIT
+## -----------------------------------------------------------------------------
 
-# binary files
+## binary files
 *.exe
 *.ttf
 demo/demo
 
-# test binary, build with `go test -c`
+## test binary, build with `go test -c`
 *.test
 
-# output of the go coverage tool
+## output of the go coverage tool
 *.out
 
-# drafts, etc.
+## drafts, etc.
 *.repl
 *`*
 __*
 ~~*
 
-# logfiles and batch files
+## logfiles and batch files
 *.log
 *.bat
 
-# ignore generated PDF files
-# (reference samples are in demo/sample)
-demo/corporate.pdf 
-demo/hello.pdf 
-demo/png_images.pdf 
+## ignore generated PDF files
+## (reference samples are in demo/sample)
+demo/corporate.pdf
+demo/hello.pdf
+demo/png_images.pdf
 
-#end
+## end

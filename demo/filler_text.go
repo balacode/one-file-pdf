@@ -90,4 +90,4 @@ web-readiness. Quickly aggregate B2B users and worldwide
 potentialities. Interactively coordinate proactive e-commerce
 via process-centric "outside the box" thinking.`
 
-//end
+// end
