@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
+// github.com/balacode/one-file-pdf                  one-file-pdf/demo/[demo.go]
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-04-28 20:57:28 93C2BF                    one-file-pdf/demo/[demo.go]
 // -----------------------------------------------------------------------------
 
 package main

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
+// github.com/balacode/one-file-pdf                   one-file-pdf/[pdf_core.go]
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2019-05-06 06:21:42 EF0581                     one-file-pdf/[pdf_core.go]
 // -----------------------------------------------------------------------------
 
 // Package pdf provides a PDF writer type to generate PDF files.

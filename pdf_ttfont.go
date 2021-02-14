@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
+// github.com/balacode/one-file-pdf                 one-file-pdf/[pdf_ttfont.go]
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2020-06-20 10:07:23 6C3570                   one-file-pdf/[pdf_ttfont.go]
 // -----------------------------------------------------------------------------
 
 // THIS FILE IS A WORK IN PROGRESS

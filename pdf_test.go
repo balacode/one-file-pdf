@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
+// github.com/balacode/one-file-pdf             one-file-pdf/utest/[pdf_test.go]
 // (c) balarabe@protonmail.com                                      License: MIT
-// :v: 2020-06-20 10:07:23 20DE3D               one-file-pdf/utest/[pdf_test.go]
 // -----------------------------------------------------------------------------
 
 package pdf
