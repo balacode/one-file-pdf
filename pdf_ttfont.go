@@ -24,7 +24,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"os"
 	"reflect"
 )
 
@@ -94,7 +94,7 @@ func (ob *pdfTTFont) readFont(owner *PDF, font interface{}) bool {
 	case string:
 		{
 			src = arg
-			data, err := ioutil.ReadFile(arg)
+			data, err := os.ReadFile(arg)
 			if err != nil {
 				ob.pdf.putError(0xE5445B, "Failed reading font file", src)
 				return false
@@ -179,7 +179,7 @@ func (ob *pdfTTFont) readTTF(reader io.Reader) {
 		return
 	}
 	var err error
-	ob.Data, err = ioutil.ReadAll(reader)
+	ob.Data, err = io.ReadAll(reader)
 	if err != nil {
 		ob.Err = err
 		return

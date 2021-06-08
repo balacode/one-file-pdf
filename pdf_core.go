@@ -146,7 +146,7 @@ import (
 	_ "image/jpeg"
 	_ "image/png" // init image decoders
 	"io"
-	"io/ioutil"
+	"os"
 	"reflect"
 	"runtime"
 	"strconv"
@@ -704,7 +704,7 @@ func (ob *PDF) Reset() *PDF {
 
 // SaveFile generates and saves the PDF document to a file.
 func (ob *PDF) SaveFile(filename string) error {
-	err := ioutil.WriteFile(filename, ob.Bytes(), 0644)
+	err := os.WriteFile(filename, ob.Bytes(), 0644)
 	if err != nil {
 		ob.putError(0xED3F6D, "Failed writing file", err.Error())
 	}
@@ -1136,7 +1136,7 @@ func (ob *PDF) loadImage(fileNameOrBytes interface{}, back color.RGBA,
 			}
 		}
 		img.filename = val
-		data, err := ioutil.ReadFile(val)
+		data, err := os.ReadFile(val)
 		if err != nil {
 			return pdfImage{}, -1, pdfError{id: 0xE9F387,
 				msg: "Failed reading file", val: err.Error()}
