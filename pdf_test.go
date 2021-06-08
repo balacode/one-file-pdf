@@ -129,7 +129,7 @@ func Test_PDF_Clean_(t *testing.T) {
 // Test_PDF_Color_ tests PDF.Color() and SetColor()
 func Test_PDF_Color_(t *testing.T) {
 	//
-	// (ob *PDF) Color() color.RGBA
+	// (p *PDF) Color() color.RGBA
 	//
 	func() {
 		var doc PDF // uninitialized PDF
@@ -140,7 +140,7 @@ func Test_PDF_Color_(t *testing.T) {
 		tEqual(t, doc.Color(), color.RGBA{A: 255})
 	}()
 	//
-	// (ob *PDF) SetColor(nameOrHTMLColor string) *PDF
+	// (p *PDF) SetColor(nameOrHTMLColor string) *PDF
 	//
 	// test various named colors and codes
 	for _, test := range []struct {
@@ -554,7 +554,7 @@ func Test_PDF_CurrentPage_(t *testing.T) {
 // Test_PDF_DocAuthor_ is the unit test for
 func Test_PDF_DocAuthor_(t *testing.T) {
 	//
-	// (ob *PDF) DocAuthor() string
+	// (p *PDF) DocAuthor() string
 	//
 	func() {
 		var doc PDF // uninitialized PDF
@@ -565,7 +565,7 @@ func Test_PDF_DocAuthor_(t *testing.T) {
 		tEqual(t, doc.DocAuthor(), "")
 	}()
 	//
-	// (ob *PDF) SetDocAuthor(s string) *PDF
+	// (p *PDF) SetDocAuthor(s string) *PDF
 	//
 	func() {
 		var doc PDF // uninitialized PDF
@@ -615,7 +615,7 @@ func Test_PDF_DocAuthor_(t *testing.T) {
 // Test_PDF_DocCreator_ is the unit test for
 func Test_PDF_DocCreator_(t *testing.T) {
 	//
-	// (ob *PDF) DocCreator() string
+	// (p *PDF) DocCreator() string
 	//
 	func() {
 		var doc PDF // uninitialized PDF
@@ -626,7 +626,7 @@ func Test_PDF_DocCreator_(t *testing.T) {
 		tEqual(t, doc.DocCreator(), "")
 	}()
 	//
-	// (ob *PDF) SetDocCreator(s string) *PDF
+	// (p *PDF) SetDocCreator(s string) *PDF
 	//
 	func() {
 		var doc PDF // uninitialized PDF
@@ -676,7 +676,7 @@ func Test_PDF_DocCreator_(t *testing.T) {
 // Test_PDF_DocKeywords_ is the unit test for
 func Test_PDF_DocKeywords_(t *testing.T) {
 	//
-	// (ob *PDF) DocKeywords() string
+	// (p *PDF) DocKeywords() string
 	//
 	func() {
 		var doc PDF // uninitialized PDF
@@ -687,7 +687,7 @@ func Test_PDF_DocKeywords_(t *testing.T) {
 		tEqual(t, doc.DocKeywords(), "")
 	}()
 	//
-	// (ob *PDF) SetDocKeywords(s string) *PDF
+	// (p *PDF) SetDocKeywords(s string) *PDF
 	//
 	func() {
 		var doc PDF // uninitialized PDF
@@ -737,7 +737,7 @@ func Test_PDF_DocKeywords_(t *testing.T) {
 // Test_PDF_DocSubject_ is the unit test for
 func Test_PDF_DocSubject_(t *testing.T) {
 	//
-	// (ob *PDF) DocSubject() string
+	// (p *PDF) DocSubject() string
 	//
 	func() {
 		var doc PDF // uninitialized PDF
@@ -748,7 +748,7 @@ func Test_PDF_DocSubject_(t *testing.T) {
 		tEqual(t, doc.DocSubject(), "")
 	}()
 	//
-	// (ob *PDF) SetDocSubject(s string) *PDF
+	// (p *PDF) SetDocSubject(s string) *PDF
 	//
 	func() {
 		var doc PDF // uninitialized PDF
@@ -798,7 +798,7 @@ func Test_PDF_DocSubject_(t *testing.T) {
 // Test_PDF_DocTitle_ is the unit test for
 func Test_PDF_DocTitle_(t *testing.T) {
 	//
-	// (ob *PDF) DocTitle() string
+	// (p *PDF) DocTitle() string
 	//
 	func() {
 		var doc PDF // uninitialized PDF
@@ -809,7 +809,7 @@ func Test_PDF_DocTitle_(t *testing.T) {
 		tEqual(t, doc.DocTitle(), "")
 	}()
 	//
-	// (ob *PDF) SetDocTitle(s string) *PDF
+	// (p *PDF) SetDocTitle(s string) *PDF
 	//
 	func() {
 		var doc PDF // uninitialized PDF
@@ -2215,7 +2215,7 @@ func Test_PDF_FillCircle_(t *testing.T) {
 // Test_PDF_FontName_ is the unit test for
 func Test_PDF_FontName_(t *testing.T) {
 	//
-	// (ob *PDF) FontName() string
+	// (p *PDF) FontName() string
 	//
 	func() {
 		var doc PDF // uninitialized PDF
@@ -2226,7 +2226,7 @@ func Test_PDF_FontName_(t *testing.T) {
 		tEqual(t, doc.FontName(), "Helvetica")
 	}()
 	//
-	// (ob *PDF) SetFontName(name string) *PDF
+	// (p *PDF) SetFontName(name string) *PDF
 	//
 	func() {
 		var doc PDF // uninitialized PDF
@@ -2288,7 +2288,7 @@ func Test_PDF_FontName_(t *testing.T) {
 // Test_PDF_FontSize_ is the unit test for PDF.FontSize() and SetFontSize()
 func Test_PDF_FontSize_(t *testing.T) {
 	//
-	// (ob *PDF) FontSize() string
+	// (p *PDF) FontSize() string
 	//
 	func() {
 		var doc PDF // uninitialized PDF
@@ -2299,7 +2299,7 @@ func Test_PDF_FontSize_(t *testing.T) {
 		tEqual(t, doc.FontSize(), 10)
 	}()
 	//
-	// (ob *PDF) SetFontSize(name string) *PDF
+	// (p *PDF) SetFontSize(name string) *PDF
 	//
 	func() {
 		var doc PDF // uninitialized PDF
@@ -3325,7 +3325,7 @@ func Test_PDF_SetXY_(t *testing.T) {
 } //                                                             Test_PDF_SetXY_
 
 // Test_PDF_ToColor_1_ is the unit test for
-// (ob *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error)
+// (p *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error)
 func Test_PDF_ToColor_1_(t *testing.T) {
 	func() {
 		var doc PDF
@@ -3671,7 +3671,7 @@ func Test_PDF_ToUnits_(t *testing.T) {
 // Test_PDF_Units_ tests PDF.Units() and SetUnits()
 func Test_PDF_Units_(t *testing.T) {
 	//
-	// (ob *PDF) Units() string
+	// (p *PDF) Units() string
 	//
 	func() {
 		var doc PDF // uninitialized PDF
@@ -3682,7 +3682,7 @@ func Test_PDF_Units_(t *testing.T) {
 		tEqual(t, doc.Units(), "POINT")
 	}()
 	//
-	// (ob *PDF) SetUnits(units string) *PDF
+	// (p *PDF) SetUnits(units string) *PDF
 	//
 	func() {
 		doc := NewPDF("A4")
