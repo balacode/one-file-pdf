@@ -289,7 +289,9 @@ func (ob *PDF) SetCurrentPage(pageNo int) *PDF {
 	if pageNo < 1 || pageNo > len(ob.pages) {
 		ob.putError(0xE65AF0, "pageNo out of range",
 			fmt.Sprint("pageNo:", pageNo, " range:1..", len(ob.pages)))
+		return ob
 	}
+	ob.pageNo = pageNo - 1
 	return ob
 } //                                                              SetCurrentPage
 
