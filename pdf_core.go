@@ -244,7 +244,7 @@ func (ob *PDF) PageWidth() float64 { return ob.ToUnits(ob.paperSize.widthPt) }
 func (ob *PDF) Color() color.RGBA { ob.init(); return ob.color }
 
 // SetColor sets the current color using a web/X11 color name
-// (e.g. "HoneyDew") or HTML color value such as "#191970"
+// (e.g. "HONEY DEW") or HTML color value such as "#191970"
 // for midnight blue (#RRGGBB). The current color is used
 // for subsequent text and line drawing and fills.
 // If the name is unknown or invalid, sets color to black.
@@ -728,7 +728,7 @@ func (ob *PDF) TextWidth(s string) float64 {
 } //                                                                   TextWidth
 
 // ToColor returns an RGBA color value from a web/X11 color name
-// (e.g. "HoneyDew") or HTML color value such as "#191970"
+// (e.g. "HONEY DEW") or HTML color value such as "#191970"
 // If the name or code is unknown or invalid, returns zero value (black).
 func (ob *PDF) ToColor(nameOrHTMLColor string) (color.RGBA, error) {
 	//
@@ -1045,7 +1045,7 @@ func (ob *PDF) drawTextLine(s string) *PDF {
 		ob.write("BT ", ob.page.horzScaling, " Tz ET\n")
 		// BT: begin text  n0 Tz: set horiz. text scaling to n0%  ET: end text
 	}
-	ob.writeMode(true) // fill/nonStroke
+	ob.writeMode(true) // fill / non-stroke
 	if handler == nil {
 		ob.write("BT ", int(ob.page.x), " ", int(ob.page.y),
 			" Td (", ob.escape(s), ") Tj ET\n")
